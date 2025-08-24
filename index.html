@@ -8048,30 +8048,43 @@ case 'qzone_post':
                     continue; 
 
                 case 'update_status':
-                    // 1. 更新内存中的状态对象
-                    chat.status.text = msgData.status_text;
-                    chat.status.isBusy = msgData.is_busy || false;
-                    chat.status.lastUpdate = Date.now();
-                    
-                    // 2. 创建一条对用户可见的系统提示消息
-                    const statusUpdateMessage = {
-                        role: 'system',
-                        type: 'pat_message',
-                        content: `[${chat.name}的状态已更新为: ${msgData.status_text}]`,
-                        timestamp: Date.now()
-                    };
-                    chat.history.push(statusUpdateMessage);
+                    // 【疫苗代码开始】
+                    // 检查AI发来的指令是否包含有效的状态文本
+                    if (msgData.status_text && typeof msgData.status_text === 'string') {
+                        
+                        // 【核心】在更新前，同样检查 status 对象是否存在，不存在就创建一个
+                        if (!chat.status) {
+                            chat.status = { text: '在线', isBusy: false, lastUpdate: Date.now() };
+                        }
 
-                    // 3. 【核心修复】将包含新状态的chat对象保存回数据库
-                    await db.chats.put(chat);
+                        // 1. 更新内存中的状态对象
+                        chat.status.text = msgData.status_text;
+                        chat.status.isBusy = msgData.is_busy || false;
+                        chat.status.lastUpdate = Date.now();
+                        
+                        // 2. 创建一条对用户可见的系统提示消息
+                        const statusUpdateMessage = {
+                            role: 'system',
+                            type: 'pat_message',
+                            content: `[${chat.name}的状态已更新为: ${msgData.status_text}]`,
+                            timestamp: Date.now()
+                        };
+                        chat.history.push(statusUpdateMessage);
 
-                    // 4. 更新UI
-                    if (isViewingThisChat) {
-                        appendMessage(statusUpdateMessage, chat);
-                        // 重新渲染聊天界面以立即显示顶栏更新
-                        renderChatInterface(chatId);
+                        // 3. 将包含新状态的chat对象保存回数据库
+                        await db.chats.put(chat);
+
+                        // 4. 更新UI
+                        if (isViewingThisChat) {
+                            appendMessage(statusUpdateMessage, chat);
+                            renderChatInterface(chatId);
+                        }
+                        renderChatList();
+                    } else {
+                        // 如果指令是破损的，就在控制台里警告一下，但什么也不做，防止程序被“感染”
+                        console.warn('AI试图更新状态，但指令不完整，已忽略:', msgData);
                     }
-                    renderChatList(); // 更新聊天列表的状态显示
+                    // 【疫苗代码结束】
                     
                     continue; 
 
