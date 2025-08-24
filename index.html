@@ -12587,34 +12587,37 @@ applyAppIcons();
 exitSelectionMode(); state.activeChatId = null; showScreen('chat-list-screen'); });
             
             document.getElementById('add-chat-btn').addEventListener('click', async () => { const name = await showCustomPrompt('创建新聊天', '请输入Ta的名字'); if (name && name.trim()) { const newChatId = 'chat_' + Date.now(); 
-const newChat = { 
-    id: newChatId, 
-    name: name.trim(), 
-    isGroup: false,                         relationship: {
-                            status: 'friend', // 'friend', 'blocked_by_user', 'pending_user_approval'
-                            blockedTimestamp: null,
-                            applicationReason: ''
-                        },
-                        status: {
-                            text: '在线',
-                            lastUpdate: Date.now(),
-                            isBusy: false 
-                        },
-    settings: { 
-        aiPersona: '你是谁呀。', 
-        myPersona: '我是谁呀。', 
-        maxMemory: 10, 
-        aiAvatar: defaultAvatar, 
-        myAvatar: defaultAvatar, 
-        background: '', 
-        theme: 'default', 
-    fontSize: 13, 
-    customCss: '', // <--- 新增这行
-    linkedWorldBookIds: [], 
-    aiAvatarLibrary: [],
-    }, 
-    history: [], 
-    musicData: { totalTime: 0 } 
+const newChat = {
+    id: newChatId,
+    name: name.trim(),
+    isGroup: false,
+    // --- 本汪在这里加了东西！ ---
+    relationship: {
+        status: 'friend', // 'friend', 'blocked_by_user', 'pending_user_approval'
+        blockedTimestamp: null,
+        applicationReason: ''
+    },
+    status: {
+        text: '在线',
+        lastUpdate: Date.now(),
+        isBusy: false
+    },
+    // --- 添加结束 ---
+    settings: {
+        aiPersona: '你是谁呀。',
+        myPersona: '我是谁呀。',
+        maxMemory: 10,
+        aiAvatar: defaultAvatar,
+        myAvatar: defaultAvatar,
+        background: '',
+        theme: 'default',
+        fontSize: 13,
+        customCss: '',
+        linkedWorldBookIds: [],
+        aiAvatarLibrary: [],
+    },
+    history: [],
+    musicData: { totalTime: 0 }
 };
 state.chats[newChatId] = newChat; await db.chats.put(newChat); renderChatList(); } });
 
