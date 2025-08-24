@@ -14628,7 +14628,7 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
 
 document.getElementById('chat-header-status').addEventListener('click', handleEditStatusClick);
 /**
- * 【全新】处理用户点击状态栏，弹出编辑框让用户修改AI的当前状态
+ * 【最终修复版】处理用户点击状态栏，弹出编辑框让用户修改AI的当前状态
  */
 async function handleEditStatusClick() {
     // 1. 安全检查，确保在单聊界面
@@ -14637,30 +14637,36 @@ async function handleEditStatusClick() {
     }
     const chat = state.chats[state.activeChatId];
 
-    // 2. 弹出输入框，让用户输入新的状态，并将当前状态作为默认值
+    // 2. 【核心修复】在读取状态前，先检查 status 对象是否存在
+    // 如果不存在，就立刻为它创建一个默认的！
+    if (!chat.status) {
+        chat.status = { text: '在线', isBusy: false, lastUpdate: Date.now() };
+    }
+
+    // 3. 弹出输入框，让用户输入新的状态，并将当前状态作为默认值
     const newStatusText = await showCustomPrompt(
         '编辑对方状态',
         '请输入对方现在的新状态：',
-        chat.status.text // 将当前状态作为输入框的默认内容
+        chat.status.text // 现在这里绝对不会是 undefined 了
     );
 
-    // 3. 如果用户输入了内容并点击了“确定”
+    // 4. 如果用户输入了内容并点击了“确定”
     if (newStatusText !== null) {
-        // 4. 更新内存和数据库中的状态数据
+        // 5. 更新内存和数据库中的状态数据
         chat.status.text = newStatusText.trim() || '在线'; // 如果用户清空了，就默认为“在线”
         chat.status.isBusy = false; // 每次手动编辑都默认其不处于“忙碌”状态
         chat.status.lastUpdate = Date.now();
-        await db.chats.put(chat); // 【核心】保存到数据库
+        await db.chats.put(chat); // 【核心】将修复后的数据保存到数据库
 
-        // 5. 立刻刷新UI，让用户看到修改后的状态
+        // 6. 立刻刷新UI，让用户看到修改后的状态
         renderChatInterface(state.activeChatId);
         renderChatList();
         
-        // 6. 给出一个无伤大雅的成功提示
+        // 7. 给出一个无伤大雅的成功提示
         await showCustomAlert('状态已更新', `“${chat.name}”的当前状态已更新为：${chat.status.text}`);
     }
 }
-			
+	
 // 在 init() 的事件监听器区域添加
 document.getElementById('selection-share-btn').addEventListener('click', () => {
     if (selectedMessages.size > 0) {
