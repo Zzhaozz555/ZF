@@ -8048,10 +8048,12 @@ case 'qzone_post':
                     continue; 
 
                 case 'update_status':
+                    // 1. 更新内存中的状态对象
                     chat.status.text = msgData.status_text;
                     chat.status.isBusy = msgData.is_busy || false;
                     chat.status.lastUpdate = Date.now();
                     
+                    // 2. 创建一条对用户可见的系统提示消息
                     const statusUpdateMessage = {
                         role: 'system',
                         type: 'pat_message',
@@ -8060,11 +8062,16 @@ case 'qzone_post':
                     };
                     chat.history.push(statusUpdateMessage);
 
+                    // 3. 【核心修复】将包含新状态的chat对象保存回数据库
+                    await db.chats.put(chat);
+
+                    // 4. 更新UI
                     if (isViewingThisChat) {
                         appendMessage(statusUpdateMessage, chat);
+                        // 重新渲染聊天界面以立即显示顶栏更新
+                        renderChatInterface(chatId);
                     }
-                    
-                    renderChatList(); 
+                    renderChatList(); // 更新聊天列表的状态显示
                     
                     continue; 
 
