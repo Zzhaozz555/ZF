@@ -4965,6 +4965,17 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <img id="bg-preview" class="bg-preview-img">
                 <input type="file" id="bg-input" accept="image/*" style="display: none;">
             </div>
+
+<!-- ▼▼▼ 【全新】后台活动独立开关 ▼▼▼ -->
+<div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+    <label for="background-activity-individual-switch" style="margin-bottom: 0;">后台活动</label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="background-activity-individual-switch">
+        <span class="slider"></span>
+    </label>
+</div>
+<!-- ▲▲▲ 新增代码结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新】感知现实时间开关 ▼▼▼ -->
 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
     <label for="time-perception-switch" style="margin-bottom: 0;">感知现实时间</label>
@@ -9194,44 +9205,40 @@ function stopBackgroundSimulation() {
  */
 function runBackgroundSimulationTick() {
     console.log("模拟器心跳 Tick...");
-    if (!state.globalSettings.enableBackgroundActivity) {
-        stopBackgroundSimulation();
-        return;
-    }
-    const allSingleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
+    
+    // 【【【核心逻辑修正！】】】
+    // 我们不再在函数开头检查全局开关！让定时器只要运行，就进入检查流程。
+    // if (!state.globalSettings.enableBackgroundActivity) { ... }  <-- 这段旧逻辑已被废除
 
+    const allSingleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
     if (allSingleChats.length === 0) return;
 
     allSingleChats.forEach(chat => {
-        // 【核心修正】将两种状态检查分离开，逻辑更清晰
+        // 【【【最高优先级检查！】】】
+        // 在检查任何具体行为之前，首先检查这个AI自己的独立开关。
+        // 这是它能否进行后台活动的唯一决定因素！
+        if (chat.settings.allowBackgroundActivity === false) {
+            console.log(`角色 "${chat.name}" 的独立开关为关闭状态，跳过所有后台活动。`);
+            return; // 使用 return 跳过当前循环，检查下一个AI
+        }
 
-        // 检查1：处理【被用户拉黑】的角色
+        // --- 后续所有行为逻辑，现在都处于“独立开关”的绝对控制之下 ---
         if (chat.relationship?.status === 'blocked_by_user') {
             const blockedTimestamp = chat.relationship.blockedTimestamp;
-            // 安全检查：确保有拉黑时间戳
             if (!blockedTimestamp) {
                 console.warn(`角色 "${chat.name}" 状态为拉黑，但缺少拉黑时间戳，跳过处理。`);
-                return; // 跳过这个角色，继续下一个
+                return;
             }
-
             const blockedDuration = Date.now() - blockedTimestamp;
             const cooldownMilliseconds = (state.globalSettings.blockCooldownHours || 1) * 60 * 60 * 1000;
-
-            console.log(`检查角色 "${chat.name}"：已拉黑 ${Math.round(blockedDuration/1000/60)}分钟，冷静期需 ${cooldownMilliseconds/1000/60}分钟。`); // 添加日志
-
-            // 【核心修改】移除了随机概率，只要冷静期一过，就触发！
+            
             if (blockedDuration > cooldownMilliseconds) {
-                console.log(`角色 "${chat.name}" 的冷静期已过，触发“反思”并申请好友事件...`);
-                
-                // 【重要】为了防止在AI响应前重复触发，我们在触发后立刻更新状态
-                chat.relationship.status = 'pending_system_reflection'; // 设置一个临时的、防止重复触发的状态
-                
+                console.log(`角色 "${chat.name}" 的冷静期已过，将触发申请好友事件...`);
+                chat.relationship.status = 'pending_system_reflection';
                 triggerAiFriendApplication(chat.id);
             }
         }
-        // 检查2：处理【好友关系】的正常后台活动
         else if (chat.relationship?.status === 'friend' && chat.id !== state.activeChatId) {
-            // 这里的随机触发逻辑保持不变，因为我们不希望所有好友同时行动
             if (Math.random() < 0.20) {
                 console.log(`角色 "${chat.name}" 被唤醒，准备独立行动...`);
                 triggerInactiveAiAction(chat.id);
@@ -12859,51 +12866,43 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
     showScreen('home-screen');
 });
 // ▲▲▲ 替换结束 ▲▲▲
-            document.getElementById('save-api-settings-btn').addEventListener('click', async () => { state.apiConfig.proxyUrl = document.getElementById('proxy-url').value.trim(); state.apiConfig.apiKey = document.getElementById('api-key').value.trim(); state.apiConfig.model = document.getElementById('model-select').value; await db.apiConfig.put(state.apiConfig); 
+            document.getElementById('save-api-settings-btn').addEventListener('click', async () => {
+    state.apiConfig.proxyUrl = document.getElementById('proxy-url').value.trim();
+    state.apiConfig.apiKey = document.getElementById('api-key').value.trim();
+    state.apiConfig.model = document.getElementById('model-select').value;
+    await db.apiConfig.put(state.apiConfig);
 
-// 在 'save-api-settings-btn' 的 click 事件监听器内部
-// await db.apiConfig.put(state.apiConfig); 这行之后
+    const backgroundSwitch = document.getElementById('background-activity-switch');
+    const intervalInput = document.getElementById('background-interval-input');
+    const newEnableState = backgroundSwitch.checked;
 
-// ▼▼▼ 将之前那段保存后台活动设置的逻辑，替换为下面这个增强版 ▼▼▼
-
-const backgroundSwitch = document.getElementById('background-activity-switch');
-const intervalInput = document.getElementById('background-interval-input');
-const newEnableState = backgroundSwitch.checked;
-const oldEnableState = state.globalSettings.enableBackgroundActivity || false;
-
-// 只有在用户“从关到开”时，才弹出警告
-if (newEnableState && !oldEnableState) {
-    const userConfirmed = confirm(
-        "【高费用警告】\n\n" +
-        "您正在启用“后台角色活动”功能。\n\n" +
-        "这会使您的AI角色们在您不和他们聊天时，也能“独立思考”并主动给您发消息或进行社交互动，极大地增强沉浸感。\n\n" +
-        "但请注意：\n" +
-        "这会【在后台自动、定期地调用API】，即使您不进行任何操作。根据您的角色数量和检测间隔，这可能会导致您的API费用显著增加。\n\n" +
-        "您确定要开启吗？"
-    );
-
-    if (!userConfirmed) {
-        backgroundSwitch.checked = false; // 用户取消，把开关拨回去
-        return; // 阻止后续逻辑
+    state.globalSettings.enableBackgroundActivity = newEnableState;
+    state.globalSettings.backgroundActivityInterval = parseInt(intervalInput.value) || 60;
+    state.globalSettings.blockCooldownHours = parseFloat(document.getElementById('block-cooldown-input').value) || 1;
+    
+    // 【核心升级】当操作全局开关时，遍历所有AI，同步它们的独立开关状态
+    for (const chatId in state.chats) {
+        const chat = state.chats[chatId];
+        if (!chat.isGroup) { 
+            if (!chat.settings) chat.settings = {}; 
+            chat.settings.allowBackgroundActivity = newEnableState;
+            await db.chats.put(chat); 
+        }
     }
-}
+    
+    await db.globalSettings.put(state.globalSettings);
 
-state.globalSettings.enableBackgroundActivity = newEnableState;
-state.globalSettings.backgroundActivityInterval = parseInt(intervalInput.value) || 60;
-state.globalSettings.blockCooldownHours = parseFloat(document.getElementById('block-cooldown-input').value) || 1;
-await db.globalSettings.put(state.globalSettings);
-
-// 动态启动或停止模拟器
-stopBackgroundSimulation();
-if (state.globalSettings.enableBackgroundActivity) {
-    startBackgroundSimulation();
-    console.log(`后台活动模拟已启动，间隔: ${state.globalSettings.backgroundActivityInterval}秒`);
-} else {
-    console.log("后台活动模拟已停止。");
-}
-// ▲▲▲ 替换结束 ▲▲▲
-
-alert('API设置已保存!'); });
+    // 总定时器的启动/停止逻辑保持不变，它只负责“心跳”
+    if (newEnableState) {
+        startBackgroundSimulation();
+        console.log(`后台活动总开关已开启，所有AI的独立开关已同步为ON。`);
+    } else {
+        stopBackgroundSimulation();
+        console.log("后台活动总开关已关闭，所有AI的独立开关已同步为OFF。");
+    }
+    
+    alert('API设置已保存!');
+});
 
                     // gemini 密钥聚焦的时候显示明文
         const ApiKeyInput = document.getElementById('api-key')
@@ -13051,7 +13050,8 @@ document.getElementById('time-perception-switch').checked = chat.settings.percei
     document.getElementById('font-size-value').textContent = `${fontSizeSlider.value}px`;
     const customCssInput = document.getElementById('custom-css-input');
     customCssInput.value = chat.settings.customCss || '';
-    
+document.getElementById('background-activity-individual-switch').checked = chat.settings.allowBackgroundActivity !== false; // 【核心】加载后台活动独立开关的状态（默认开启）
+document.getElementById('time-perception-switch').checked = chat.settings.perceiveTime !== false; // 【核心】加载时间感知开关的状态    
     updateSettingsPreview(); 
     document.getElementById('chat-settings-modal').classList.add('visible');
 });
@@ -13115,7 +13115,10 @@ document.getElementById('save-chat-settings-btn').addEventListener('click', asyn
     chat.settings.fontSize = parseInt(document.getElementById('font-size-slider').value);
     chat.settings.customCss = document.getElementById('custom-css-input').value.trim();
 
-    chat.settings.myPersona = document.getElementById('my-persona').value;
+chat.settings.allowBackgroundActivity = document.getElementById('background-activity-individual-switch').checked; // 【核心】保存后台活动独立开关的状态
+chat.settings.perceiveTime = document.getElementById('time-perception-switch').checked; // 【核心】保存时间感知开关的状态
+    
+chat.settings.myPersona = document.getElementById('my-persona').value;
     chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
     const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container input[type="checkbox"]:checked');
     chat.settings.linkedWorldBookIds = Array.from(checkedBooks).map(cb => cb.value);
