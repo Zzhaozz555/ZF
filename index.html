@@ -4103,6 +4103,92 @@ input:checked + .slider:before {
 }
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】“我”的页面样式 (V5.1 - 布局恢复+图标移除最终版) ▼▼▼ */
+
+#me-view {
+    background-color: #f0f2f5;
+    display: flex;
+    flex-direction: column;
+}
+
+#phone-screen.dark-mode #me-view {
+    background-color: #000000;
+}
+
+.me-view-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.me-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    /* 【布局恢复1】精确控制头像和昵称的垂直位置 */
+    margin-top: 50px; 
+    margin-bottom: 50px; 
+}
+
+.me-avatar-container { width: 80px; height: 80px; cursor: pointer; }
+#me-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+#me-nickname { font-size: 22px; font-weight: 600; color: var(--text-primary); margin: 0; cursor: pointer; }
+
+.me-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* 【布局恢复2】移除所有位置控制，让它自然地跟在头像下方 */
+}
+
+.me-options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.me-option-item {
+    display: flex;
+    align-items: center;
+    /* 【图标移除修正1】移除图标和文字之间的间距 */
+    /* gap: 15px; */ 
+    padding: 16px;
+    background-color: var(--secondary-bg);
+    cursor: pointer;
+}
+
+#phone-screen.dark-mode .me-option-item {
+    background-color: #1c1c1e;
+}
+
+/* 【图标移除修正2】将所有图标的样式彻底删除 */
+.me-option-icon {
+   display: none;
+}
+
+.me-option-label {
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+/* --- iOS风格Toggle Switch开关样式 (保持不变) --- */
+.me-option-item .toggle-switch { margin-left: auto; }
+.toggle-switch { position: relative; display: inline-block; width: 51px; height: 31px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e9e9eb; transition: .4s; border-radius: 34px; }
+#phone-screen.dark-mode .slider { background-color: #39393d; }
+.slider:before { position: absolute; content: ""; height: 27px; width: 27px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+input:checked + .slider { background-color: #34c759; }
+input:checked + .slider:before { transform: translateX(20px); }
+
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+```**本次CSS重构的核心：**
+
     </style>
 </head>
 <body>
@@ -4335,23 +4421,64 @@ input:checked + .slider:before {
         </div>
         <div id="memories-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
+
+<!-- ▼▼▼ 【全新】“我”的页面视图 ▼▼▼ -->
+<div id="me-view" class="chat-list-view">
+    <div class="me-view-content">
+        <div class="me-profile-section">
+            <div class="me-avatar-container">
+                <img id="me-avatar-img" src="https://files.catbox.moe/q6z5fc.jpeg" alt="我的头像">
+                <input type="file" id="me-avatar-input" accept="image/*" hidden>
+            </div>
+            <h2 id="me-nickname">{{user}}</h2>
+        </div>
+                                     <div class="me-options-list">
+        <div class="me-options-group">
+            <div class="me-option-item">
+                <!-- 图标已移除 -->
+                <span class="me-option-label">服务</span>
+            </div>
+            <div class="me-option-item">
+                <!-- 图标已移除 -->
+                <span class="me-option-label">IP地址</span>
+            </div>
+            <div class="me-option-item">
+                <!-- 图标已移除 -->
+                <span class="me-option-label">夜间模式</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="me-dark-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="me-options-group">
+            <div class="me-option-item">
+                <!-- 图标已移除 -->
+                <span class="me-option-label">设置</span>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
     
     <!-- 底部导航栏 -->
     <div id="chat-list-bottom-nav">
-        <div class="nav-item active" data-view="messages-view">
-            <span>消息</span>
-        </div>
-        <div class="nav-item" data-view="qzone-screen">
-            <span>动态</span>
-        </div>
-        <div class="nav-item" data-view="memories-view">
-            <span>回忆</span>
-        </div>
-        <!-- 【已修复】这里是我们上次修改的“我”按钮 -->
-        <div class="nav-item"> 
-            <span>我</span>
-        </div>
+    <div class="nav-item active" data-view="messages-view">
+        <span>消息</span>
     </div>
+    <div class="nav-item" data-view="qzone-screen">
+        <span>动态</span>
+    </div>
+    <div class="nav-item" data-view="memories-view">
+        <span>回忆</span>
+    </div>
+    <!-- 【核心修改】为“我”按钮连接到新的视图 -->
+    <div class="nav-item" data-view="me-view"> 
+        <span>我</span>
+    </div>
+</div>
 </div>
 <!-- ▲▲▲ 替换区域结束 ▲▲▲ -->
 
@@ -5622,64 +5749,62 @@ db.version(23).stores({
         window.updateListenTogetherIconProxy = () => {};
 
         function switchToChatListView(viewId) {
-            const chatListScreen = document.getElementById('chat-list-screen');
-            const views = {
-                'messages-view': document.getElementById('messages-view'),
-                'qzone-screen': document.getElementById('qzone-screen'),
-                'favorites-view': document.getElementById('favorites-view'),
-        'memories-view': document.getElementById('memories-view') // <-- 新增这一行
+    const chatListScreen = document.getElementById('chat-list-screen');
+    const views = {
+        'messages-view': document.getElementById('messages-view'),
+        'qzone-screen': document.getElementById('qzone-screen'),
+        'favorites-view': document.getElementById('favorites-view'),
+        'memories-view': document.getElementById('memories-view'),
+        'me-view': document.getElementById('me-view') // 【核心1】把新房间加进来
     };
-            const mainHeader = document.getElementById('main-chat-list-header');
-            const mainBottomNav = document.getElementById('chat-list-bottom-nav'); // 获取主导航栏
+    const mainHeader = document.getElementById('main-chat-list-header');
+    const mainBottomNav = document.getElementById('chat-list-bottom-nav');
 
-            if (isFavoritesSelectionMode) {
-                document.getElementById('favorites-edit-btn').click(); 
-            }
+    if (isFavoritesSelectionMode) {
+        document.getElementById('favorites-edit-btn').click();
+    }
 
-            // 隐藏所有视图
-            Object.values(views).forEach(v => v.classList.remove('active'));
-            // 显示目标视图
-            if (views[viewId]) {
-                views[viewId].classList.add('active');
-            }
+    Object.values(views).forEach(v => v.classList.remove('active'));
+    if (views[viewId]) {
+        views[viewId].classList.add('active');
+    }
 
-            // 更新底部导航栏高亮
-            document.querySelectorAll('#chat-list-bottom-nav .nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.view === viewId);
-            });
-            
-            // ▼▼▼ 【核心修正】在这里统一管理所有UI元素的显隐 ▼▼▼
-            if (viewId === 'messages-view') {
-                mainHeader.style.display = 'flex';
-                mainBottomNav.style.display = 'flex';
-            } else {
-                mainHeader.style.display = 'none';
-                mainBottomNav.style.display = 'none';
-            }
-            // ▲▲▲ 修正结束 ▲▲▲
+    document.querySelectorAll('#chat-list-bottom-nav .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.view === viewId);
+    });
+    
+    // 【核心2】全新的、绝对正确的显示/隐藏逻辑！
+    if (viewId === 'messages-view' || viewId === 'me-view') {
+        mainHeader.style.display = 'flex'; // 在“消息”和“我”都显示主头部
+        mainBottomNav.style.display = 'flex'; // 在“消息”和“我”都显示底栏
+        if (viewId === 'me-view') {
+            mainHeader.style.visibility = 'hidden'; // 在“我”页面，虽然头部占着位置，但让它隐形
+        } else {
+            mainHeader.style.visibility = 'visible'; // 在“消息”页面，恢复可见
+        }
+    } else {
+        mainHeader.style.display = 'none'; // 在其他所有页面，都不显示主头部
+        mainBottomNav.style.display = 'none'; // 在其他所有页面，都不显示底栏
+    }
 
     if (viewId !== 'memories-view') {
         activeCountdownTimers.forEach(timerId => clearInterval(timerId));
         activeCountdownTimers = [];
     }
 
-            // 根据视图ID执行特定的渲染/更新逻辑
-            switch (viewId) {
-                case 'qzone-screen':
-                    views['qzone-screen'].style.backgroundColor = '#f0f2f5';
-                    updateUnreadIndicator(0);
-                    renderQzoneScreen();
-                    renderQzonePosts();
-                    break;
-                case 'favorites-view':
-                    views['favorites-view'].style.backgroundColor = '#f9f9f9';
-                    renderFavoritesScreen();
-                    break;
-                case 'messages-view':
-                    // 如果需要，可以在这里添加返回消息列表时要执行的逻辑
-                    break;
-            }
-        }
+    switch (viewId) {
+        case 'qzone-screen':
+            views['qzone-screen'].style.backgroundColor = '#f0f2f5';
+            updateUnreadIndicator(0);
+            renderQzoneScreen();
+            renderQzonePosts();
+            break;
+        case 'favorites-view':
+            views['favorites-view'].style.backgroundColor = '#f9f9f9';
+            renderFavoritesScreen();
+            break;
+    }
+}
         
         function renderQzoneScreen() {
             if (state && state.qzoneSettings) {
@@ -13720,6 +13845,75 @@ postsList.addEventListener('click', async (e) => {
                 switchToChatListView('favorites-view');
             });
             // ▲▲▲ 新增代码结束 ▲▲▲
+
+        // ▼▼▼ 【全新】“我”的页面所有功能逻辑 ▼▼▼
+        
+        // 1. 渲染“我”页面的初始数据
+        function renderMeView() {
+            if (state && state.qzoneSettings) {
+                document.getElementById('me-avatar-img').src = state.qzoneSettings.avatar;
+                document.getElementById('me-nickname').textContent = state.qzoneSettings.nickname;
+            }
+        }
+        
+        // 2. 为“我”页面的按钮绑定事件
+        document.querySelector('.nav-item[data-view="me-view"]').addEventListener('click', renderMeView);
+
+        // 3. 点击头像，触发文件选择
+        document.querySelector('.me-avatar-container').addEventListener('click', () => {
+            document.getElementById('me-avatar-input').click();
+        });
+        
+        // 4. 选择新头像后的处理逻辑
+        document.getElementById('me-avatar-input').addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const dataUrl = await new Promise(res => {
+                    const reader = new FileReader();
+                    reader.onload = () => res(reader.result);
+                    reader.readAsDataURL(file);
+                });
+                // 更新 state, UI, 和数据库
+                state.qzoneSettings.avatar = dataUrl;
+                await db.qzoneSettings.put(state.qzoneSettings);
+                renderMeView(); // 刷新“我”页面
+                renderQzoneScreen(); // 同步刷新“动态”页面
+            }
+            event.target.value = null; // 清空选择，以便下次还能选择同一张图
+        });
+        
+        // 5. 点击昵称，弹出修改框
+        document.getElementById('me-nickname').addEventListener('click', async () => {
+            const currentNickname = state.qzoneSettings.nickname;
+            const newNickname = await showCustomPrompt("修改昵称", "请输入你的新昵称", currentNickname);
+            
+            // 如果用户输入了新昵称，并且和旧的不一样
+            if (newNickname && newNickname.trim() && newNickname.trim() !== currentNickname) {
+                const trimmedNickname = newNickname.trim();
+                // 更新 state, UI, 和数据库
+                state.qzoneSettings.nickname = trimmedNickname;
+                await db.qzoneSettings.put(state.qzoneSettings);
+                renderMeView(); // 刷新“我”页面
+                renderQzoneScreen(); // 同步刷新“动态”页面
+
+                // 【核心】通知所有AI，你的昵称变了！
+                for (const chatId in state.chats) {
+                    const chat = state.chats[chatId];
+                    if (!chat.isGroup) { // 只通知单聊的AI
+                        const historyMessage = {
+                            role: 'system',
+                            content: `[系统提示：用户的昵称刚刚从“${currentNickname}”修改为了“${trimmedNickname}”。请根据你的人设，决定是否要对此事发表评论。]`,
+                            timestamp: Date.now(),
+                            isHidden: true // 这条消息对用户不可见
+                        };
+                        chat.history.push(historyMessage);
+                        await db.chats.put(chat);
+                    }
+                }
+            }
+        });
+
+        // ▲▲▲ 新增代码结束 ▲▲▲
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，检查并确保你有这段完整的代码 ▼▼▼
 
