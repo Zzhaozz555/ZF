@@ -4097,6 +4097,12 @@ input:checked + .slider:before {
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* === 【全新美化】动态功能栏四按钮样式 === */
+.qzone-actions-bar .action-item {
+    font-size: 14px; /* 将字体稍微缩小一点，避免四个字挤在一起 */
+}
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
     </style>
 </head>
 <body>
@@ -4258,7 +4264,7 @@ input:checked + .slider:before {
     <!-- 主头部 (只在消息列表显示) -->
     <div class="header" id="main-chat-list-header">
         <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
-<span id="chat-list-title">消息</span>
+        <span id="chat-list-title">消息</span>
         <div class="header-actions">
             <span class="action-btn" id="add-group-chat-btn" title="创建群聊"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 17.5C19.1569 17.5 20.5 16.1569 20.5 14.5C20.5 12.8431 19.1569 11.5 17.5 11.5C15.8431 11.5 14.5 12.8431 14.5 14.5C14.5 16.1569 15.8431 17.5 17.5 17.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 21L19 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 11.5C10.1569 11.5 11.5 10.1569 11.5 8.5C11.5 6.84315 10.1569 5.5 8.5 5.5C6.84315 5.5 5.5 6.84315 5.5 8.5C5.5 10.1569 6.84315 11.5 8.5 11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.5 14.5H4.5C3.39543 14.5 2.5 15.3954 2.5 16.5V18.5H12.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <span class="action-btn" id="add-chat-btn">+</span>
@@ -4296,6 +4302,8 @@ input:checked + .slider:before {
                 <div class="action-item" id="create-shuoshuo-btn"><span>说说</span></div>
                 <div class="action-item" id="create-post-btn"><span>动态</span></div>
                 <div class="action-item" id="open-album-btn"><span>相册</span></div>
+                <!-- 【已修复】这里是我们上次添加的收藏按钮 -->
+                <div class="action-item" id="open-favorites-btn"><span>收藏</span></div>
             </div>
             <div id="qzone-posts-list"></div>
         </div>
@@ -4303,60 +4311,47 @@ input:checked + .slider:before {
 
     <!-- 收藏界面视图 -->
     <div id="favorites-view" class="chat-list-view">
-    <div class="header"> 
-        <span class="back-btn" id="favorites-back-btn">‹</span>
-        <span>我的收藏</span>
-        <!-- 新增的编辑按钮 -->
-        <span class="action-btn" id="favorites-edit-btn">编辑</span>
-    </div>
-
-        <!-- 【新增】搜索栏容器 -->
+        <div class="header"> 
+            <span class="back-btn" id="favorites-back-btn">‹</span>
+            <span>我的收藏</span>
+            <span class="action-btn" id="favorites-edit-btn">编辑</span>
+        </div>
         <div class="search-bar-container">
             <input type="search" id="favorites-search-input" placeholder="搜索收藏的标题、内容或作者...">
             <button id="favorites-search-clear-btn" class="search-clear-btn" style="display: none;">×</button>
         </div>
-
-        <div id="favorites-list" class="list-container">
-            <!-- 收藏内容将由JS动态生成在这里 -->
+        <div id="favorites-list" class="list-container"></div>
+        <div id="favorites-action-bar" style="display: none;">
+            <button id="favorites-delete-selected-btn" class="action-bar-btn">删除 (0)</button>
         </div>
-
-<!-- 新增：收藏页底部操作栏 -->
-<div id="favorites-action-bar" style="display: none;">
-    <button id="favorites-delete-selected-btn" class="action-bar-btn">删除 (0)</button>
-</div>
-
     </div>
 
-<!-- ▼▼▼ 【全新】回忆录界面视图 ▼▼▼ -->
-<div id="memories-view" class="chat-list-view">
-    <div class="header"> 
-        <span class="back-btn" id="memories-back-btn">‹</span>
-        <span>我们的回忆</span>
+    <!-- 回忆录界面视图 -->
+    <div id="memories-view" class="chat-list-view">
+        <div class="header"> 
+            <span class="back-btn" id="memories-back-btn">‹</span>
+            <span>我们的回忆</span>
             <span class="action-btn" id="add-countdown-btn">+</span>
         </div>
-    <div id="memories-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px;">
-        <!-- 回忆卡片将由JS动态生成在这里 -->
+        <div id="memories-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
-</div>
-<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
     
     <!-- 底部导航栏 -->
-<div id="chat-list-bottom-nav">
-    <div class="nav-item active" data-view="messages-view">
-        <span>消息</span>
+    <div id="chat-list-bottom-nav">
+        <div class="nav-item active" data-view="messages-view">
+            <span>消息</span>
+        </div>
+        <div class="nav-item" data-view="qzone-screen">
+            <span>动态</span>
+        </div>
+        <div class="nav-item" data-view="memories-view">
+            <span>回忆</span>
+        </div>
+        <!-- 【已修复】这里是我们上次修改的“我”按钮 -->
+        <div class="nav-item"> 
+            <span>我</span>
+        </div>
     </div>
-    <div class="nav-item" data-view="qzone-screen">
-        <span>动态</span>
-    </div>
-    <!-- ▼▼▼ 在“动态”和“收藏”之间，加入这个新页签 ▼▼▼ -->
-    <div class="nav-item" data-view="memories-view">
-        <span>回忆</span>
-    </div>
-    <!-- ▲▲▲ 添加结束 ▲▲▲ -->
-    <div class="nav-item" data-view="favorites-view">
-        <span>收藏</span>
-    </div>
-</div>
 </div>
 <!-- ▲▲▲ 替换区域结束 ▲▲▲ -->
 
@@ -13719,6 +13714,12 @@ postsList.addEventListener('click', async (e) => {
             document.getElementById('favorites-back-btn').addEventListener('click', () => switchToChatListView('messages-view'));
 
             // ▲▲▲ 添加结束 ▲▲▲
+
+            // ▼▼▼ 【全新】为动态页里的“收藏”按钮绑定点击事件 ▼▼▼
+            document.getElementById('open-favorites-btn').addEventListener('click', () => {
+                switchToChatListView('favorites-view');
+            });
+            // ▲▲▲ 新增代码结束 ▲▲▲
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，检查并确保你有这段完整的代码 ▼▼▼
 
