@@ -4965,6 +4965,15 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <img id="bg-preview" class="bg-preview-img">
                 <input type="file" id="bg-input" accept="image/*" style="display: none;">
             </div>
+<!-- ▼▼▼ 【全新】感知现实时间开关 ▼▼▼ -->
+<div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+    <label for="time-perception-switch" style="margin-bottom: 0;">感知现实时间</label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="time-perception-switch">
+        <span class="slider"></span>
+    </label>
+</div>
+<!-- ▲▲▲ 新增代码结束 ▲▲▲ -->
 <hr style="margin: 25px 0; border: none; border-top: 1px solid #eee;">
 <button class="form-button form-button-secondary" id="block-chat-btn" style="background-color: #ff3b30; color: white; border-color: #ff3b30;">拉黑对方</button>
 <button class="form-button form-button-secondary" id="clear-chat-btn">清空聊天记录</button></div><div class="modal-footer"><button class="cancel" id="cancel-chat-settings-btn">取消</button><button class="save" id="save-chat-settings-btn">保存</button></div></div></div>
@@ -7587,8 +7596,12 @@ ${contextSummary || "（无有效对话记录）"}
         const maxMemory = parseInt(chat.settings.maxMemory) || 10;
         const historySlice = chat.history.slice(-maxMemory);
 
-        // --- ▼▼▼ 全新添加的时间感知代码 ▼▼▼ ---
-        let timeContext = `\n- **当前时间**: ${currentTime}`;
+            // --- ▼▼▼ 【V2.0】带开关的时间感知代码 ▼▼▼ ---
+    let timeContext = ''; // 先创建一个空的容器
+    // 【核心】检查当前AI的设置，如果开关是打开的（或者从未设置过），才提供时间
+    if (chat.settings.perceiveTime !== false) { 
+        timeContext = `\n- **当前时间**: ${currentTime}`;
+    }
         const lastAiMessage = historySlice.filter(m => m.role === 'assistant' && !m.isHidden).slice(-1)[0];
 
         if (lastAiMessage) {
@@ -12980,6 +12993,7 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     document.getElementById('my-persona').value = chat.settings.myPersona;
     document.getElementById('my-avatar-preview').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
     document.getElementById('max-memory').value = chat.settings.maxMemory;
+document.getElementById('time-perception-switch').checked = chat.settings.perceiveTime !== false; // 【核心】加载时间感知开关的状态
     const bgPreview = document.getElementById('bg-preview');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     if (chat.settings.background) {
@@ -13117,6 +13131,7 @@ document.getElementById('save-chat-settings-btn').addEventListener('click', asyn
     }
 
     chat.settings.maxMemory = parseInt(document.getElementById('max-memory').value) || 10;
+        chat.settings.perceiveTime = document.getElementById('time-perception-switch').checked; // 【核心】保存时间感知开关的状态
     await db.chats.put(chat);
 
     applyScopedCss(chat.settings.customCss, '#chat-messages', 'custom-bubble-style');
