@@ -4187,6 +4187,222 @@ input:checked + .slider { background-color: #34c759; }
 input:checked + .slider:before { transform: translateX(20px); }
 
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】钱包 & 零钱 & 账单页面样式 ▼▼▼ */
+
+/* --- 1. 钱包、零钱、账单页面的通用背景色 --- */
+#wallet-screen,
+#change-screen,
+#billing-screen {
+    background-color: #f0f2f5;
+}
+#phone-screen.dark-mode #wallet-screen,
+#phone-screen.dark-mode #change-screen,
+#phone-screen.dark-mode #billing-screen {
+    background-color: #000000;
+}
+
+/* --- 2. 钱包页面 (#wallet-screen) --- */
+.wallet-content, .billing-content {
+    padding: 15px 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.wallet-group {
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    margin: 0 15px 15px 15px;
+    overflow: hidden;
+}
+.wallet-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 12px;
+    cursor: pointer;
+    position: relative;
+}
+.wallet-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50px; /* 与图标左边距对齐 */
+    right: 12px;
+    height: 1px;
+    background-color: var(--border-color);
+}
+.wallet-item .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 14px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.wallet-item .label {
+    flex-grow: 1;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+.wallet-item .value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-right: 5px;
+}
+.wallet-item .arrow-right {
+    font-size: 20px;
+    color: var(--text-secondary);
+}
+
+/* 钱包图标 (SVG代码绘制) */
+.wallet-item .icon.change {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23F6C659"/><path d="M12 5V7M12 17V19M8 9H16M8 15H16M15 9L9 15" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>');
+}
+.wallet-item .icon.bank-card {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="%235A88E4"/><rect x="5" y="14" width="6" height="2" rx="1" fill="white" opacity="0.7"/></svg>');
+}
+.wallet-item .icon.family-card {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.5,14.5 C20.5,15.6 19.6,16.5 18.5,16.5 H5.5 C4.4,16.5 3.5,15.6 3.5,14.5 V9.5 C3.5,8.4 4.4,7.5 5.5,7.5 H18.5 C19.6,7.5 20.5,8.4 20.5,9.5 Z" fill="%23FAB951"/><path d="M12 7.5a4 4 0 00-4 4" stroke="%23FAB951" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M12 16.5a4 4 0 004-4" stroke="%23FAB951" stroke-width="2" fill="none" stroke-linecap="round"/></svg>');
+}
+.wallet-item .icon.payment-score {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2 L21 6 V13 C21 18 17 21 12 22 C7 21 3 18 3 13 V6 Z" fill="%234CAF50"/><path d="M16 10 L11 15 L8 12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+.wallet-item .icon.customer-service {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13 C19,16.87 15.87,20 12,20 C10.13,20 8.4,19.23 7.07,18.07 L4,20 L5.93,16.93 C4.77,15.6 4,13.87 4,12 C4,8.13 7.13,5 11,5 C13.31,5 15.35,6.08 16.74,7.74 C18.17,9.45 19,11.22 19,13 Z" fill="%234CAF50" fill-opacity="0.8"/></svg>');
+}
+
+/* 钱包底部链接 */
+.wallet-footer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 13px;
+    color: #6B7785;
+    /* 【核心修改1】增加底部内边距，拉开与底框的距离 */
+    padding-bottom: 15px;
+}
+#phone-screen.dark-mode .wallet-footer {
+    color: #8d8d92;
+}
+
+/* --- 3. 零钱页面 (#change-screen) --- */
+.change-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 【核心修改2】减少顶部内边距，让内容上移 */
+    padding: 20px 30px 30px 30px;
+    box-sizing: border-box;
+    background-color: var(--secondary-bg);
+}
+.change-icon-big {
+    width: 60px;
+    height: 60px;
+    background-color: #F6C659;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: white;
+    font-weight: bold;
+    /* 【核心修改3】减少顶部外边距，进一步让内容上移 */
+    margin-top: 15px;
+}
+.change-label {
+    margin-top: 15px;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+.change-balance {
+    margin-top: 10px;
+    font-size: 40px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+.change-actions {
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.change-actions button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.change-recharge-btn {
+    background-color: #07C160;
+    color: white;
+}
+.change-withdraw-btn {
+    background-color: #f2f2f2;
+    color: #333;
+}
+#phone-screen.dark-mode .change-withdraw-btn {
+    background-color: #2c2c2e;
+    color: #f0f0f0;
+}
+.change-footer {
+    margin-top: auto;
+    text-align: center;
+    font-size: 12px;
+    color: #B2B2B2;
+}
+.change-footer .faq {
+    color: #5A88E4;
+    cursor: pointer;
+}
+
+/* --- 4. 账单页面 (#billing-screen) --- */
+.billing-record-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--secondary-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+.billing-record-item:first-child {
+    border-top: 1px solid var(--border-color);
+}
+.billing-record-item .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 12px;
+    background-color: #eee;
+    object-fit: cover;
+}
+.billing-record-item .info {
+    flex-grow: 1;
+}
+.billing-record-item .info .title {
+    font-size: 15px;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+.billing-record-item .info .timestamp {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+.billing-record-item .amount {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'SF Mono', 'Menlo', monospace; /* 使用等宽字体让数字更好看 */
+    color: var(--text-primary);
+}
+.billing-record-item .amount.income {
+    color: #07C160; /* 收入用绿色 */
+}
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
 ```**本次CSS重构的核心：**
 
     </style>
@@ -4208,44 +4424,41 @@ input:checked + .slider:before { transform: translateX(20px); }
             
             <div id="home-screen" class="screen active">
                 <div id="clock-container"><div id="main-time">12:00</div><div id="main-date">星期一, 1月1日</div></div>
-                                                <!-- ▼▼▼ 用这整块代码替换你原来的 id="app-grid" ▼▼▼ -->
+                                                                   <!-- ▼▼▼ 用这整块代码替换你原来的 id="app-grid" ▼▼▼ -->
 <div id="app-grid">
     <!-- 第一行：放2个图标 -->
     <div class="app-row">
         <div class="app-icon" onclick="showScreen('world-book-screen')">
             <div class="icon-bg">
-                <!-- 【核心修改1】添加ID -->
                 <img id="icon-img-world-book" src="https://i.postimg.cc/HWf1JKzn/IMG-6435.jpg" alt="世界书">
             </div>
             <span class="label">世界书</span>
         </div>
         <div class="app-icon" onclick="showScreen('chat-list-screen')">
             <div class="icon-bg">
-                <!-- 【核心修改2】添加ID -->
-                <img id="icon-img-qq" src="https://i.postimg.cc/MTC3Tkw8/IMG-6436.jpg" alt="QQ">
+                <!-- 【核心修改1】alt属性修改 -->
+                <img id="icon-img-qq" src="https://i.postimg.cc/MTC3Tkw8/IMG-6436.jpg" alt="微信">
             </div>
-            <span class="label">QQ</span>
+            <!-- 【核心修改2】标签文字修改 -->
+            <span class="label">微信</span>
         </div>
     </div>
     <!-- 第二行：放3个图标 -->
     <div class="app-row">
         <div class="app-icon" onclick="showScreen('api-settings-screen')">
             <div class="icon-bg">
-                <!-- 【核心修改3】添加ID -->
                 <img id="icon-img-api-settings" src="https://i.postimg.cc/MK8rJ8t7/IMG-6438.jpg" alt="API设置">
             </div>
             <span class="label">API设置</span>
         </div>
         <div class="app-icon" onclick="showScreen('wallpaper-screen')">
             <div class="icon-bg">
-                <!-- 【核心修改4】添加ID -->
                 <img id="icon-img-wallpaper" src="https://i.postimg.cc/T1j03pQr/IMG-6440.jpg" alt="外观设置">
             </div>
             <span class="label">外观设置</span>
         </div>
         <div class="app-icon" onclick="showScreen('font-settings-screen')">
             <div class="icon-bg">
-                <!-- 【核心修改5】添加ID -->
                 <img id="icon-img-font" src="https://i.postimg.cc/pXxk1JXk/IMG-6442.jpg" alt="字体">
             </div>
             <span class="label">字体</span>
@@ -4253,6 +4466,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
+
             </div>
           
 <div id="world-book-screen" class="screen">
@@ -4434,16 +4648,14 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
                                      <div class="me-options-list">
         <div class="me-options-group">
-            <div class="me-option-item">
-                <!-- 图标已移除 -->
+            <!-- 【核心修改】为“服务”项添加 onclick 事件 -->
+            <div class="me-option-item" onclick="document.getElementById('open-wallet-btn-handler').click();">
                 <span class="me-option-label">服务</span>
             </div>
             <div class="me-option-item">
-                <!-- 图标已移除 -->
                 <span class="me-option-label">IP地址</span>
             </div>
             <div class="me-option-item">
-                <!-- 图标已移除 -->
                 <span class="me-option-label">夜间模式</span>
                 <label class="toggle-switch">
                     <input type="checkbox" id="me-dark-mode-toggle">
@@ -4885,6 +5097,90 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
     <div id="call-history-list" class="list-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px;">
         <!-- 通话记录卡片将由JS动态生成在这里 -->
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】钱包页面 ▼▼▼ -->
+<div id="wallet-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" id="wallet-back-btn">‹</span>
+        <span>钱包</span>
+        <span class="action-btn" id="billing-btn">账单</span>
+    </div>
+    <div class="wallet-content">
+        <div class="wallet-group">
+            <div class="wallet-item" id="open-change-btn">
+                <span class="icon change"></span>
+                <span class="label">零钱</span>
+                <span class="value" id="wallet-balance-display">¥0.00</span>
+                <span class="arrow-right">›</span>
+            </div>
+        </div>
+        <div class="wallet-group">
+            <div class="wallet-item">
+                <span class="icon bank-card"></span>
+                <span class="label">银行卡</span>
+                <span class="arrow-right">›</span>
+            </div>
+            <div class="wallet-item">
+                <span class="icon family-card"></span>
+                <span class="label">亲属卡</span>
+                <span class="arrow-right">›</span>
+            </div>
+        </div>
+        <div class="wallet-group">
+            <div class="wallet-item">
+                <span class="icon payment-score"></span>
+                <span class="label">支付分</span>
+                <span class="arrow-right">›</span>
+            </div>
+            <div class="wallet-item">
+                <span class="icon customer-service"></span>
+                <span class="label">客服中心</span>
+                <span class="arrow-right">›</span>
+            </div>
+        </div>
+    </div>
+    <div class="wallet-footer">
+        <span>身份信息</span> | <span>支付设置</span>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】零钱页面 ▼▼▼ -->
+<div id="change-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" id="change-back-btn">‹</span>
+        <span></span> <!-- 占位 -->
+        <!-- 【核心修改】将“零钱明细”改为“明细” -->
+        <span class="action-btn">明细</span>
+    </div>
+    <div class="change-content">
+        <div class="change-icon-big">¥</div>
+        <span class="change-label">我的零钱</span>
+        <span class="change-balance" id="change-balance-display">¥0.00</span>
+        <div class="change-actions">
+            <button id="recharge-btn" class="change-recharge-btn">充值</button>
+            <button class="change-withdraw-btn">提现</button>
+        </div>
+        <div class="change-footer">
+            <span class="faq">常见问题</span>
+            <div>本服务由财付通提供</div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】账单页面 ▼▼▼ -->
+<div id="billing-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" id="billing-back-btn">‹</span>
+        <span>账单</span>
+        <span style="width: 30px;"></span>
+    </div>
+    <div class="billing-content" id="billing-list">
+        <!-- 账单记录将由JS动态生成 -->
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
@@ -5726,13 +6022,13 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
         // 2. 数据库结构定义
         // ===================================================================
 
-db.version(23).stores({ 
+db.version(24).stores({ 
     chats: '&id, isGroup, groupId', 
     apiConfig: '&id', 
     globalSettings: '&id', 
     userStickers: '&id, url, name',
-    worldBooks: '&id, name, categoryId', // <-- 【核心修改1】在这里添加 categoryId
-    worldBookCategories: '++id, name',    // <-- 【核心修改2】新增这个表
+    worldBooks: '&id, name, categoryId',
+    worldBookCategories: '++id, name',
     musicLibrary: '&id', 
     personaPresets: '&id',
     qzoneSettings: '&id',
@@ -5742,7 +6038,9 @@ db.version(23).stores({
     favorites: '++id, type, timestamp, originalTimestamp',
     qzoneGroups: '++id, name',
     memories: '++id, chatId, timestamp, type, targetDate' ,
-    callRecords: '++id, chatId, timestamp, customName' // <--【核心修改】在这里加上 customName
+    callRecords: '++id, chatId, timestamp, customName',
+    // 【核心新增】添加钱包交易记录表
+    walletTransactions: '++id, timestamp',
 });
 
         // ===================================================================
@@ -6425,8 +6723,12 @@ state.globalSettings = globalSettings || {
     enableBackgroundActivity: false, 
     backgroundActivityInterval: 60,
     blockCooldownHours: 1,
-    appIcons: { ...DEFAULT_APP_ICONS } // 【核心修改】确保appIcons存在并有默认值
+    // 【核心新增】初始化钱包余额，默认300
+    walletBalance: 300.00,
+    appIcons: { ...DEFAULT_APP_ICONS }
 };
+// ▲▲▲ 添加结束 ▲▲▲ -->
+
 // 【核心修改】合并已保存的图标和默认图标，防止更新后旧数据丢失新图标
 state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings.appIcons || {}) };
 
@@ -8746,7 +9048,46 @@ case 'send_and_recall': {
 
         async function sendSticker(sticker) { if (!state.activeChatId) return; const chat = state.chats[state.activeChatId]; const msg = { role: 'user', content: sticker.url, meaning: sticker.name, timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); document.getElementById('sticker-panel').classList.remove('visible'); }
 
-        async function sendUserTransfer() { if (!state.activeChatId) return; const amountInput = document.getElementById('transfer-amount'); const noteInput = document.getElementById('transfer-note'); const amount = parseFloat(amountInput.value); const note = noteInput.value.trim(); if (isNaN(amount) || amount < 0 || amount > 9999) { alert('请输入有效的金额 (0 到 9999 之间)！'); return; } const chat = state.chats[state.activeChatId]; const senderName = chat.isGroup ? (chat.settings.myNickname || '我') : '我'; const receiverName = chat.isGroup ? '群聊' : chat.name; const msg = { role: 'user', type: 'transfer', amount: amount, note: note, senderName, receiverName, timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); document.getElementById('transfer-modal').classList.remove('visible'); amountInput.value = ''; noteInput.value = ''; }
+        async function sendUserTransfer() { 
+    if (!state.activeChatId) return; 
+    const amountInput = document.getElementById('transfer-amount'); 
+    const noteInput = document.getElementById('transfer-note'); 
+    const amount = parseFloat(amountInput.value); 
+    const note = noteInput.value.trim(); 
+    if (isNaN(amount) || amount <= 0 || amount > 99999) { 
+        alert('请输入有效的金额 (0.01 到 99999 之间)！'); return; 
+    } 
+
+    // 【核心修改1】检查余额
+    if (state.globalSettings.walletBalance < amount) {
+        alert('零钱余额不足！');
+        return;
+    }
+
+    // 【核心修改2】扣除余额并记录交易
+    state.globalSettings.walletBalance -= amount;
+    await db.globalSettings.put(state.globalSettings);
+    
+    const chat = state.chats[state.activeChatId]; 
+    const senderName = chat.isGroup ? (chat.settings.myNickname || '我') : '我'; 
+    const receiverName = chat.isGroup ? '群聊' : chat.name; 
+    
+    await logWalletTransaction({
+        type: 'send',
+        amount: -amount, // 支出为负数
+        counterpartyName: `转账-给${receiverName}`,
+        counterpartyAvatar: chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar
+    });
+
+    const msg = { role: 'user', type: 'transfer', amount: amount, note: note, senderName, receiverName, timestamp: Date.now() }; 
+    chat.history.push(msg); 
+    await db.chats.put(chat); 
+    appendMessage(msg, chat); 
+    renderChatList(); 
+    document.getElementById('transfer-modal').classList.remove('visible'); 
+    amountInput.value = ''; 
+    noteInput.value = ''; 
+}
 
         function enterSelectionMode(initialMsgTimestamp) { if (isSelectionMode) return; isSelectionMode = true; document.getElementById('chat-interface-screen').classList.add('selection-mode'); toggleMessageSelection(initialMsgTimestamp); }
 
@@ -9205,24 +9546,24 @@ function stopBackgroundSimulation() {
  */
 function runBackgroundSimulationTick() {
     console.log("模拟器心跳 Tick...");
+    // 总开关关闭时，依然停止所有活动
+    if (!state.globalSettings.enableBackgroundActivity) {
+        stopBackgroundSimulation();
+        return;
+    }
     
-    // 【【【核心逻辑修正！】】】
-    // 我们不再在函数开头检查全局开关！让定时器只要运行，就进入检查流程。
-    // if (!state.globalSettings.enableBackgroundActivity) { ... }  <-- 这段旧逻辑已被废除
-
     const allSingleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
     if (allSingleChats.length === 0) return;
 
     allSingleChats.forEach(chat => {
-        // 【【【最高优先级检查！】】】
-        // 在检查任何具体行为之前，首先检查这个AI自己的独立开关。
-        // 这是它能否进行后台活动的唯一决定因素！
+        // 【【【最终决定权检查！】】】
+        // 在检查任何具体行为之前，先检查这个AI自己的独立开关是否为关闭状态
         if (chat.settings.allowBackgroundActivity === false) {
             console.log(`角色 "${chat.name}" 的独立开关为关闭状态，跳过所有后台活动。`);
             return; // 使用 return 跳过当前循环，检查下一个AI
         }
 
-        // --- 后续所有行为逻辑，现在都处于“独立开关”的绝对控制之下 ---
+        // --- 后续逻辑保持不变，但现在它们都在独立开关的控制之下了 ---
         if (chat.relationship?.status === 'blocked_by_user') {
             const blockedTimestamp = chat.relationship.blockedTimestamp;
             if (!blockedTimestamp) {
@@ -9233,7 +9574,7 @@ function runBackgroundSimulationTick() {
             const cooldownMilliseconds = (state.globalSettings.blockCooldownHours || 1) * 60 * 60 * 1000;
             
             if (blockedDuration > cooldownMilliseconds) {
-                console.log(`角色 "${chat.name}" 的冷静期已过，将触发申请好友事件...`);
+                console.log(`角色 "${chat.name}" 的冷静期已过，触发“反思”并申请好友事件...`);
                 chat.relationship.status = 'pending_system_reflection';
                 triggerAiFriendApplication(chat.id);
             }
@@ -12171,48 +12512,50 @@ async function handleUserTransferResponse(choice) {
     const messageIndex = chat.history.findIndex(m => m.timestamp === timestamp);
     if (messageIndex === -1) return;
 
-    // 1. 更新原始转账消息的状态
     const originalMessage = chat.history[messageIndex];
     originalMessage.status = choice;
 
     let systemContent;
 
-    // 2. 如果用户选择“拒绝”
     if (choice === 'declined') {
-        // 立刻在前端生成一个“退款”卡片，让用户看到
         const refundMessage = {
             role: 'user',
             type: 'transfer',
-            isRefund: true, // 这是一个关键标记，用于UI显示这是退款
+            isRefund: true, 
             amount: originalMessage.amount,
             note: '已拒收对方转账',
             timestamp: Date.now()
         };
         chat.history.push(refundMessage);
-        
-        // 准备一条对AI可见的隐藏消息，告诉它发生了什么
         systemContent = `[系统提示：你拒绝并退还了“${originalMessage.senderName}”的转账。]`;
-    } else { // 如果用户选择“接受”
-        // 只需准备隐藏消息通知AI即可
+    } else { 
+        // 【核心修改】如果用户选择“接受”，增加余额并记录
+        state.globalSettings.walletBalance += originalMessage.amount;
+        await db.globalSettings.put(state.globalSettings);
+        
+        await logWalletTransaction({
+            type: 'receive',
+            amount: originalMessage.amount,
+            counterpartyName: `转账-来自${originalMessage.senderName}`,
+            counterpartyAvatar: chat.settings.aiAvatar
+        });
+
         systemContent = `[系统提示：你接受了“${originalMessage.senderName}”的转账。]`;
     }
 
-    // 3. 创建这条对用户隐藏、但对AI可见的系统消息
     const hiddenMessage = {
         role: 'system',
         content: systemContent,
-        timestamp: Date.now() + 1, // 保证时间戳在退款消息之后
-        isHidden: true // 这个标记会让它不在聊天界面显示
+        timestamp: Date.now() + 1, 
+        isHidden: true
     };
     chat.history.push(hiddenMessage);
 
-    // 4. 保存所有更改到数据库，并刷新界面
     await db.chats.put(chat);
     hideTransferActionModal(); 
     renderChatInterface(state.activeChatId);
     renderChatList();
 }
-
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 // ▼▼▼ 【全新】通话记录功能核心函数 ▼▼▼
@@ -12677,6 +13020,104 @@ async function deleteCategory(categoryId) {
 
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
+// ▼▼▼ 【全新】钱包、零钱、账单功能核心函数 ▼▼▼
+
+/**
+ * 渲染钱包主页
+ */
+function renderWalletScreen() {
+    const balance = state.globalSettings.walletBalance || 0;
+    document.getElementById('wallet-balance-display').textContent = `¥${balance.toFixed(2)}`;
+}
+
+/**
+ * 渲染零钱页面
+ */
+function renderChangeScreen() {
+    const balance = state.globalSettings.walletBalance || 0;
+    document.getElementById('change-balance-display').textContent = `¥${balance.toFixed(2)}`;
+}
+
+/**
+ * 处理充值按钮点击
+ */
+async function handleRecharge() {
+    const currentBalance = state.globalSettings.walletBalance || 0;
+    const newAmountStr = await showCustomPrompt('修改零钱', '请输入新的零钱总额', currentBalance.toFixed(2), 'number');
+    
+    if (newAmountStr !== null) {
+        const newAmount = parseFloat(newAmountStr);
+        if (!isNaN(newAmount) && newAmount >= 0) {
+            const difference = newAmount - currentBalance;
+            state.globalSettings.walletBalance = newAmount;
+            await db.globalSettings.put(state.globalSettings);
+
+            // 记录交易
+            if (difference !== 0) {
+                await logWalletTransaction({
+                    type: difference > 0 ? 'recharge_in' : 'recharge_out',
+                    amount: difference,
+                    counterpartyName: difference > 0 ? '神秘收入' : '神秘支出',
+                    counterpartyAvatar: 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg' // 一个通用图标
+                });
+            }
+
+            renderChangeScreen(); // 刷新零钱页
+            renderWalletScreen(); // 同时刷新钱包页
+            await showCustomAlert('成功', `零钱已更新为 ¥${newAmount.toFixed(2)}`);
+        } else {
+            alert('请输入有效的金额！');
+        }
+    }
+}
+
+/**
+ * 渲染账单页面
+ */
+async function renderBillingScreen() {
+    const listEl = document.getElementById('billing-list');
+    listEl.innerHTML = '';
+    const transactions = await db.walletTransactions.orderBy('timestamp').reverse().toArray();
+
+    if (transactions.length === 0) {
+        listEl.innerHTML = '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">暂无账单记录</p>';
+        return;
+    }
+
+    transactions.forEach(tx => {
+        const item = document.createElement('div');
+        item.className = 'billing-record-item';
+        const txDate = new Date(tx.timestamp);
+        const dateString = `${String(txDate.getMonth() + 1).padStart(2, '0')}-${String(txDate.getDate()).padStart(2, '0')} ${String(txDate.getHours()).padStart(2, '0')}:${String(txDate.getMinutes()).padStart(2, '0')}`;
+        
+        const isIncome = tx.amount > 0;
+        const amountClass = isIncome ? 'income' : '';
+        const amountPrefix = isIncome ? '+' : '';
+
+        item.innerHTML = `
+            <img src="${tx.counterpartyAvatar || defaultAvatar}" class="avatar">
+            <div class="info">
+                <div class="title">${tx.counterpartyName}</div>
+                <div class="timestamp">${dateString}</div>
+            </div>
+            <span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span>
+        `;
+        listEl.appendChild(item);
+    });
+}
+
+/**
+ * 记录一笔钱包交易
+ * @param {object} txData - 交易数据对象
+ */
+async function logWalletTransaction(txData) {
+    const transaction = {
+        ...txData,
+        timestamp: Date.now()
+    };
+    await db.walletTransactions.add(transaction);
+}
+
         // ===================================================================
         // 4. 初始化函数 init()
         // ===================================================================
@@ -12733,6 +13174,29 @@ applyAppIcons();
             // ==========================================================
             // --- 各种事件监听器 ---
             // ==========================================================
+
+            // 【新增一个隐藏的按钮，用于处理“我”页面服务按钮的点击】
+            const walletHandlerBtn = document.createElement('button');
+            walletHandlerBtn.id = 'open-wallet-btn-handler';
+            walletHandlerBtn.style.display = 'none';
+            document.body.appendChild(walletHandlerBtn);
+
+            walletHandlerBtn.addEventListener('click', () => {
+                renderWalletScreen();
+                showScreen('wallet-screen');
+            });
+            document.getElementById('wallet-back-btn').addEventListener('click', () => showScreen('chat-list-screen'));
+            document.getElementById('billing-btn').addEventListener('click', () => {
+                renderBillingScreen();
+                showScreen('billing-screen');
+            });
+            document.getElementById('billing-back-btn').addEventListener('click', () => showScreen('wallet-screen'));
+            document.getElementById('open-change-btn').addEventListener('click', () => {
+                renderChangeScreen();
+                showScreen('change-screen');
+            });
+            document.getElementById('change-back-btn').addEventListener('click', () => showScreen('wallet-screen'));
+            document.getElementById('recharge-btn').addEventListener('click', handleRecharge);
 
             document.getElementById('custom-modal-cancel').addEventListener('click', hideCustomModal);
             document.getElementById('custom-modal-overlay').addEventListener('click', (e) => { if (e.target === modalOverlay) hideCustomModal(); });
@@ -12872,6 +13336,7 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
     state.apiConfig.model = document.getElementById('model-select').value;
     await db.apiConfig.put(state.apiConfig);
 
+    // 【核心升级1】全局开关现在是批量操作
     const backgroundSwitch = document.getElementById('background-activity-switch');
     const intervalInput = document.getElementById('background-interval-input');
     const newEnableState = backgroundSwitch.checked;
@@ -12880,22 +13345,22 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
     state.globalSettings.backgroundActivityInterval = parseInt(intervalInput.value) || 60;
     state.globalSettings.blockCooldownHours = parseFloat(document.getElementById('block-cooldown-input').value) || 1;
     
-    // 【核心升级】当操作全局开关时，遍历所有AI，同步它们的独立开关状态
+    // 【核心升级2】当操作全局开关时，遍历所有AI，同步它们的独立开关状态
     for (const chatId in state.chats) {
         const chat = state.chats[chatId];
-        if (!chat.isGroup) { 
-            if (!chat.settings) chat.settings = {}; 
+        if (!chat.isGroup) { // 只影响单聊AI
+            if (!chat.settings) chat.settings = {}; // 安全检查
             chat.settings.allowBackgroundActivity = newEnableState;
-            await db.chats.put(chat); 
+            await db.chats.put(chat); // 将更改保存到每个AI的档案里
         }
     }
     
     await db.globalSettings.put(state.globalSettings);
 
-    // 总定时器的启动/停止逻辑保持不变，它只负责“心跳”
+    // 动态启动或停止总模拟器
     if (newEnableState) {
         startBackgroundSimulation();
-        console.log(`后台活动总开关已开启，所有AI的独立开关已同步为ON。`);
+        console.log(`后台活动总开关已开启，所有AI的独立开关已同步为ON。间隔: ${state.globalSettings.backgroundActivityInterval}秒`);
     } else {
         stopBackgroundSimulation();
         console.log("后台活动总开关已关闭，所有AI的独立开关已同步为OFF。");
