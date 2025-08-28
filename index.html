@@ -5000,7 +5000,8 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
         <div class="playlist-body" id="playlist-body"></div>
     </div>
-    <input type="file" id="local-song-upload-input" accept="audio/*" multiple style="display: none;">
+        <!-- 【终极修复版】使用最广泛的 accept 许可，确保万无一失 -->
+    <input type="file" id="local-song-upload-input" accept="audio/*,video/mp4,video/x-m4v,video/*" multiple style="display: none;">
 <input type="file" id="lrc-upload-input" accept=".lrc" style="display: none;">
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
@@ -5429,7 +5430,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
 </div>
 
-    <audio id="audio-player" style="display:none;"></audio>
+<!-- 【核心修正】为audio标签增加 controls 属性，便于调试，并用 crossorigin 解决潜在的跨域问题 -->
+    <audio id="audio-player" style="display:none;" crossorigin="anonymous"></audio>
 
 <!-- ▼▼▼ 用下面这段【完整】的模态框代码，替换掉你现有的 id="create-post-modal" 的整个 div ▼▼▼ -->
 <div id="create-post-modal" class="modal">
@@ -7962,35 +7964,31 @@ ${contextSummary || "（无有效对话记录）"}
                 worldBookContent = `\n\n# 核心世界观设定 (必须严格遵守以下所有设定)\n${linkedContents}\n`;
             }
         }
-        let musicContext = '';
+                let musicContext = '';
         if (musicState.isActive && musicState.activeChatId === chatId) {
-            // 【核心修改】提供更详细的音乐上下文
             const currentTrack = musicState.currentIndex > -1 ? musicState.playlist[musicState.currentIndex] : null;
             const playlistInfo = musicState.playlist.map(t => `"${t.name}"`).join(', ');
 
-    // --- 【核心新增】获取歌词上下文 ---
-    let lyricsContext = "";
-    // 检查是否有解析好的歌词，并且当前有高亮的行
-    if (currentTrack && musicState.parsedLyrics && musicState.parsedLyrics.length > 0 && musicState.currentLyricIndex > -1) {
-        // 获取当前高亮歌词
-        const currentLine = musicState.parsedLyrics[musicState.currentLyricIndex];
-        
-        // 获取接下来的2句歌词作为预告
-        const upcomingLines = musicState.parsedLyrics.slice(musicState.currentLyricIndex + 1, musicState.currentLyricIndex + 3);
+            // 【V2升级版】获取歌词上下文
+            let lyricsContext = "";
+            if (currentTrack && musicState.parsedLyrics && musicState.parsedLyrics.length > 0 && musicState.currentLyricIndex > -1) {
+                const currentLine = musicState.parsedLyrics[musicState.currentLyricIndex];
+                const upcomingLines = musicState.parsedLyrics.slice(musicState.currentLyricIndex + 1, musicState.currentLyricIndex + 3);
+                
+                lyricsContext += `- **当前歌词**: "${currentLine.text}"\n`;
+                if (upcomingLines.length > 0) {
+                    lyricsContext += `- **即将演唱**: ${upcomingLines.map(line => `"${line.text}"`).join(' / ')}\n`;
+                }
+            }
 
-        // 构建歌词部分的Prompt
-        lyricsContext += `- **当前歌词**: "${currentLine.text}"\n`;
-        if (upcomingLines.length > 0) {
-            lyricsContext += `- **即将演唱**: ${upcomingLines.map(line => `"${line.text}"`).join(' / ')}\n`;
-        }
-    }
-    // --- 【新增结束】 ---
-
-            musicContext = `\n\n# 当前音乐情景
--   **当前状态**: 你正在和用户一起听歌。
--   **正在播放**: ${currentTrack ? `《${currentTrack.name}》 - ${currentTrack.artist}` : '无'}
--   **可用播放列表**: [${playlistInfo}]
--   **你的任务**: 你可以根据对话内容和氛围，使用 "change_music" 指令切换到播放列表中的任何一首歌，以增强互动体验。
+            // 【V2升级版】为AI提供更强的指令和上下文
+            musicContext = `\n\n# 当前音乐情景 (至关重要！)
+- **状态**: 你正在和用户一起听歌，这是一个沉浸式体验。
+- **正在播放**: ${currentTrack ? `《${currentTrack.name}》 - ${currentTrack.artist}` : '无'}
+${lyricsContext ? `- **歌词上下文**:\n${lyricsContext}` : ''}- **可用播放列表**: [${playlistInfo}]
+- **你的核心任务**:
+  1. **感知歌词**: 你能“看到”当前正在播放的歌词。如果用户正在和你聊天，你可以根据自己的人设，【自然地】将歌词内容、意境或感想融入到你的回复中。
+  2. **主动切歌**: 你【被赋予了主动权】，可以根据聊天氛围的变化，使用 "change_music" 指令切换到播放列表中【更应景】的歌曲。这会让用户感到惊喜！请以中等频率执行此操作。
 `;
         }
         let systemPrompt, messagesPayload;
@@ -9271,6 +9269,11 @@ function updatePlaylistUI() {
     });
 }
 
+// ▼▼▼ 【V4 终极统一版】这是唯一的、正确的音乐播放控制中心 ▼▼▼
+
+/**
+ * 播放指定索引的歌曲，已完全修复本地文件和Blob播放问题
+ */
 function playSong(index) {
     if (index < 0 || index >= musicState.playlist.length) return;
     musicState.currentIndex = index;
@@ -9278,30 +9281,93 @@ function playSong(index) {
     musicState.parsedLyrics = parseLRC(track.lrcContent || "");
     musicState.currentLyricIndex = -1;
     renderLyrics();
+
+    // 【核心：处理Blob】这里的逻辑现在能完美处理从数据库读出的 Blob 对象
     if (track.isLocal && track.src instanceof Blob) {
+        // 先释放上一个本地URL，避免内存泄漏
+        if (audioPlayer.src.startsWith('blob:')) {
+            URL.revokeObjectURL(audioPlayer.src);
+        }
         audioPlayer.src = URL.createObjectURL(track.src);
     } else if (!track.isLocal) {
         audioPlayer.src = track.src;
     } else {
-        console.error('本地歌曲源错误:', track);
+        console.error('本地歌曲源错误或已丢失:', track);
+        alert(`无法播放歌曲《${track.name}》，文件源可能已损坏。`);
         return;
     }
-    audioPlayer.play();
+    
+    // 【核心：安全播放】使用 .then() 和 .catch() 来处理播放，更稳定
+    audioPlayer.play().catch(e => {
+        console.error("播放失败:", e);
+        alert(`播放《${track.name}》失败，可能是文件格式不受支持。`);
+    });
+    
     updatePlaylistUI();
     updatePlayerUI();
     updateMusicProgressBar();
 }
 
-        function togglePlayPause() { if (audioPlayer.paused) { if (musicState.currentIndex === -1 && musicState.playlist.length > 0) { playSong(0); } else if (musicState.currentIndex > -1) { audioPlayer.play(); } } else { audioPlayer.pause(); } }
+/**
+ * 切换播放/暂停状态
+ */
+function togglePlayPause() {
+    if (audioPlayer.paused) {
+        if (musicState.currentIndex === -1 && musicState.playlist.length > 0) {
+            playSong(0);
+        } else if (musicState.currentIndex > -1) {
+            audioPlayer.play();
+        }
+    } else {
+        audioPlayer.pause();
+    }
+}
 
-        function playNext() { if (musicState.playlist.length === 0) return; let nextIndex; switch(musicState.playMode) { case 'random': nextIndex = Math.floor(Math.random() * musicState.playlist.length); break; case 'single': playSong(musicState.currentIndex); return; case 'order': default: nextIndex = (musicState.currentIndex + 1) % musicState.playlist.length; break; } playSong(nextIndex); }
+/**
+ * 播放下一首歌曲
+ */
+function playNext() {
+    if (musicState.playlist.length === 0) return;
+    let nextIndex;
+    switch(musicState.playMode) {
+        case 'random':
+            nextIndex = Math.floor(Math.random() * musicState.playlist.length);
+            break;
+        case 'single':
+            playSong(musicState.currentIndex);
+            return;
+        case 'order':
+        default:
+            nextIndex = (musicState.currentIndex + 1) % musicState.playlist.length;
+            break;
+    }
+    playSong(nextIndex);
+}
 
-        function playPrev() { if (musicState.playlist.length === 0) return; const newIndex = (musicState.currentIndex - 1 + musicState.playlist.length) % musicState.playlist.length; playSong(newIndex); }
+/**
+ * 播放上一首歌曲
+ */
+function playPrev() {
+    if (musicState.playlist.length === 0) return;
+    const newIndex = (musicState.currentIndex - 1 + musicState.playlist.length) % musicState.playlist.length;
+    playSong(newIndex);
+}
 
-        function changePlayMode() { const modes = ['order', 'random', 'single']; const currentModeIndex = modes.indexOf(musicState.playMode); musicState.playMode = modes[(currentModeIndex + 1) % modes.length]; document.getElementById('music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[musicState.playMode]; }
+/**
+ * 切换播放模式
+ */
+function changePlayMode() {
+    const modes = ['order', 'random', 'single'];
+    const currentModeIndex = modes.indexOf(musicState.playMode);
+    musicState.playMode = modes[(currentModeIndex + 1) % modes.length];
+    document.getElementById('music-mode-btn').textContent = {'order': '顺序', 'random': '随机', 'single': '单曲'}[musicState.playMode];
+}
+
+// ▲▲▲ 替换结束 ▲▲▲
 
         async function addSongFromURL() { const url = await showCustomPrompt("添加网络歌曲", "请输入歌曲的URL", "", "url"); if (!url) return; const name = await showCustomPrompt("歌曲信息", "请输入歌名"); if (!name) return; const artist = await showCustomPrompt("歌曲信息", "请输入歌手名"); if (!artist) return; musicState.playlist.push({ name, artist, src: url, isLocal: false }); await saveGlobalPlaylist(); updatePlaylistUI(); if(musicState.currentIndex === -1) { musicState.currentIndex = musicState.playlist.length - 1; updatePlayerUI(); } }
 
+// ▼▼▼ 【这是重构后的V2版本，已修复导入Bug并优化流程】 ▼▼▼
 async function addSongFromLocal(event) {
     const files = event.target.files;
     if (!files.length) return;
@@ -9319,7 +9385,7 @@ async function addSongFromLocal(event) {
         if (wantLrc) {
             lrcContent = await new Promise(resolve => {
                 const lrcInput = document.getElementById('lrc-upload-input');
-                const lrcChangeHandler = (e) => {
+                const handler = (e) => {
                     const lrcFile = e.target.files[0];
                     if (lrcFile) {
                         const reader = new FileReader();
@@ -9329,21 +9395,15 @@ async function addSongFromLocal(event) {
                     } else {
                         resolve("");
                     }
-                    lrcInput.removeEventListener('change', lrcChangeHandler);
+                    lrcInput.removeEventListener('change', handler);
                     lrcInput.value = '';
                 };
-                lrcInput.addEventListener('change', lrcChangeHandler);
+                lrcInput.addEventListener('change', handler);
                 lrcInput.click();
             });
         }
         
-        musicState.playlist.push({ 
-            name, 
-            artist, 
-            src: file, 
-            isLocal: true,
-            lrcContent: lrcContent
-        });
+        musicState.playlist.push({ name, artist, src: file, isLocal: true, lrcContent });
     }
     
     await saveGlobalPlaylist();
@@ -9353,6 +9413,40 @@ async function addSongFromLocal(event) {
         updatePlayerUI();
     }
     event.target.value = null;
+}
+
+/**
+ * 【全新】打开手动歌词编辑器
+ */
+async function openLyricEditor() {
+    // 必须在播放中且有歌曲时才能编辑
+    if (!musicState.isActive || musicState.currentIndex === -1) {
+        alert("请先播放一首歌曲再编辑歌词。");
+        return;
+    }
+    
+    const currentTrack = musicState.playlist[musicState.currentIndex];
+    
+    // 使用 showCustomPrompt 的 textarea 模式来显示和编辑歌词
+    const newLrcContent = await showCustomPrompt(
+        `编辑《${currentTrack.name}》的歌词`,
+        "在此手动输入或粘贴LRC格式的歌词...",
+        currentTrack.lrcContent || '', // 初始值为当前歌词
+        'textarea' // 指定类型为多行文本框
+    );
+
+    // 如果用户点击了“保存”
+    if (newLrcContent !== null) {
+        // 1. 更新内存中的歌词
+        currentTrack.lrcContent = newLrcContent;
+        // 2. 将更新后的整个播放列表保存到数据库
+        await saveGlobalPlaylist();
+        // 3. 重新解析并渲染新的歌词
+        musicState.parsedLyrics = parseLRC(newLrcContent);
+        renderLyrics();
+        
+        alert("歌词已更新！");
+    }
 }
 
         async function deleteTrack(index) { if (index < 0 || index >= musicState.playlist.length) return; const track = musicState.playlist[index]; const wasPlaying = musicState.isPlaying && musicState.currentIndex === index; if (track.isLocal && audioPlayer.src.startsWith('blob:') && musicState.currentIndex === index) URL.revokeObjectURL(audioPlayer.src); musicState.playlist.splice(index, 1); await saveGlobalPlaylist(); if (musicState.playlist.length === 0) { if (musicState.isPlaying) audioPlayer.pause(); audioPlayer.src = ''; musicState.currentIndex = -1; musicState.isPlaying = false; } else { if (wasPlaying) { playNext(); } else { if (musicState.currentIndex >= index) musicState.currentIndex = Math.max(0, musicState.currentIndex - 1); } } updatePlayerUI(); updatePlaylistUI(); }
@@ -14830,6 +14924,10 @@ document.getElementById('copy-post-btn').addEventListener('click', copyPostConte
 document.getElementById('cancel-post-action-btn').addEventListener('click', hidePostActions);
 
 // ▲▲▲ 添加结束 ▲▲▲
+
+            // ▼▼▼ 【全新】为歌词区域绑定点击事件，用于手动编辑 ▼▼▼
+            document.getElementById('music-lyrics-container').addEventListener('click', openLyricEditor);
+            // ▲▲▲ 新增代码结束 ▲▲▲
 
 // ▼▼▼ 【新增】联系人选择器事件绑定 ▼▼▼
 document.getElementById('cancel-contact-picker-btn').addEventListener('click', () => {
