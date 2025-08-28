@@ -264,7 +264,6 @@
 }
 
         .checkboxes-container.visible { display: block; }
-        .checkboxes-container label { display: block; padding: 10px 12px; cursor: pointer; font-weight: normal; color: var(--text-primary); }
 
 .checkboxes-container label {
     display: block;
@@ -4364,49 +4363,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     cursor: pointer;
 }
 
-/* --- 4. 账单页面 (#billing-screen) --- */
-.billing-record-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: var(--secondary-bg);
-    border-bottom: 1px solid var(--border-color);
-}
-.billing-record-item:first-child {
-    border-top: 1px solid var(--border-color);
-}
-.billing-record-item .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    margin-right: 12px;
-    background-color: #eee;
-    object-fit: cover;
-}
-.billing-record-item .info {
-    flex-grow: 1;
-}
-.billing-record-item .info .title {
-    font-size: 15px;
-    color: var(--text-primary);
-    font-weight: 500;
-}
-.billing-record-item .info .timestamp {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-.billing-record-item .amount {
-    font-size: 16px;
-    font-weight: bold;
-    font-family: 'SF Mono', 'Menlo', monospace; /* 使用等宽字体让数字更好看 */
-    color: var(--text-primary);
-}
-.billing-record-item .amount.income {
-    color: #07C160; /* 收入用绿色 */
-}
-/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
-
 /* ▼▼▼ 【全新】时间戳置于头像下方样式 ▼▼▼ */
 
 /* 1. 为聊天消息区增加底部内边距和行间距，给时间戳留出空间 */
@@ -4448,7 +4404,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
-/* ▼▼▼ 【全新】微信风格账单页面样式 (V3 - 终极修正版) ▼▼▼ */
+/* ▼▼▼ 【全新】微信风格账单页面样式 (V4 - 对齐修正版) ▼▼▼ */
 
 /* 1. 月份分组头部 (保持不变) */
 .billing-month-header {
@@ -4467,15 +4423,18 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: var(--text-secondary);
 }
 
-/* 2. 账单项样式 (核心修正) */
+/* 2. 账单项样式 (核心布局修正) */
 .billing-record-item {
     display: flex;
-    /* 【核心修正1】将垂直对齐方式改为顶部对齐 */
-    align-items: flex-start; 
+    /* 【核心修正1】将所有子项在垂直方向上居中对齐，确保高度一致 */
+    align-items: center; 
     padding: 15px;
     background-color: var(--secondary-bg);
     border-bottom: 1px solid var(--border-color);
     cursor: pointer;
+    /* 【核心修正2】为卡片设置一个最小高度，防止内容过少时塌陷 */
+    min-height: 70px;
+    box-sizing: border-box;
 }
 .billing-record-item:first-child {
     border-top: 1px solid var(--border-color);
@@ -4487,9 +4446,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     margin-right: 12px;
     background-color: #eee;
     object-fit: cover;
-    flex-shrink: 0; /* 防止头像被压缩 */
+    flex-shrink: 0;
 }
-
 .billing-record-item .info {
     flex-grow: 1;
 }
@@ -4498,7 +4456,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     color: var(--text-primary);
     font-weight: 500;
 }
-/* 【核心修正】将.timestamp类名改为.billing-timestamp，并设置正确样式 */
 .billing-record-item .info .billing-timestamp {
     font-size: 12px;
     color: var(--text-secondary);
@@ -4509,8 +4466,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-weight: bold;
     font-family: 'SF Mono', 'Menlo', monospace;
     color: var(--text-primary);
-    /* 【核心修正3】让金额在垂直方向上自我居中，不受顶部对齐的影响 */
-    align-self: center;
+    /* 【核心修正3】由于父级已经居中，不再需要 align-self */
 }
 .billing-record-item .amount.income {
     color: #07C160;
@@ -10890,42 +10846,6 @@ function cleanupWaimaiTimers() {
 }
 // ▲▲▲ 新函数粘贴结束 ▲▲▲
 
-async function handleWaimaiResponse(originalTimestamp, choice) {
-    const chat = state.chats[state.activeChatId];
-    if (!chat) return;
-
-    const messageIndex = chat.history.findIndex(m => m.timestamp === originalTimestamp);
-    if (messageIndex === -1) return;
-
-    // 1. 更新原始消息的状态
-    const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
-    
-    // 【核心修正】记录支付者，并构建对AI更清晰的系统消息
-    let systemContent;
-    const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
-    
-    if (choice === 'paid') {
-        originalMessage.paidBy = myNickname; // 记录是用户付的钱
-        systemContent = `[系统提示：你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单（时间戳: ${originalTimestamp}）完成了支付。此订单已关闭，其他成员不能再支付。]`;
-    } else {
-        systemContent = `[系统提示：你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求（时间戳: ${originalTimestamp}）。]`;
-    }
-
-    // 2. 创建一条新的、对用户隐藏的系统消息，告知AI结果
-    const systemNote = {
-        role: 'system',
-        content: systemContent,
-        timestamp: Date.now(),
-        isHidden: true
-    };
-    chat.history.push(systemNote);
-
-    // 3. 保存更新到数据库并刷新UI
-    await db.chats.put(chat);
-    renderChatInterface(state.activeChatId);  
-}
-
 let videoCallState = {
     isActive: false,       
     isAwaitingResponse: false, 
@@ -11359,7 +11279,7 @@ function toggleCallButtons(isGroup) {
 }
 // ▲▲▲ 粘贴结束 ▲▲▲
 
-// ▼▼▼ 【全新】这个函数是本次修复的核心，请粘贴到你的JS功能区 ▼▼▼
+// ▼▼▼ 【这是V5版本，已遵从您的指令替换为指定的图片链接！】 ▼▼▼
 async function handleWaimaiResponse(originalTimestamp, choice) {
     const chat = state.chats[state.activeChatId];
     if (!chat) return;
@@ -11367,22 +11287,40 @@ async function handleWaimaiResponse(originalTimestamp, choice) {
     const messageIndex = chat.history.findIndex(m => m.timestamp === originalTimestamp);
     if (messageIndex === -1) return;
 
-    // 1. 更新内存中原始消息的状态
     const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
     
-    // 2. 获取当前用户的昵称，并构建对AI更清晰的系统消息
     let systemContent;
     const myNickname = chat.isGroup ? (chat.settings.myNickname || '我') : '我';
     
     if (choice === 'paid') {
-        originalMessage.paidBy = myNickname; // 记录是“我”付的钱
+        const amountToPay = originalMessage.amount;
+        if (state.globalSettings.walletBalance < amountToPay) {
+            alert('零钱余额不足！');
+            return;
+        }
+
+        state.globalSettings.walletBalance -= amountToPay;
+        await db.globalSettings.put(state.globalSettings);
+
+        // 【核心修改】已将图标源替换为您亲自提供的URL。
+        const meituanAvatarSVG = 'https://tc-new.z.wiki/autoupload/f/bXAooZ0IDljhh4MHapqVqKA4qcHEfP9-2R96V8Dzzxqyl5f0KlZfm6UsKj-HyTuv/20250829/ULyl/960X956/IMG_9932.jpeg';
+
+        await logWalletTransaction({
+            type: 'waimai_payment',
+            amount: -amountToPay,
+            counterpartyName: '美团代付扣款',
+            counterpartyAvatar: meituanAvatarSVG
+        });
+
+        originalMessage.paidBy = myNickname;
+        originalMessage.status = choice;
         systemContent = `[系统提示：你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单（时间戳: ${originalTimestamp}）完成了支付。此订单已关闭，其他成员不能再支付。]`;
-    } else {
+    
+    } else { // 如果是 'rejected'
+        originalMessage.status = choice;
         systemContent = `[系统提示：你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求（时间戳: ${originalTimestamp}）。]`;
     }
 
-    // 3. 创建一条新的、对用户隐藏的系统消息，告知AI结果
     const systemNote = {
         role: 'system',
         content: systemContent,
@@ -11391,16 +11329,9 @@ async function handleWaimaiResponse(originalTimestamp, choice) {
     };
     chat.history.push(systemNote);
 
-    // 4. 将更新后的数据保存到数据库，并立刻重绘UI
     await db.chats.put(chat);
     renderChatInterface(state.activeChatId);
-    
-    // 5. 【重要】只有在支付成功后，才触发一次AI响应，让它感谢你
-    if (choice === 'paid') {
-        triggerAiResponse();
-    }
 }
-// ▲▲▲ 新函数粘贴结束 ▲▲▲
 
 /**
  * 【全新】处理用户点击头像发起的“拍一-拍”，带有自定义后缀功能
