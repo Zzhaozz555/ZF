@@ -9269,42 +9269,64 @@ function updatePlaylistUI() {
     });
 }
 
-// ▼▼▼ 【V4 终极统一版】这是唯一的、正确的音乐播放控制中心 ▼▼▼
-
-/**
- * 播放指定索引的歌曲，已完全修复本地文件和Blob播放问题
- */
+// ▼▼▼ 【这是V5终极修复版，已重铸播放授权与错误处理系统】 ▼▼▼
 function playSong(index) {
     if (index < 0 || index >= musicState.playlist.length) return;
+    
+    // 释放可能存在的上一个Blob URL，防止内存泄漏和浏览器混淆
+    if (audioPlayer.src.startsWith('blob:')) {
+        URL.revokeObjectURL(audioPlayer.src);
+    }
+
     musicState.currentIndex = index;
     const track = musicState.playlist[index];
+    
+    // 更新歌词和UI
     musicState.parsedLyrics = parseLRC(track.lrcContent || "");
     musicState.currentLyricIndex = -1;
     renderLyrics();
+    updatePlaylistUI();
+    updatePlayerUI();
 
-    // 【核心：处理Blob】这里的逻辑现在能完美处理从数据库读出的 Blob 对象
+    // 【核心修正1：统一的数据处理流程】
+    // 无论是网络URL还是本地文件Blob，都先设置好src
     if (track.isLocal && track.src instanceof Blob) {
-        // 先释放上一个本地URL，避免内存泄漏
-        if (audioPlayer.src.startsWith('blob:')) {
-            URL.revokeObjectURL(audioPlayer.src);
-        }
         audioPlayer.src = URL.createObjectURL(track.src);
     } else if (!track.isLocal) {
         audioPlayer.src = track.src;
     } else {
         console.error('本地歌曲源错误或已丢失:', track);
-        alert(`无法播放歌曲《${track.name}》，文件源可能已损坏。`);
+        showCustomAlert('播放错误', `无法播放歌曲《${track.name}》，文件源可能已损坏或丢失。`);
         return;
     }
-    
-    // 【核心：安全播放】使用 .then() 和 .catch() 来处理播放，更稳定
-    audioPlayer.play().catch(e => {
-        console.error("播放失败:", e);
-        alert(`播放《${track.name}》失败，可能是文件格式不受支持。`);
-    });
-    
-    updatePlaylistUI();
-    updatePlayerUI();
+
+    // 【核心修正2：最稳妥的异步播放与错误捕获机制】
+    // 我们尝试播放，并为所有可能发生的错误都准备了清晰的中文提示
+    const playPromise = audioPlayer.play();
+    if (playPromise !== undefined) {
+        playPromise.then(_ => {
+            // 播放成功，一切正常
+            console.log(`《${track.name}》已开始播放。`);
+        }).catch(error => {
+            console.error(`播放《${track.name}》时发生错误:`, error);
+            let errorMessage = `播放《${track.name}》失败。`;
+            switch (error.name) {
+                case 'NotAllowedError':
+                    errorMessage += '\n原因：浏览器禁止自动播放，请先与页面进行一次交互（如点击一下屏幕）。';
+                    break;
+                case 'NotSupportedError':
+                    errorMessage += '\n原因：您选择的文件格式（可能是视频编码）不受当前浏览器或设备的音频播放器支持。';
+                    break;
+                default:
+                    errorMessage += `\n错误详情: ${error.message}`;
+            }
+            showCustomAlert('播放失败', errorMessage);
+            // 播放失败后，重置UI状态
+            musicState.isPlaying = false;
+            updatePlayerUI();
+        });
+    }
+
     updateMusicProgressBar();
 }
 
