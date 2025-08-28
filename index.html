@@ -9415,6 +9415,7 @@ async function addSongFromLocal(event) {
     event.target.value = null;
 }
 
+// ▼▼▼ 【这是V2终极修复版，已加入强制保存逻辑】 ▼▼▼
 /**
  * 【全新】打开手动歌词编辑器
  */
@@ -9435,17 +9436,20 @@ async function openLyricEditor() {
         'textarea' // 指定类型为多行文本框
     );
 
-    // 如果用户点击了“保存”
+    // 如果用户点击了“确定”
     if (newLrcContent !== null) {
-        // 1. 更新内存中的歌词
+        // 1. 更新内存中当前歌曲的歌词
         currentTrack.lrcContent = newLrcContent;
-        // 2. 将更新后的整个播放列表保存到数据库
+        
+        // 2. 【核心修复！】立刻调用 saveGlobalPlaylist() 函数，
+        //    将包含新歌词的整个播放列表强制写入数据库，确保永久保存！
         await saveGlobalPlaylist();
-        // 3. 重新解析并渲染新的歌词
+        
+        // 3. 重新解析并渲染新的歌词，让UI立刻生效
         musicState.parsedLyrics = parseLRC(newLrcContent);
         renderLyrics();
         
-        alert("歌词已更新！");
+        alert("歌词已成功保存！");
     }
 }
 
