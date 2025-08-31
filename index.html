@@ -4490,6 +4490,126 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】账单详情页面样式 ▼▼▼ */
+
+/* 1. 页面主容器 */
+#billing-details-screen {
+    background-color: #f0f2f5;
+}
+#phone-screen.dark-mode #billing-details-screen {
+    background-color: #000000;
+}
+.billing-details-content {
+    flex-grow: 1;
+    overflow-y: auto; /* 确保内容可滚动 */
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+/* 2. 顶部信息区 (头像, 标题, 金额) */
+.billing-details-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+#phone-screen.dark-mode .billing-details-header {
+    border-bottom-color: rgba(255,255,255,0.1);
+}
+.billing-details-header .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+.billing-details-header .title {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+.billing-details-header .amount {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--text-primary);
+    font-family: 'SF Mono', 'Menlo', monospace;
+}
+.billing-details-header .amount.income {
+    color: #07C160;
+}
+
+/* 3. 详情列表 */
+.billing-details-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 每一行之间的间距 */
+}
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+}
+.detail-row .label {
+    color: var(--text-secondary);
+}
+.detail-row .value {
+    color: var(--text-primary);
+    max-width: 65%; /* 防止长文本换行 */
+    text-align: right;
+    word-break: break-all;
+}
+
+/* 4. 底部服务标签 */
+.billing-details-footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 13px;
+    color: #5A88E4;
+}
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】退款详情页专属样式 ▼▼▼ */
+
+/* 1. 账单列表里红色的“对方已退还”状态 */
+.billing-record-item .refunded-status {
+    font-size: 12px;
+    color: #FA5151; /* 微信红 */
+    margin-top: 4px;
+}
+
+/* 2. 支出详情页里的“退款记录”一栏 */
+.detail-refund-record {
+    padding: 15px 0;
+    margin: 15px 0;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+#phone-screen.dark-mode .detail-refund-record {
+    border-color: rgba(255,255,255,0.1);
+}
+.detail-refund-record .label {
+    color: var(--text-secondary);
+}
+.detail-refund-record .value {
+    color: var(--text-primary);
+    font-size: 15px;
+}
+.detail-refund-record .value .refund-amount {
+    color: #FA5151; /* 金额用红色 */
+    font-weight: 500;
+}
+.detail-refund-record .value .timestamp {
+    display: block; /* 让时间戳换行 */
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
+
 ```**本次CSS重构的核心：**
 
     </style>
@@ -5269,6 +5389,19 @@ input:checked + .slider:before { transform: translateX(20px); }
     </div>
     <div class="billing-content" id="billing-list">
         <!-- 账单记录将由JS动态生成 -->
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】账单详情页面 ▼▼▼ -->
+<div id="billing-details-screen" class="screen">
+    <div class="header">
+        <span class="back-btn" style="font-size: 28px; font-weight: 300;">×</span>
+        <span></span> <!-- 标题留空，因为详情页没有标题 -->
+        <span style="width: 30px;"></span>
+    </div>
+    <div class="billing-details-content" id="billing-details-content">
+        <!-- 账单详情将由JS动态生成在这里 -->
     </div>
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
@@ -8876,37 +9009,39 @@ case 'change_avatar':
                     continue; // 接受指令只修改状态，不产生新消息
                 }
 
-                case 'decline_transfer': { // 使用大括号创建块级作用域
+                                                case 'decline_transfer': {
                     const originalTransferMsgIndex = chat.history.findIndex(m => m.timestamp === msgData.for_timestamp);
                     if (originalTransferMsgIndex > -1) {
                         const originalMsg = chat.history[originalTransferMsgIndex];
-                        originalMsg.status = 'declined';
+                        originalMsg.status = 'declined'; 
                         
-                        // 【核心】创建一条新的“退款”消息
-                        const refundMessage = {
-                            role: 'assistant',
-                            senderName: chat.name,
-                            type: 'transfer',
-                            isRefund: true, // 标记这是一条退款消息
-                            amount: originalMsg.amount,
-                            note: '转账已被拒收',
-                            timestamp: messageTimestamp++ // 使用递增的时间戳
+                        // 1. 把钱放进您的“临时口袋”
+                        state.globalSettings.walletBalance += originalMsg.amount;
+                        
+                        // 2.【核心修复】将更新后的余额，立刻、马上、永久地存回您的“银行金库”（数据库）！
+                        await db.globalSettings.put(state.globalSettings);
+
+                        const refundMessageInChat = {
+                            role: 'assistant', senderName: chat.name,
+                            type: 'transfer', isRefund: true,
+                            amount: originalMsg.amount, note: '转账已被拒收',
+                            timestamp: messageTimestamp++
                         };
+                        chat.history.push(refundMessageInChat);
+
+                        await logWalletTransaction({
+                            type: 'refund',
+                            amount: originalMsg.amount,
+                            originalMessageTimestamp: originalMsg.timestamp,
+                            counterpartyName: `转账-退款`,
+                            counterpartyAvatar: chat.settings.aiAvatar
+                        });
                         
-                        // 将新消息推入历史记录，它会被后续的循环处理并渲染
-                        chat.history.push(refundMessage);
-
-        // ▼▼▼ 在这里添加下面的代码 ▼▼▼
-        if (isViewingThisChat) {
-            // 因为退款消息是新生成的，所以我们直接将它添加到界面上
-            appendMessage(refundMessage, chat); 
-            // 同时，原始的转账消息状态变了，所以要重绘整个界面以更新它
-            renderChatInterface(chatId); 
-        }
-        // ▲▲▲ 添加结束 ▲▲▲
-
+                        if (isViewingThisChat) {
+                            appendMessage(refundMessageInChat, chat);
+                        }
                     }
-                    continue; // 继续处理AI返回的文本消息
+                    continue;
                 }
 
 // ▲▲▲ 添加结束 ▲▲▲
@@ -9134,7 +9269,8 @@ case 'send_and_recall': {
 
         async function sendSticker(sticker) { if (!state.activeChatId) return; const chat = state.chats[state.activeChatId]; const msg = { role: 'user', content: sticker.url, meaning: sticker.name, timestamp: Date.now() }; chat.history.push(msg); await db.chats.put(chat); appendMessage(msg, chat); renderChatList(); document.getElementById('sticker-panel').classList.remove('visible'); }
 
-        async function sendUserTransfer() { 
+        // ▼▼▼ 【V2-重构版】实现立即扣款和备注记录 ▼▼▼
+async function sendUserTransfer() { 
     if (!state.activeChatId) return; 
     const amountInput = document.getElementById('transfer-amount'); 
     const noteInput = document.getElementById('transfer-note'); 
@@ -9144,28 +9280,32 @@ case 'send_and_recall': {
         alert('请输入有效的金额 (0.01 到 99999 之间)！'); return; 
     } 
 
-    // 【核心修改1】检查余额
     if (state.globalSettings.walletBalance < amount) {
         alert('零钱余额不足！');
         return;
     }
 
-    // 【核心修改2】扣除余额并记录交易
-    state.globalSettings.walletBalance -= amount;
-    await db.globalSettings.put(state.globalSettings);
-    
+    // 1. 创建转账消息，并赋予一个唯一的“原始身份证号” (时间戳)
     const chat = state.chats[state.activeChatId]; 
     const senderName = chat.isGroup ? (chat.settings.myNickname || '我') : '我'; 
     const receiverName = chat.isGroup ? '群聊' : chat.name; 
+    const msg = { role: 'user', type: 'transfer', amount: amount, note: note, senderName, receiverName, timestamp: Date.now(), status: 'pending' }; 
+
+    // 2.【核心】立即扣款
+    state.globalSettings.walletBalance -= amount;
+    await db.globalSettings.put(state.globalSettings);
     
+    // 3.【核心】记录这笔支出账单，并把“备注”和“身份证号”一起存进去
     await logWalletTransaction({
         type: 'send',
-        amount: -amount, // 支出为负数
+        amount: -amount,
+        note: note, // <-- 备注修好了！
+        originalMessageTimestamp: msg.timestamp, // <-- 存入“身份证号”
         counterpartyName: `转账-给${receiverName}`,
         counterpartyAvatar: chat.isGroup ? chat.settings.groupAvatar : chat.settings.aiAvatar
     });
 
-    const msg = { role: 'user', type: 'transfer', amount: amount, note: note, senderName, receiverName, timestamp: Date.now() }; 
+    // 4. 发送消息并更新UI
     chat.history.push(msg); 
     await db.chats.put(chat); 
     appendMessage(msg, chat); 
@@ -12684,8 +12824,7 @@ function hideTransferActionModal() {
 }
 
 /**
- * 处理用户接受或拒绝转账的逻辑
- * @param {string} choice - 用户的选择, 'accepted' 或 'declined'
+ * 【V2-逻辑修正版】处理用户接受或拒绝转账的逻辑，严格遵守无账单规则
  */
 async function handleUserTransferResponse(choice) {
     if (!activeTransferTimestamp) return;
@@ -12696,29 +12835,27 @@ async function handleUserTransferResponse(choice) {
     if (messageIndex === -1) return;
 
     const originalMessage = chat.history[messageIndex];
-    originalMessage.status = choice;
+    originalMessage.status = choice; // 无论如何，先更新卡片状态
 
     let systemContent;
 
     if (choice === 'declined') {
+        // 【拒收逻辑】只创建退款卡片和AI提示，不涉及零钱和账单
         const refundMessage = {
-            role: 'user',
-            type: 'transfer',
-            isRefund: true, 
-            amount: originalMessage.amount,
-            note: '已拒收对方转账',
-            timestamp: Date.now()
+            role: 'user', type: 'transfer', isRefund: true,
+            amount: originalMessage.amount, note: '已拒收对方转账', timestamp: Date.now()
         };
         chat.history.push(refundMessage);
         systemContent = `[系统提示：你拒绝并退还了“${originalMessage.senderName}”的转账。]`;
-    } else { 
-        // 【核心修改】如果用户选择“接受”，增加余额并记录
+    } else { // choice === 'accepted'
+        // 【收钱逻辑】增加余额、记录账单、创建AI提示
         state.globalSettings.walletBalance += originalMessage.amount;
         await db.globalSettings.put(state.globalSettings);
         
         await logWalletTransaction({
             type: 'receive',
             amount: originalMessage.amount,
+            note: originalMessage.note, // 把原始备注也存入账单
             counterpartyName: `转账-来自${originalMessage.senderName}`,
             counterpartyAvatar: chat.settings.aiAvatar
         });
@@ -12727,10 +12864,8 @@ async function handleUserTransferResponse(choice) {
     }
 
     const hiddenMessage = {
-        role: 'system',
-        content: systemContent,
-        timestamp: Date.now() + 1, 
-        isHidden: true
+        role: 'system', content: systemContent,
+        timestamp: Date.now() + 1, isHidden: true
     };
     chat.history.push(hiddenMessage);
 
@@ -13255,7 +13390,7 @@ async function handleRecharge() {
 }
 
 /**
- * 【重构版 V2】渲染账单页面，实现月份分组和长按删除
+ * 【V5-终极修复版】渲染账单页面，为每一张卡片强制注入生命（点击事件）
  */
 async function renderBillingScreen() {
     const listEl = document.getElementById('billing-list');
@@ -13267,24 +13402,24 @@ async function renderBillingScreen() {
         return;
     }
 
+    const refundedTimestampSet = new Set(
+        transactions.filter(tx => tx.type === 'refund').map(tx => tx.originalMessageTimestamp)
+    );
+
     const groupedTxs = transactions.reduce((acc, tx) => {
         const date = new Date(tx.timestamp);
         const monthKey = `${date.getFullYear()}年${date.getMonth() + 1}月`;
-        
         if (!acc[monthKey]) {
             acc[monthKey] = { transactions: [], income: 0, expense: 0 };
         }
-        
         acc[monthKey].transactions.push(tx);
         if (tx.amount > 0) acc[monthKey].income += tx.amount;
         else acc[monthKey].expense += Math.abs(tx.amount);
-        
         return acc;
     }, {});
 
     for (const monthKey in groupedTxs) {
         const group = groupedTxs[monthKey];
-
         const monthHeader = document.createElement('div');
         monthHeader.className = 'billing-month-header';
         monthHeader.innerHTML = `
@@ -13299,31 +13434,34 @@ async function renderBillingScreen() {
             
             const txDate = new Date(tx.timestamp);
             const dateString = `${String(txDate.getMonth() + 1).padStart(2, '0')}月${String(txDate.getDate()).padStart(2, '0')}日 ${String(txDate.getHours()).padStart(2, '0')}:${String(txDate.getMinutes()).padStart(2, '0')}`;
-            
             const isIncome = tx.amount > 0;
             const amountClass = isIncome ? 'income' : '';
             const amountPrefix = isIncome ? '+' : '';
+            let refundedStatusHtml = '';
+
+            if (tx.type === 'send' && refundedTimestampSet.has(tx.originalMessageTimestamp)) {
+                refundedStatusHtml = `<div class="refunded-status">对方已退还</div>`;
+            }
 
             item.innerHTML = `
                 <img src="${tx.counterpartyAvatar || defaultAvatar}" class="avatar">
                 <div class="info">
                     <div class="title">${tx.counterpartyName}</div>
-                    <!-- 【核心修正】在这里，将 class 从 "timestamp" 改为 "billing-timestamp" -->
                     <div class="billing-timestamp">${dateString}</div>
                 </div>
-                <span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span>
+                <div style="text-align: right;">
+                    <span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span>
+                    ${refundedStatusHtml}
+                </div>
             `;
             
-            // 【核心修改】在这里为每个账单项添加长按删除监听器
+            // 【核心修复】为每一张被创造出来的卡片，都强制注入“生命”（点击和长按事件）
+            item.addEventListener('click', () => showBillingDetails(tx.id));
             addLongPressListener(item, async () => {
-                 const confirmed = await showCustomConfirm(
-                    '删除记录',
-                    '确定要删除这条账单记录吗？此操作不会影响您的零钱余额。',
-                    { confirmButtonClass: 'btn-danger' }
-                );
+                const confirmed = await showCustomConfirm('删除记录', '确定要删除这条账单记录吗？此操作不会影响您的零钱余额。', { confirmButtonClass: 'btn-danger' });
                 if (confirmed) {
                     await db.walletTransactions.delete(tx.id);
-                    await renderBillingScreen(); // 重新渲染列表
+                    await renderBillingScreen();
                     alert('账单记录已删除。');
                 }
             });
@@ -13348,6 +13486,104 @@ async function logWalletTransaction(txData) {
         timestamp: Date.now()
     };
     await db.walletTransactions.add(transaction);
+}
+
+/**
+ * 【全新】格式化日期，精确到秒
+ */
+function formatDateToSeconds(timestamp) {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+}
+
+/**
+ * 【V2-建筑师版】显示账单详情页，能盖三种不同的楼
+ */
+async function showBillingDetails(txId) {
+    const tx = await db.walletTransactions.get(txId);
+    if (!tx) { alert("找不到该账单记录。"); return; }
+
+    const contentEl = document.getElementById('billing-details-content');
+    const isIncome = tx.amount > 0;
+    const amountClass = isIncome ? 'income' : '';
+    const amountPrefix = isIncome ? '+' : '';
+    
+    let headerHtml = '', detailsListHtml = '', footerHtml = '';
+
+    // 【核心】根据账单类型，选择不同的“图纸”来盖楼
+    switch (tx.type) {
+        case 'send':
+            // 对于支出账单，我们需要检查它是否已被退款
+            const originalMsg = Object.values(state.chats).flatMap(c => c.history).find(m => m.timestamp === tx.originalMessageTimestamp);
+            const isRefunded = originalMsg && originalMsg.status === 'declined';
+            
+            headerHtml = `<div class="billing-details-header"><img src="${tx.counterpartyAvatar}" class="avatar"><div class="title">${tx.counterpartyName}</div><span class="amount">${tx.amount.toFixed(2)}</span></div>`;
+            
+            if (isRefunded) {
+                // 如果已退款，盖“图三”的楼
+                const refundTx = await db.walletTransactions.where({originalMessageTimestamp: tx.originalMessageTimestamp, type: 'refund'}).first();
+                detailsListHtml = `
+                    <div class="detail-refund-record">
+                        <div class="detail-row">
+                            <span class="label">退款记录</span>
+                            <span class="value"><span class="refund-amount">已退款 ¥${Math.abs(tx.amount).toFixed(2)}</span><span class="timestamp">${formatDateToSeconds(refundTx.timestamp)}</span></span>
+                        </div>
+                    </div>
+                    <div class="detail-row"><span class="label">当前状态</span><span class="value">对方已退还</span></div>
+                    <div class="detail-row"><span class="label">转账说明</span><span class="value">${tx.note || '微信转账'}</span></div>
+                    <div class="detail-row"><span class="label">转账时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div>
+                    <div class="detail-row"><span class="label">支付方式</span><span class="value">零钱</span></div>
+                    <div class="detail-row"><span class="label">转账单号</span><span class="value">...${String(tx.timestamp).slice(-10)}</span></div>`;
+                footerHtml = `<div class="billing-details-footer">账单服务</div>`;
+            } else {
+                // 否则，盖普通的支出楼
+                detailsListHtml = `
+                    <div class="detail-row"><span class="label">当前状态</span><span class="value">对方已收钱</span></div>
+                    <div class="detail-row"><span class="label">转账说明</span><span class="value">${tx.note || '微信转账'}</span></div>
+                    <div class="detail-row"><span class="label">转账时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div>
+                    <div class="detail-row"><span class="label">收款时间</span><span class="value">${formatDateToSeconds(tx.timestamp + Math.random() * 10000)}</span></div>
+                    <div class="detail-row"><span class="label">支付方式</span><span class="value">零钱</span></div>`;
+                footerHtml = `<div class="billing-details-footer">账单服务</div>`;
+            }
+            break;
+
+        case 'receive':
+            // 普通的收入楼
+            headerHtml = `<div class="billing-details-header"><img src="${tx.counterpartyAvatar}" class="avatar"><div class="title">${tx.counterpartyName}</div><span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span></div>`;
+            detailsListHtml = `
+                <div class="detail-row"><span class="label">当前状态</span><span class="value">已存入零钱</span></div>
+                <div class="detail-row"><span class="label">转账说明</span><span class="value">${tx.note || '微信转账'}</span></div>
+                <div class="detail-row"><span class="label">转账时间</span><span class="value">${formatDateToSeconds(tx.timestamp - Math.random() * 10000)}</span></div>
+                <div class="detail-row"><span class="label">收款时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div>`;
+            footerHtml = `<div class="billing-details-footer">账单服务</div>`;
+            break;
+            
+        case 'refund':
+            // 【全新】盖“图二”的退款详情楼
+            headerHtml = `<div class="billing-details-header"><img src="${tx.counterpartyAvatar}" class="avatar"><div class="title">${tx.counterpartyName}</div><span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span></div>`;
+            detailsListHtml = `
+                <div class="detail-row"><span class="label">退款状态</span><span class="value">已退款</span></div>
+                <div class="detail-row"><span class="label">退款时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div>
+                <div class="detail-row"><span class="label">退款方式</span><span class="value">零钱</span></div>
+                <div class="detail-row"><span class="label">退款单号</span><span class="value">...${String(tx.timestamp).slice(-15)}</span></div>
+                <div class="detail-row"><span class="label">原订单</span><span class="value" style="color: #5A88E4;">查看原订单</span></div>`;
+            footerHtml = `<div class="billing-details-footer">本服务由财付通提供</div>`;
+            break;
+        
+        // 外卖和神秘收支的楼保持不变
+        case 'waimai_payment':
+            headerHtml = `<div class="billing-details-header"><img src="${tx.counterpartyAvatar}" class="avatar"><div class="title">美团</div><span class="amount">${tx.amount.toFixed(2)}</span></div>`;
+            detailsListHtml = `<div class="detail-row"><span class="label">当前状态</span><span class="value">支付成功</span></div><div class="detail-row"><span class="label">支付时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div><div class="detail-row"><span class="label">收单机构</span><span class="value">财付通支付科技有限公司</span></div><div class="detail-row"><span class="label">支付方式</span><span class="value">零钱</span></div><div class="detail-row"><span class="label">交易单号</span><span class="value">${Date.now()}${Math.floor(Math.random()*1000)}</span></div><div class="detail-row"><span class="label">商户单号</span><span class="value">${Math.floor(Math.random()*1000000000000000)}</span></div>`;
+            break;
+        case 'recharge_in': case 'recharge_out':
+            headerHtml = `<div class="billing-details-header"><img src="${tx.counterpartyAvatar}" class="avatar"><div class="title">${tx.counterpartyName}</div><span class="amount ${amountClass}">${amountPrefix}${tx.amount.toFixed(2)}</span></div>`;
+            detailsListHtml = `<div class="detail-row"><span class="label">当前状态</span><span class="value">${isIncome ? '已收入小金库' : '已打水漂'}</span></div><div class="detail-row"><span class="label">转账说明</span><span class="value">神秘调动</span></div><div class="detail-row"><span class="label">订单时间</span><span class="value">${formatDateToSeconds(tx.timestamp)}</span></div>`;
+            break;
+    }
+
+    contentEl.innerHTML = `<div class="billing-details-list">${headerHtml}${detailsListHtml}</div>${footerHtml}`;
+    showScreen('billing-details-screen');
 }
 
         // ===================================================================
@@ -15572,6 +15808,18 @@ document.getElementById('chat-messages').addEventListener('click', (e) => {
 });
 
 document.getElementById('chat-header-status').addEventListener('click', handleEditStatusClick);
+// ▼▼▼ 【全新】账单详情功能事件绑定 ▼▼▼
+document.getElementById('billing-list').addEventListener('click', (e) => {
+    const item = e.target.closest('.billing-record-item');
+    if (item && item.dataset.txId) {
+        showBillingDetails(parseInt(item.dataset.txId));
+    }
+});
+document.querySelector('#billing-details-screen .back-btn').addEventListener('click', () => {
+    showScreen('billing-screen');
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
+
 /**
  * 【最终修复版】处理用户点击状态栏，弹出编辑框让用户修改AI的当前状态
  */
