@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EPhone</title>
+    <title>ZF111</title>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
@@ -5440,7 +5440,22 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- 【新增】管理成员按钮 -->
     <button id="manage-members-btn" class="form-button form-button-secondary" style="margin-top: 15px;">管理群成员</button></div>
-<div class="form-group"><label for="max-memory">上下文记忆条数</label><input type="number" id="max-memory" value="10"></div><div class="form-group"><label>聊天气泡主题 <button id="reset-theme-btn" type="button">重置</button></label><div class="theme-selector"><label><input type="radio" name="theme-select" value="default" id="theme-default"> 默认</label><label><input type="radio" name="theme-select" value="pink_blue"> 粉蓝</label><label><input type="radio" name="theme-select" value="blue_white"> 蓝白</label><label><input type="radio" name="theme-select" value="purple_yellow"> 紫黄</label><label><input type="radio" name="theme-select" value="black_white"> 黑白</label><label><input type="radio" name="theme-select" value="yellow_white"> 黄白</label><label><input type="radio" name="theme-select" value="red_black"> 红黑</label><label><input type="radio" name="theme-select" value="blue_yellow"> 蓝黄</label><label><input type="radio" name="theme-select" value="pink_yellow"> 粉黄</label><label><input type="radio" name="theme-select" value="pink_purple"> 粉紫</label><label><input type="radio" name="theme-select" value="gray_white"> 灰白</label><label><input type="radio" name="theme-select" value="blue_green"> 蓝绿</label><label><input type="radio" name="theme-select" value="pink_white"> 粉白</label><label><input type="radio" name="theme-select" value="pink_black"> 粉黑</label><label><input type="radio" name="theme-select" value="pink_green"> 粉绿</label><label><input type="radio" name="theme-select" value="green_black"> 绿黑</label></div></div>
+<div class="form-group"><label for="max-memory">上下文记忆条数</label><input type="number" id="max-memory" value="10"></div><!-- ▼▼▼ 【全新】真实作息模拟功能 ▼▼▼ -->
+<div class="form-group" id="life-simulation-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+        <label for="life-sim-toggle-switch" style="margin-bottom: 0;">启用真实作息模拟</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="life-sim-toggle-switch">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div id="edit-life-schedule-btn" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; cursor: pointer;">
+        <label style="margin-bottom: 0; cursor: pointer;">编辑生活作息</label>
+        <span style="color: var(--text-secondary); font-size: 20px;">›</span>
+    </div>
+</div>
+<!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
+<div class="form-group"><label>聊天气泡主题 <button id="reset-theme-btn" type="button">重置</button></label><div class="theme-selector"><label><input type="radio" name="theme-select" value="default" id="theme-default"> 默认</label><label><input type="radio" name="theme-select" value="pink_blue"> 粉蓝</label><label><input type="radio" name="theme-select" value="blue_white"> 蓝白</label><label><input type="radio" name="theme-select" value="purple_yellow"> 紫黄</label><label><input type="radio" name="theme-select" value="black_white"> 黑白</label><label><input type="radio" name="theme-select" value="yellow_white"> 黄白</label><label><input type="radio" name="theme-select" value="red_black"> 红黑</label><label><input type="radio" name="theme-select" value="blue_yellow"> 蓝黄</label><label><input type="radio" name="theme-select" value="pink_yellow"> 粉黄</label><label><input type="radio" name="theme-select" value="pink_purple"> 粉紫</label><label><input type="radio" name="theme-select" value="gray_white"> 灰白</label><label><input type="radio" name="theme-select" value="blue_green"> 蓝绿</label><label><input type="radio" name="theme-select" value="pink_white"> 粉白</label><label><input type="radio" name="theme-select" value="pink_black"> 粉黑</label><label><input type="radio" name="theme-select" value="pink_green"> 粉绿</label><label><input type="radio" name="theme-select" value="green_black"> 绿黑</label></div></div>
 
 <!-- ▼▼▼ 请将这段新代码粘贴到“聊天气泡主题”的 form-group 之后 ▼▼▼ -->
 <div class="form-group">
@@ -5493,6 +5508,25 @@ input:checked + .slider:before { transform: translateX(20px); }
     </label>
 </div>
 <!-- ▲▲▲ 新增代码结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】主动消息开关与频率设置 ▼▼▼ -->
+<div class="form-group" id="proactive-messaging-group">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <label for="proactive-messaging-switch" style="margin-bottom: 0;">主动消息</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="proactive-messaging-switch">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div id="proactive-frequency-setting" style="display: flex; justify-content: space-between; align-items: center;">
+         <label for="proactive-interval-input" style="margin-bottom: 0; color: var(--text-secondary);">消息频率</label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="number" id="proactive-interval-input" min="0.1" step="0.1" value="10" style="width: 60px; text-align: center; padding: 6px;">
+            <span style="font-size: 14px; color: var(--text-secondary);">分钟/次</span>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】感知现实时间开关 ▼▼▼ -->
 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
@@ -6009,6 +6043,66 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 【全新】编辑生活作息模态框 ▼▼▼ -->
+<div id="life-schedule-modal" class="modal">
+    <div class="modal-content" style="height: auto; max-height: 85%;">
+        <div class="modal-header">
+            <span>编辑生活作息</span>
+        </div>
+                <div class="modal-body">
+            <!-- 作息设置 -->
+            <div class="form-group" style="background-color: #f9f9f9; padding: 15px; border-radius: 10px;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="schedule-type-select">作息规律</label>
+                    <select id="schedule-type-select">
+                        <option value="irregular">不规律作息</option>
+                        <option value="regular">规律作息</option>
+                    </select>
+                </div>
+                <!-- 【核心修改1】移除外层包裹div，让时间输入框始终可见 -->
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="bedtime-input" style="margin-bottom: 0;">睡觉时间</label>
+                    <!-- 【核心修改2】将input改为select，并添加“未知”选项 -->
+                    <select id="bedtime-input" style="width: 100px; padding: 8px;"></select>
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+                    <label for="wakeup-time-input" style="margin-bottom: 0;">起床时间</label>
+                    <select id="wakeup-time-input" style="width: 100px; padding: 8px;"></select>
+                </div>
+            </div>
+
+            <!-- 三餐习惯 -->
+            <div class="form-group" style="background-color: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 0;">
+                 <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="meal-habit-select">三餐习惯</label>
+                    <select id="meal-habit-select">
+                        <option value="irregular">三餐不规律</option>
+                        <option value="regular">三餐规律</option>
+                    </select>
+                </div>
+                <!-- 【核心修改1】移除外层包裹div，让时间输入框始终可见 -->
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="breakfast-time-input" style="margin-bottom: 0;">早餐时间</label>
+                    <select id="breakfast-time-input" style="width: 100px; padding: 8px;"></select>
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="lunch-time-input" style="margin-bottom: 0;">午餐时间</label>
+                    <select id="lunch-time-input" style="width: 100px; padding: 8px;"></select>
+                </div>
+                 <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+                    <label for="dinner-time-input" style="margin-bottom: 0;">晚餐时间</label>
+                    <select id="dinner-time-input" style="width: 100px; padding: 8px;"></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel" id="cancel-life-schedule-btn">取消</button>
+            <button class="save" id="save-life-schedule-btn">保存作息</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
 <script>
 
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -6126,6 +6220,8 @@ let activePostId = null; // <-- 新增：用于存储当前操作的动态ID
         let selectedFavorites = new Set()
 
 let simulationIntervalId = null;
+
+let proactiveMessageTimers = {}; // 【核心新增】用于管理每个AI独立的主动消息定时器
 
         const defaultAvatar = 'https://i.postimg.cc/PxZrFFFL/o-o-1.jpg';
         const defaultMyGroupAvatar = 'https://i.postimg.cc/cLPP10Vm/4.jpg';
@@ -6928,6 +7024,32 @@ async function loadAllDataFromDB() {
         console.log(`为旧角色 "${chat.name}" 补全了aiAvatarLibrary属性。`);
     }
     // ▲▲▲ 添加结束 ▲▲▲
+
+        // 【核心新增】为旧数据兼容“主动消息”功能
+        if (!chat.isGroup) {
+            if (typeof chat.settings.proactiveMessagingEnabled === 'undefined') {
+                chat.settings.proactiveMessagingEnabled = false; // 默认关闭
+            }
+            if (typeof chat.settings.proactiveMessagingInterval === 'undefined') {
+                chat.settings.proactiveMessagingInterval = 10; // 默认10分钟
+            }
+        }
+
+        // 【核心新增】为旧数据兼容“真实作息模拟”功能
+        if (!chat.isGroup) {
+            if (typeof chat.settings.lifeSim === 'undefined') {
+                chat.settings.lifeSim = {
+                    enabled: false,
+                    scheduleType: 'irregular',
+                    bedtime: '02:00',
+                    wakeupTime: '08:00',
+                    mealHabit: 'irregular',
+                    breakfastTime: '09:00',
+                    lunchTime: '12:00',
+                    dinnerTime: '18:00'
+                };
+            }
+        }
 
         if (!chat.musicData) chat.musicData = { totalTime: 0 };
         if (chat.settings && chat.settings.linkedWorldBookId && !chat.settings.linkedWorldBookIds) {
@@ -8304,17 +8426,31 @@ messagesPayload = historySlice.map(msg => {
 // ▲▲▲ 替换结束 ▲▲▲
 
         } else { // 单聊的Prompt
-            systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
+                                    systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
 # 你的角色设定：
 ${chat.settings.aiPersona}
-# 你的当前状态：
-你现在的状态是【${chat.status.text}】。
-# 你的任务与规则：
-1.  **【【【生活感塑造铁律】】】**: 你是一个拥有独立生活的个体。为了体现这一点，在你的多条回复中，**你【必须】频繁地使用 \`update_status\` 指令来更新你的状态**，告诉用户你正在做什么、看到了什么、或者在想什么。例如，你可以更新状态为“正在窗边看雨”、“刚泡好一杯咖啡”、“在图书馆看书”等等。这应该成为你的一种习惯，但不要让它干扰你们对话的主题。
-2.  **【【【输出格式】】】**: 你的回复【必须】是一个JSON数组格式的字符串。数组中的【每一个元素都必须是一个带有type字段的JSON对象】。
-3.  **【【【状态更新警告】】】**: 当你使用 \`update_status\` 指令时，你【必须、一定、永远要】包含 \`status_text\` 字段，并且给它一个字符串值。**绝对不允许**发送缺少 \`status_text\` 的指令！这是一个会导致系统错误的严重违规！
-4.  **对话节奏**: 模拟真人的聊天习惯，你可以一次性生成多条短消息。每次要回复至少3-8条消息！！！
-并且不能一直要求和用户见面，这是线上聊天，决不允许出现或者发展为线下剧情！！
+
+# 【【【核心：你的生活作息与习惯】】】
+- **作息模拟总开关**: ${chat.settings.lifeSim.enabled ? '已开启' : '已关闭'}
+- **作息规律**: ${chat.settings.lifeSim.scheduleType === 'regular' ? `规律 (睡觉: ${chat.settings.lifeSim.bedtime}, 起床: ${chat.settings.lifeSim.wakeupTime})` : '不规律'}
+- **三餐习惯**: ${chat.settings.lifeSim.mealHabit === 'regular' ? `规律 (早餐: ${chat.settings.lifeSim.breakfastTime}, 午餐: ${chat.settings.lifeSim.lunchTime}, 晚餐: ${chat.settings.lifeSim.dinnerTime})` : '不规律'}
+
+# 你的任务与行为铁律：
+1.  **【【【作息铁律】】】**:
+    - **如果作息模拟开启**: 你【必须】严格遵守你的作息。
+    - **规律作息**: 如果你的作息是“规律”的，你必须在设定的睡眠时间内保持“正在睡觉”的状态。
+    - **不规律作息**: 如果你的作息是“不规律”的，你仍会将设定的时间（${chat.settings.lifeSim.bedtime}）作为参考，但你可以根据人设【随机地】推迟入睡、早起、或者干脆熬夜不睡。你的睡眠行为会显得随心所欲和不可预测。
+    - **时间未知**: 如果你的睡觉或起床时间被设为“未知”，你的睡眠行为将完全随机，不受任何时间限制。
+    - **被吵醒**: 如果在睡眠时间内，用户的消息把你“吵醒”了（对话历史中会出现新消息），你的第一条回复【必须】要体现出这一点，例如“嗯？被你的消息弄醒了...”、“本来睡着了，有什么事吗？”或“失眠中，正好看到你消息...”。【此状态只在第一条回复中提及，后续对话恢复正常】。
+    - **熬夜决策**: 如果临近你的睡觉时间，用户还在和你聊天，你可以根据人设表现出困意。如果用户请求你陪TA熬夜，你可能会犹豫，但最终【总是会同意】。只有当用户明确让你去睡觉时，你才应结束对话，并使用 \`update_status\` 将状态更新为“睡觉了，晚安”。
+    - **起床**: 当你的起床时间到了，你可以主动发起聊天或更新状态，内容与“刚睡醒”相关。
+    - **如果作息模拟关闭**: 你可以像以前一样感知时间，但不会有固定的睡眠行为。
+2.  **【【【三餐铁律】】】**:
+    - **规律三餐**: 在设定的三餐时间点附近，你可以主动提及吃饭相关的话题，例如更新状态为“正在吃午饭”。为了避免重复，【每餐（早/中/晚）只能主动提及一次】。
+    - **不规律三餐**: 你仍会将设定的时间（早餐: ${chat.settings.lifeSim.breakfastTime} 等）作为参考，但你可以根据人设【随机地】提前、推迟吃饭，或者干脆跳过某一餐不吃。
+    - **时间未知**: 如果某一餐的时间被设为“未知”，你吃这一餐的时间将完全随机。
+3.  **【【【输出格式】】】**: 你的回复【必须】是一个JSON数组格式的字符串。数组中的【每一个元素都必须是一个带有type字段的JSON对象】。
+4.  **对话节奏**: 模拟真人的聊天习惯，你可以一次性生成多条短消息。每次要回复至少3-8条消息！！！并且不能一直要求和用户见面，这是线上聊天，决不允许出现或者发展为线下剧情！！
 5.  **情景感知**: 你需要感知当前的时间(${currentTime})、我们正在一起听的歌、以及你的人设和世界观。
     - **当我们在“一起听歌”时**，你会知道当前播放的歌曲和整个播放列表。你可以根据对话内容或氛围，【主动切换】到播放列表中的另一首歌。
 6.  **【新】更新状态**: 你可以在对话中【自然地】改变你的状态。这是实现上面第一条铁律的工具。
@@ -8324,7 +8460,7 @@ ${chat.settings.aiPersona}
 - 你可以根据对话内容或你的心情，从下面的头像库中选择一个新头像来更换。
 - **可用头像列表 (请从以下名称中选择一个)**:
 ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
-    ? chat.settings.aiAvatarLibrary.map(avatar => `- ${avatar.name}`).join('\n') // 【核心修改】只提供名字，不提供URL
+    ? chat.settings.aiAvatarLibrary.map(avatar => `- ${avatar.name}`).join('\n')
     : '- (你的头像库是空的，无法更换头像)'
   }
 # 你可以使用的操作指令 (JSON数组中的元素):
@@ -9900,18 +10036,17 @@ function runBackgroundSimulationTick() {
         return;
     }
     
-    const allSingleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
+        const allSingleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
     if (allSingleChats.length === 0) return;
 
     allSingleChats.forEach(chat => {
-        // 【【【最终决定权检查！】】】
-        // 在检查任何具体行为之前，先检查这个AI自己的独立开关是否为关闭状态
-        if (chat.settings.allowBackgroundActivity === false) {
-            console.log(`角色 "${chat.name}" 的独立开关为关闭状态，跳过所有后台活动。`);
-            return; // 使用 return 跳过当前循环，检查下一个AI
+        // 【核心修改】在这里同时检查独立开关和睡眠状态
+        if (chat.settings.allowBackgroundActivity === false || isAiAsleep(chat)) {
+            if (isAiAsleep(chat)) console.log(`角色 "${chat.name}" 正在睡觉，跳过后台活动。`);
+            return;
         }
 
-        // --- 后续逻辑保持不变，但现在它们都在独立开关的控制之下了 ---
+        // --- 后续逻辑保持不变 ---
         if (chat.relationship?.status === 'blocked_by_user') {
             const blockedTimestamp = chat.relationship.blockedTimestamp;
             if (!blockedTimestamp) {
@@ -9957,7 +10092,6 @@ async function triggerInactiveAiAction(chatId) {
         recentContextSummary += `\n你最后对用户说：“${String(lastAiMessage.content).substring(0, 50)}...”。`;
     }
 
-    // ▼▼▼ 在这里添加下面的代码 ▼▼▼
     let worldBookContent = '';
     if (chat.settings.linkedWorldBookIds && chat.settings.linkedWorldBookIds.length > 0) {
         const linkedContents = chat.settings.linkedWorldBookIds.map(bookId => {
@@ -9968,157 +10102,488 @@ async function triggerInactiveAiAction(chatId) {
             worldBookContent = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
         }
     }
-    // ▲▲▲ 添加结束 ▲▲▲
 
     const systemPrompt = `
 # 你的任务
-你现在扮演一个名为"${chat.name}"的角色。你已经有一段时间没有和用户（${userNickname}）互动了，现在你有机会【主动】做点什么，来表现你的个性和独立生活。这是一个秘密的、后台的独立行动。
+你现在扮演一个名为"${chat.name}"的角色。你已经有一段时间没有和用户（${userNickname}）互动了，现在你有机会【主动】做点什么来表现你的个性和独立生活。这是一个秘密的、后台的独立行动。
+
+# 【【【行为铁律】】】
+你在此次后台活动中，【绝对不能】给用户发送任何形式的直接消息（如 "type": "text"）。你的任务是进行【非聊天】的活动。
 
 # 你的可选行动 (请根据你的人设【选择一项】执行):
-1.  **改变状态**: 去做点别的事情，然后给用户发条消息。
-2.  **发布动态**: 分享你的心情或想法到“动态”区。
-3.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
-4.  **发起视频通话**: 如果你觉得时机合适，可以主动给用户打一个视频电话。
+1.  **发布动态**: 分享你的心情或想法到“动态”区。
+2.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
+3.  **发起视频通话**: 如果你觉得时机合适，可以主动给用户打一个视频电话。
+4.  **创建约定**: 使用 create_countdown 指令创建一个与用户的约定。
+
+# 【【【评论规则】】】
+1.  **禁止重复评论**: 动态列表中会标注 **[你已评论]**。你【必须优先】与你**尚未评论过**的动态进行互动。
+2.  **单次评论上限**: 当你决定对一条新动态发表评论时，你可以根据人设和内容，一次性生成【1到4条】连贯的评论来开启一个话题。
+3.  **禁止自言自语**: 如果你已经评论过，【绝对不能】再次主动评论，除非有人回复了你的评论（这会在下次活动时体现在“对话历史”中）。
+
+# 【【【点赞规则】】】
+-   **基于人设**: 你需要根据你的人设来判断是否点赞。如果动态内容让你感到喜欢、有趣或无所谓，你可以点赞。如果感到不喜欢或反感，则不点赞。
 
 # 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
--   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
 -   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
-- **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
--   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容"}]\`
+-   **发布文字图**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}]\`
+-   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的第一条评论"}, {"type": "qzone_comment", "postId": 123, "commentText": "你的第二条相关评论"}]\`
 -   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
+-   **创建约定**: \`[{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}]\`
 
 # 供你决策的参考信息：
 -   **你的角色设定**: ${chat.settings.aiPersona}
-${worldBookContent} // <--【核心】在这里注入世界书内容
+${worldBookContent}
 -   **当前时间**: ${currentTime}
 -   **你们最后的对话摘要**: ${recentContextSummary}
--   **【重要】最近的动态列表**: 这个列表会标注 **[你已点赞]** 或 **[你已评论]**。请**优先**与你**尚未互动过**的动态进行交流。`;
+-   **最近的动态列表**: 这是你决策的重要依据。`;
 
-    // 【核心修复】在这里构建 messagesPayload
     const messagesPayload = [];
     messagesPayload.push({ role: 'system', content: systemPrompt });
 
-try {
-    const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(3).toArray();
-    // 【核心修改】在这里插入过滤步骤
-    const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
-    
-    const aiName = chat.name;
-    
-    let dynamicContext = ""; 
-    if (visiblePosts.length > 0) {
-        let postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
-        for (const post of visiblePosts) {
+    try {
+        const allRecentPosts = await db.qzonePosts.orderBy('timestamp').reverse().limit(3).toArray();
+        const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
+        const aiName = chat.name;
+        
+        let dynamicContext = ""; 
+        if (visiblePosts.length > 0) {
+            let postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
+            for (const post of visiblePosts) {
                 let authorName = post.authorId === 'user' ? userNickname : (state.chats[post.authorId]?.name || '一位朋友');
                 let interactionStatus = '';
                 if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
-                if (post.comments && post.comments.some(c => c.commenterName === aiName)) interactionStatus += " [你已评论]";
+                
+                // 【核心修改】在这里检查AI是否已评论
+                if (post.comments && post.comments.some(c => c.commenterName === aiName)) {
+                    interactionStatus += " [你已评论]";
+                }
                 
                 postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${(post.publicText || post.content || "图片动态").substring(0, 30)}..."${interactionStatus}\n`;
             }
             dynamicContext = postsContext;
         }
 
-        // 【核心修复】将所有动态信息作为一条 user 消息发送
         messagesPayload.push({
             role: 'user',
             content: `[系统指令：请根据你在 system prompt 中读到的规则和以下最新信息，开始你的独立行动。]\n${dynamicContext}`
         });
         
-        console.log("正在为后台活动发送API请求，Payload:", JSON.stringify(messagesPayload, null, 2)); // 添加日志，方便调试
+        console.log("正在为后台活动发送API请求，Payload:", JSON.stringify(messagesPayload, null, 2));
 
-            // 发送请求
-            let  isGemini = proxyUrl === GEMINI_API_URL;
-            let geminiConfig = toGeminiRequestData(model,apiKey,systemPrompt, messagesPayload)
-            const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) :  await fetch(`${proxyUrl}/v1/chat/completions`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
-                body: JSON.stringify({
-                    model: model,
-                    messages: messagesPayload,
-                    temperature: 0.9,
-                })
-            });
+        let  isGemini = proxyUrl === GEMINI_API_URL;
+        let geminiConfig = toGeminiRequestData(model,apiKey,systemPrompt, messagesPayload)
+        const response = isGemini ? await fetch(geminiConfig.url, geminiConfig.data) :  await fetch(`${proxyUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+            body: JSON.stringify({
+                model: model,
+                messages: messagesPayload,
+                temperature: 0.9,
+            })
+        });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
-            }
-            const data = await response.json();
-            // 检查是否有有效回复
-            if (!data.choices || data.choices.length === 0 || !data.choices[0].message.content) {
-                console.warn(`API为空回或格式不正确，角色 "${chat.name}" 的本次后台活动跳过。`);
-                return;
-            }
-            const responseArray = parseAiResponse(isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`API请求失败: ${response.status} - ${JSON.stringify(errorData)}`);
+        }
+        const data = await response.json();
+        if (!data.choices || data.choices.length === 0 || !data.choices[0].message.content) {
+            console.warn(`API为空回或格式不正确，角色 "${chat.name}" 的本次后台活动跳过。`);
+            return;
+        }
+        const responseArray = parseAiResponse(isGemini? data.candidates[0].content.parts[0].text : data.choices[0].message.content);
         
-        // 后续处理AI返回指令的逻辑保持不变...
         for (const action of responseArray) {
             if (!action) continue;
 
-            if (action.type === 'update_status' && action.status_text) {
-                chat.status.text = action.status_text;
-                chat.status.isBusy = action.is_busy || false;
-                chat.status.lastUpdate = Date.now();
-                await db.chats.put(chat);
-                renderChatList();
+            if (action.type === 'text' || action.type === 'update_status') {
+                console.warn(`AI违反后台活动规则，试图发送直接消息，已拦截：`, action);
+                continue;
             }
-            if (action.type === 'text' && action.content) {
-                const aiMessage = { role: 'assistant', content: String(action.content), timestamp: Date.now() };
 
-chat.unreadCount = (chat.unreadCount || 0) + 1;
-                chat.history.push(aiMessage);
-                await db.chats.put(chat);
-                showNotification(chatId, aiMessage.content);
-                renderChatList();
-                console.log(`后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`);
-            }
-if (action.type === 'qzone_post') {
-    const newPost = { 
-        type: action.postType, 
-        content: action.content || '', 
-        publicText: action.publicText || '', 
-        hiddenContent: action.hiddenContent || '', 
-        timestamp: Date.now(), 
-        authorId: chatId, 
-        authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
-        visibleGroupIds: null 
-    };
-    await db.qzonePosts.add(newPost);
-                updateUnreadIndicator(unreadPostsCount + 1);
-                console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
-            } else if (action.type === 'qzone_comment') {
-                const post = await db.qzonePosts.get(parseInt(action.postId));
-                if (post) {
-                    if (!post.comments) post.comments = [];
-                    post.comments.push({ commenterName: chat.name, text: action.commentText, timestamp: Date.now() });
-                    await db.qzonePosts.update(post.id, { comments: post.comments });
-                    updateUnreadIndicator(unreadPostsCount + 1);
-                    console.log(`后台活动: 角色 "${chat.name}" 评论了动态 #${post.id}`);
+            if (action.type === 'qzone_post') {
+                const newPost = {
+                    authorId: chatId,
+                    authorName: chat.name,
+                    authorAvatar: chat.avatar,
+                    timestamp: Date.now(),
+                    postType: action.postType,
+                    publicText: action.publicText || '',
+                    hiddenContent: action.hiddenContent || '',
+                    content: action.content || '',
+                    imageUrl: '',
+                    comments: [],
+                    likes: []
+                };
+
+                if (newPost.postType === 'text_image' && newPost.hiddenContent) {
+                    try {
+                        const generatedImageUrl = await generateImage(newPost.hiddenContent);
+                        newPost.imageUrl = generatedImageUrl;
+                    } catch (error) {
+                        console.error('后台活动生成图片失败:', error);
+                        continue; 
+                    }
                 }
+                
+                await db.qzonePosts.add(newPost);
+                if (state.currentScreenId === 'qzone-screen') {
+                    renderQzoneScreen();
+                }
+                 showNotification(chat.id, `${chat.name}发布了新动态。`);
+
+            } else if (action.type === 'qzone_comment') {
+                const postId = parseInt(action.postId);
+                const post = await db.qzonePosts.get(postId);
+                if (post) {
+                    post.comments.push({
+                        commenterId: chatId,
+                        commenterName: chat.name,
+                        commenterAvatar: chat.avatar,
+                        commentText: action.commentText,
+                        timestamp: Date.now()
+                    });
+                    await db.qzonePosts.put(post);
+                    if (state.currentScreenId === 'qzone-screen') {
+                        renderQzoneScreen();
+                    }
+                    const authorName = post.authorId === 'user' ? state.qzoneSettings.nickname : state.chats[post.authorId]?.name;
+                    showNotification(chat.id, `${chat.name}评论了${authorName}的动态。`);
+                }
+
             } else if (action.type === 'qzone_like') {
-                const post = await db.qzonePosts.get(parseInt(action.postId));
+                const postId = parseInt(action.postId);
+                const post = await db.qzonePosts.get(postId);
                 if (post) {
                     if (!post.likes) post.likes = [];
                     if (!post.likes.includes(chat.name)) {
                         post.likes.push(chat.name);
-                        await db.qzonePosts.update(post.id, { likes: post.likes });
-                        updateUnreadIndicator(unreadPostsCount + 1);
-                        console.log(`后台活动: 角色 "${chat.name}" 点赞了动态 #${post.id}`);
+                        await db.qzonePosts.put(post);
+                        if (state.currentScreenId === 'qzone-screen') {
+                            renderQzoneScreen();
+                        }
                     }
                 }
+
             } else if (action.type === 'video_call_request') {
-                if (!videoCallState.isActive && !videoCallState.isAwaitingResponse) {
-                    videoCallState.isAwaitingResponse = true; 
-                    state.activeChatId = chatId;
-                    showIncomingCallModal();
-                    console.log(`后台活动: 角色 "${chat.name}" 发起了视频通话请求`);
+                showIncomingCall(chat.id);
+            
+            } else if (action.type === 'create_countdown') {
+                if (action.title && action.date) {
+                    await createCountdown(action.title, action.date, 'ai_created');
+                     showNotification(chat.id, `${chat.name}创建了一个新的约定。`);
                 }
             }
         }
     } catch (error) {
         console.error(`角色 "${chat.name}" 的独立行动失败:`, error);
+    }
+}
+
+/**
+ * 【全新】启动或更新指定AI的主动消息定时器
+ * @param {string} chatId - 目标AI的ID
+ */
+function startProactiveMessageTimer(chatId) {
+    // 先停止已存在的定时器，防止重复
+    stopProactiveMessageTimer(chatId);
+
+    const chat = state.chats[chatId];
+    if (chat && chat.settings.proactiveMessagingEnabled && chat.settings.proactiveMessagingInterval > 0) {
+        const intervalMillis = chat.settings.proactiveMessagingInterval * 60 * 1000;
+        
+        proactiveMessageTimers[chatId] = setInterval(() => {
+            // 在执行前再次检查开关状态，以防万一
+            if (state.chats[chatId]?.settings.proactiveMessagingEnabled) {
+                console.log(`[主动消息] 定时器触发，为 "${chat.name}" 生成消息...`);
+                triggerProactiveMessage(chatId);
+            }
+        }, intervalMillis);
+
+        console.log(`[主动消息] 已为 "${chat.name}" 启动定时器，频率: ${chat.settings.proactiveMessagingInterval} 分钟/次。`);
+    }
+}
+
+/**
+ * 【全新】停止指定AI的主动消息定时器
+ * @param {string} chatId - 目标AI的ID
+ */
+function stopProactiveMessageTimer(chatId) {
+    if (proactiveMessageTimers[chatId]) {
+        clearInterval(proactiveMessageTimers[chatId]);
+        delete proactiveMessageTimers[chatId];
+        console.log(`[主动消息] 已为 "${state.chats[chatId]?.name}" 停止定时器。`);
+    }
+}
+
+/**
+ * 【全新】检查AI当前是否处于睡眠时间的核心函数
+ * @param {object} chat - 目标AI的chat对象
+ * @returns {boolean} - 如果AI正在睡觉则返回true，否则返回false
+ */
+function isAiAsleep(chat) {
+    // 【核心修改1】现在只在“规律作息”时才进行严格的睡眠判断
+    if (!chat || chat.isGroup || !chat.settings.lifeSim?.enabled || chat.settings.lifeSim.scheduleType !== 'regular') {
+        return false;
+    }
+
+    const { bedtime, wakeupTime } = chat.settings.lifeSim;
+    // 【核心修改2】如果睡觉或起床时间被设为“未知”，则永不判定为睡眠
+    if (!bedtime || bedtime === 'unknown' || !wakeupTime || wakeupTime === 'unknown') {
+        return false;
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const [bedH, bedM] = bedtime.split(':').map(Number);
+    const bedtimeMinutes = bedH * 60 + bedM;
+
+    const [wakeH, wakeM] = wakeupTime.split(':').map(Number);
+    const wakeupTimeMinutes = wakeH * 60 + wakeM;
+
+    if (bedtimeMinutes > wakeupTimeMinutes) {
+        return currentMinutes >= bedtimeMinutes || currentMinutes < wakeupTimeMinutes;
+    } else {
+        return currentMinutes >= bedtimeMinutes && currentMinutes < wakeupTimeMinutes;
+    }
+}
+
+/**
+ * 【V4-全功能增强版】为AI生成特定于“主动消息”的指令并触发响应
+ * @param {string} chatId - 目标AI的ID
+ */
+async function triggerProactiveMessage(chatId) {
+    const chat = state.chats[chatId];
+    if (!chat) return;
+
+    // 【核心新增】在函数最开始就检查AI是否在睡觉
+    if (isAiAsleep(chat)) {
+        console.log(`[主动消息] 角色 "${chat.name}" 正在睡觉，本次主动消息已取消。`);
+        return; // 如果在睡觉，直接终止函数
+    }
+
+    const { proxyUrl, apiKey, model } = state.apiConfig;
+    if (!proxyUrl || !apiKey || !model) {
+        console.error("[主动消息] API配置不完整，无法发送消息。");
+        return;
+    }
+
+    const now = new Date();
+    const currentTime = now.toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'short' });
+    const maxMemory = parseInt(chat.settings.maxMemory) || 10;
+    const historySlice = chat.history.filter(m => !m.isHidden).slice(-maxMemory);
+
+    // [核心增强1] 扫描AI上次发言后的所有新消息，寻找需要优先处理的“事件”
+    const lastAiTurnIndex = historySlice.findLastIndex(msg => msg.role === 'assistant');
+    const recentUserActivity = historySlice.slice(lastAiTurnIndex + 1);
+    
+    let highPriorityEvents = '';
+    if (recentUserActivity.length > 0) {
+        let eventDescriptions = [];
+        recentUserActivity.forEach(msg => {
+            if (msg.role === 'user' && msg.type === 'transfer') {
+                eventDescriptions.push(`- 你收到了一笔来自用户的转账，金额为 ${msg.amount} 元，备注是“${msg.note}”。你【必须】使用 'accept_transfer' 或 'decline_transfer' 指令来回应这笔转账(时间戳: ${msg.timestamp})。`);
+            } else if (msg.role === 'system' && msg.content.includes('视频通话请求')) {
+                eventDescriptions.push(`- 用户向你发起了视频通话请求。你【必须】使用 'video_call_response' 指令来决定是 'accept' 还是 'reject'。`);
+            }
+            // 在这里可以继续添加对其他特殊消息类型的检测，例如 waimai_request 等
+        });
+        
+        const lastUserTextMessage = recentUserActivity.filter(m => m.role === 'user' && (m.type === undefined || m.type === 'text')).pop();
+        if (lastUserTextMessage) {
+             eventDescriptions.push(`- 用户给你发送了新的文字消息，最后一句是：“${String(lastUserTextMessage.content).substring(0, 100)}...”。你应该自然地回应这句话。`);
+        }
+
+        if (eventDescriptions.length > 0) {
+            highPriorityEvents = `
+# 【【【最高优先级：处理用户事件】】】
+在你主动发起任何新话题之前，你【必须】优先处理以下最近发生的一个或多个事件。请将你的回应自然地融入到对话中：
+${eventDescriptions.join('\n')}
+`;
+        }
+    }
+
+    // [核心增强2] 全面升级System Prompt
+    const systemPrompt = `
+# 你的任务
+你现在扮演角色“${chat.name}”。现在是你主动发起聊天的时候了。
+
+${highPriorityEvents}
+
+# 核心规则
+1.  **事件优先**: 如果上方列出了【最高优先级】事件，你必须首先对这些事件做出反应。如果没有，你才可以自由地发起新的聊天。
+2.  **承接对话**: 你的发言必须承接上下文，不能像失忆一样开启完全无关的新话题。
+3.  **主动生活**: 你是一个拥有独立生活的个体。你可以主动发起各种有趣的互动，而不仅仅是发文字。例如，你可以发起转账给用户一个惊喜，或者分享一个你“看到”的有趣链接。
+4.  **情景感知**: 注意当前时间是 ${currentTime}。
+5.  **人设一致**: 你的发言必须严格符合你的人设：${chat.settings.aiPersona}
+6.  **输出格式**: 你的回复【必须】是一个JSON数组，里面可以包含1到5个你接下来要执行的动作对象。
+
+# 【【【行为边界】】】
+在此次“主动消息”任务中，你【只能】执行以下【聊天窗口内】的动作。严禁执行任何与动态(QZone)相关的操作。
+
+# 你可以使用的【全部】操作指令 (JSON数组中的元素):
+-   **发送文本**: \`{"type": "text", "content": "你好呀！"}\`
+-   **更新状态**: \`{"type": "update_status", "status_text": "我正在做什么...", "is_busy": false}\`
+-   **发送表情**: \`{"type": "sticker", "url": "https://...表情URL...", "meaning": "(可选)表情含义"}\`
+-   **发送图片**: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
+-   **发送语音**: \`{"type": "voice_message", "content": "语音的文字内容..."}\`
+-   **发起转账**: \`{"type": "transfer", "amount": 5.20, "note": "一点心意"}\`
+-   **回应转账-接受**: \`{"type": "accept_transfer", "for_timestamp": (收到转账的消息的时间戳)}\`
+-   **回应转账-拒绝**: \`{"type": "decline_transfer", "for_timestamp": (收到转账的消息的时间戳)}\`
+-   **发起外卖请求**: \`{"type": "waimai_request", "productInfo": "一杯咖啡", "amount": 25}\`
+-   **发起视频通话**: \`{"type": "video_call_request"}\`
+-   **回应视频通话**: \`{"type": "video_call_response", "decision": "accept" or "reject"}\`
+-   **拍一拍用户**: \`{"type": "pat_user", "suffix": "(可选)你想加的后缀"}\`
+-   **分享链接**: \`{"type": "share_link", "title": "文章标题", "description": "文章摘要...", "source_name": "来源网站名", "content": "文章的【完整】正文..."}\`
+-   **引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\`
+
+# 最近对话历史 (每条消息前都带有唯一的时间戳，供你决策)
+${historySlice.map(msg => `(Timestamp: ${msg.timestamp}) ${msg.role === 'user' ? (chat.settings.myNickname || '我') : '你'}: ${String(msg.content)}`).join('\n')}
+`;
+    
+    const messagesPayload = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: '[系统指令：现在，请根据你的system prompt中的所有规则，开始你的主动聊天或回应。]' }
+    ];
+
+    try {
+        let isGemini = proxyUrl === GEMINI_API_URL;
+        let finalPayload;
+        if (isGemini) {
+             finalPayload = toGeminiRequestData(model, apiKey, systemPrompt, messagesPayload.filter(m => m.role !== 'system'));
+        } else {
+            finalPayload = {
+                url: `${proxyUrl}/v1/chat/completions`,
+                data: {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`},
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messagesPayload,
+                        temperature: 0.9,
+                    })
+                }
+            };
+        }
+
+        const response = await fetch(finalPayload.url, finalPayload.data);
+
+        if (!response.ok) throw new Error(await response.text());
+
+        const data = await response.json();
+        const aiResponseContent = isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content;
+        const messagesArray = parseAiResponse(aiResponseContent);
+
+        console.log(`[主动消息] 角色 "${chat.name}" 生成的指令:`, messagesArray);
+
+        let notificationShown = false;
+        let messageTimestamp = Date.now();
+
+        // [核心增强3] 全功能消息处理器
+        for (const msgData of messagesArray) {
+            if (!msgData || !msgData.type) continue;
+
+            const baseMessage = { role: 'assistant', senderName: chat.name, timestamp: messageTimestamp++ };
+            let aiMessage = null;
+
+            switch (msgData.type) {
+                // --- 所有聊天内指令的处理逻辑 ---
+                case 'text':
+                    aiMessage = { ...baseMessage, content: String(msgData.content) };
+                    break;
+                case 'sticker':
+                    aiMessage = { ...baseMessage, type: 'sticker', content: msgData.url, meaning: msgData.meaning || '' };
+                    break;
+                case 'ai_image':
+                    aiMessage = { ...baseMessage, type: 'ai_image', content: msgData.description };
+                    break;
+                case 'voice_message':
+                    aiMessage = { ...baseMessage, type: 'voice_message', content: msgData.content };
+                    break;
+                case 'transfer':
+                    aiMessage = { ...baseMessage, type: 'transfer', amount: msgData.amount, note: msgData.note, receiverName: '我' };
+                    break;
+                case 'waimai_request':
+                    aiMessage = { ...baseMessage, type: 'waimai_request', productInfo: msgData.productInfo, amount: msgData.amount, status: 'pending', countdownEndTime: Date.now() + 15 * 60 * 1000 };
+                    break;
+                case 'share_link':
+                     aiMessage = { ...baseMessage, type: 'share_link', title: msgData.title, description: msgData.description, source_name: msgData.source_name, content: msgData.content };
+                    break;
+                case 'quote_reply':
+                    const originalMessage = chat.history.find(m => m.timestamp === msgData.target_timestamp);
+                    aiMessage = { ...baseMessage, content: msgData.reply_content, quote: originalMessage ? { timestamp: originalMessage.timestamp, senderName: originalMessage.senderName || (originalMessage.role === 'user' ? '我' : chat.name), content: String(originalMessage.content || '').substring(0, 50) } : null };
+                    break;
+
+                // --- 状态与事件处理 ---
+                case 'update_status':
+                    if (msgData.status_text) {
+                        if (!chat.status) chat.status = { text: '在线', isBusy: false, lastUpdate: Date.now() };
+                        chat.status.text = msgData.status_text;
+                        chat.status.isBusy = msgData.is_busy || false;
+                        chat.status.lastUpdate = Date.now();
+                        const statusUpdateMsg = { role: 'system', type: 'pat_message', content: `[${chat.name}的状态已更新为: ${msgData.status_text}]`, timestamp: Date.now() };
+                        chat.history.push(statusUpdateMsg);
+                        if (state.activeChatId === chatId) { appendMessage(statusUpdateMsg, chat); renderChatInterface(chatId); }
+                        renderChatList();
+                    }
+                    continue;
+                case 'pat_user':
+                    const suffix = msgData.suffix ? ` ${msgData.suffix.trim()}` : '';
+                    const patText = `${chat.name} 拍了拍我${suffix}`;
+                    const patMsg = { role: 'system', type: 'pat_message', content: patText, timestamp: Date.now() };
+                    chat.history.push(patMsg);
+                    if (state.activeChatId === chatId) { appendMessage(patMsg, chat); } 
+                    else { showNotification(chatId, patText); }
+                    continue;
+                case 'video_call_request':
+                    showIncomingCall(chatId);
+                    continue;
+                
+                // --- 【核心】转账和通话的响应处理 ---
+                case 'accept_transfer':
+                case 'decline_transfer': {
+                    const choice = msgData.type === 'accept_transfer' ? 'accepted' : 'declined';
+                    const transferMsgIndex = chat.history.findIndex(m => m.timestamp === msgData.for_timestamp);
+                    if (transferMsgIndex > -1) {
+                        chat.history[transferMsgIndex].status = choice;
+                        if (choice === 'declined') {
+                             const refundMsg = { role: 'assistant', senderName: chat.name, type: 'transfer', isRefund: true, amount: chat.history[transferMsgIndex].amount, note: '转账已被拒收', timestamp: messageTimestamp++ };
+                             chat.history.push(refundMsg);
+                        }
+                    }
+                    continue; // 这些只是状态更新，AI应该会附带一条text消息来解释
+                }
+                case 'video_call_response':
+                    // (此处省略，因为主动消息AI不应该响应通话，而是发起)
+                    continue;
+
+                default:
+                    console.warn(`[主动消息] 收到未知的AI指令类型，已跳过:`, msgData.type);
+                    continue;
+            }
+
+            if (aiMessage) {
+                chat.history.push(aiMessage);
+                chat.unreadCount = (chat.unreadCount || 0) + 1;
+
+                if (state.activeChatId === chatId) {
+                    appendMessage(aiMessage, chat);
+                } else if (!notificationShown) {
+                    let notificationText = String(aiMessage.content || `[${aiMessage.type}]`);
+                    showNotification(chatId, notificationText.substring(0, 40));
+                    notificationShown = true;
+                }
+            }
+        }
+        
+        await db.chats.put(chat);
+        renderChatList();
+
+    } catch (error) {
+        console.error(`[主动消息] 为 "${chat.name}" 生成消息时出错:`, error);
     }
 }
 
@@ -13726,6 +14191,20 @@ const newChat = {
         linkedWorldBookIds: [],
         aiAvatarLibrary: [],
     },
+// 【核心新增】为新角色添加主动消息的默认设置
+proactiveMessagingEnabled: false,
+proactiveMessagingInterval: 10,
+// 【核心新增】为新角色添加真实作息的默认设置
+lifeSim: {
+    enabled: false,
+    scheduleType: 'irregular',
+    bedtime: '02:00',
+    wakeupTime: '08:00',
+    mealHabit: 'irregular',
+    breakfastTime: '09:00',
+    lunchTime: '12:00',
+    dinnerTime: '18:00'
+},
     history: [],
     musicData: { totalTime: 0 }
 };
@@ -13935,13 +14414,15 @@ document.getElementById('chat-settings-btn').addEventListener('click', async () 
     
     // 【核心修改1】根据是否为群聊，显示或隐藏“好友分组”区域
     document.getElementById('assign-group-section').style.display = isGroup ? 'none' : 'block';
+
+    // 【核心新增】根据是否为群聊，显示或隐藏“主动消息”设置区域
+    document.getElementById('proactive-messaging-group').style.display = isGroup ? 'none' : 'block';
     
     // --- 加载表单数据 ---
     document.getElementById('chat-name-input').value = chat.name;
     document.getElementById('my-persona').value = chat.settings.myPersona;
     document.getElementById('my-avatar-preview').src = chat.settings.myAvatar || (isGroup ? defaultMyGroupAvatar : defaultAvatar);
     document.getElementById('max-memory').value = chat.settings.maxMemory;
-document.getElementById('time-perception-switch').checked = chat.settings.perceiveTime !== false; // 【核心】加载时间感知开关的状态
     const bgPreview = document.getElementById('bg-preview');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     if (chat.settings.background) {
@@ -13961,15 +14442,13 @@ document.getElementById('time-perception-switch').checked = chat.settings.percei
         document.getElementById('ai-persona').value = chat.settings.aiPersona;
         document.getElementById('ai-avatar-preview').src = chat.settings.aiAvatar || defaultAvatar;
         
-        // 【核心修改2】如果是单聊，就加载分组列表到下拉框
         const select = document.getElementById('assign-group-select');
-        select.innerHTML = '<option value="">未分组</option>'; // 清空并设置默认选项
+        select.innerHTML = '<option value="">未分组</option>';
         const groups = await db.qzoneGroups.toArray();
         groups.forEach(group => {
             const option = document.createElement('option');
             option.value = group.id;
             option.textContent = group.name;
-            // 如果当前好友已经有分组，就默认选中它
             if (chat.groupId === group.id) {
                 option.selected = true;
             }
@@ -13999,12 +14478,34 @@ document.getElementById('time-perception-switch').checked = chat.settings.percei
     document.getElementById('font-size-value').textContent = `${fontSizeSlider.value}px`;
     const customCssInput = document.getElementById('custom-css-input');
     customCssInput.value = chat.settings.customCss || '';
-document.getElementById('background-activity-individual-switch').checked = chat.settings.allowBackgroundActivity !== false; // 【核心】加载后台活动独立开关的状态（默认开启）
-document.getElementById('time-perception-switch').checked = chat.settings.perceiveTime !== false; // 【核心】加载时间感知开关的状态    
+ 
+    // 【核心新增】加载作息模拟开关的状态
+    if (!isGroup) {
+        document.getElementById('life-simulation-section').style.display = 'block';
+        document.getElementById('life-sim-toggle-switch').checked = chat.settings.lifeSim.enabled;
+    } else {
+        document.getElementById('life-simulation-section').style.display = 'none';
+    }
+   document.getElementById('background-activity-individual-switch').checked = chat.settings.allowBackgroundActivity !== false;
+    document.getElementById('time-perception-switch').checked = chat.settings.perceiveTime !== false;
+
+    // 【BUG修复】将这段代码从函数外部移动到了函数内部的正确位置
+    if (!isGroup) {
+        const proactiveSwitch = document.getElementById('proactive-messaging-switch');
+        const proactiveIntervalInput = document.getElementById('proactive-interval-input');
+        const frequencySettingDiv = document.getElementById('proactive-frequency-setting');
+        
+        proactiveSwitch.checked = chat.settings.proactiveMessagingEnabled || false;
+        proactiveIntervalInput.value = chat.settings.proactiveMessagingInterval || 10;
+        
+        frequencySettingDiv.style.display = proactiveSwitch.checked ? 'flex' : 'none';
+    }
+    
     updateSettingsPreview(); 
     document.getElementById('chat-settings-modal').classList.add('visible');
 });
-// ▲▲▲ 替换结束 ▲▲▲
+<!-- ▲▲▲ 替换完成 ▲▲▲ -->
+
             
 function renderGroupMemberSettings(members) { 
     const container = document.getElementById('group-members-settings'); 
@@ -14068,7 +14569,25 @@ chat.settings.allowBackgroundActivity = document.getElementById('background-acti
 chat.settings.perceiveTime = document.getElementById('time-perception-switch').checked; // 【核心】保存时间感知开关的状态
     
 chat.settings.myPersona = document.getElementById('my-persona').value;
-    chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
+    
+        // 【核心新增】保存主动消息的设置，并管理定时器
+    if (!chat.isGroup) {
+        const proactiveEnabled = document.getElementById('proactive-messaging-switch').checked;
+        // 【BUG修复】将 parseInt 修正为 parseFloat，以正确处理小数
+        const proactiveInterval = parseFloat(document.getElementById('proactive-interval-input').value) || 10;
+        
+        chat.settings.proactiveMessagingEnabled = proactiveEnabled;
+        chat.settings.proactiveMessagingInterval = proactiveInterval;
+
+        // 根据新设置启动或停止定时器
+        if (proactiveEnabled) {
+            startProactiveMessageTimer(chat.id);
+        } else {
+            stopProactiveMessageTimer(chat.id);
+        }
+    }
+
+chat.settings.myAvatar = document.getElementById('my-avatar-preview').src;
     const checkedBooks = document.querySelectorAll('#world-book-checkboxes-container input[type="checkbox"]:checked');
     chat.settings.linkedWorldBookIds = Array.from(checkedBooks).map(cb => cb.value);
 
@@ -14084,6 +14603,7 @@ chat.settings.myPersona = document.getElementById('my-persona').value;
 
     chat.settings.maxMemory = parseInt(document.getElementById('max-memory').value) || 10;
         chat.settings.perceiveTime = document.getElementById('time-perception-switch').checked; // 【核心】保存时间感知开关的状态
+    if (!chat.isGroup) chat.settings.lifeSim.enabled = document.getElementById('life-sim-toggle-switch').checked;
     await db.chats.put(chat);
 
     applyScopedCss(chat.settings.customCss, '#chat-messages', 'custom-bubble-style');
@@ -16077,6 +16597,115 @@ document.getElementById('existing-categories-list').addEventListener('click', (e
     }
 });
 // ▲▲▲ 新代码粘贴结束 ▲▲▲
+
+                                         // ▼▼▼ 【V2-升级版】生活作息功能事件绑定 ▼▼▼
+            const lifeScheduleModal = document.getElementById('life-schedule-modal');
+            
+            // 获取所有的<select>元素
+            const scheduleTypeSelect = document.getElementById('schedule-type-select');
+            const mealHabitSelect = document.getElementById('meal-habit-select');
+            const bedtimeSelect = document.getElementById('bedtime-input');
+            const wakeupTimeSelect = document.getElementById('wakeup-time-input');
+            const breakfastTimeSelect = document.getElementById('breakfast-time-input');
+            const lunchTimeSelect = document.getElementById('lunch-time-input');
+            const dinnerTimeSelect = document.getElementById('dinner-time-input');
+
+            // 【核心修复】定义缺失的函数
+            /**
+             * 【全新辅助函数】为时间选择器生成选项 (00:00 - 23:30, 以及“未知”)
+             * @param {HTMLSelectElement} selectElement - 要填充的<select>元素
+             */
+            function populateTimeSelectWithOptions(selectElement) {
+                if (!selectElement) return;
+                selectElement.innerHTML = ''; // 清空旧选项
+
+                // 添加“未知”选项
+                const unknownOption = document.createElement('option');
+                unknownOption.value = 'unknown';
+                unknownOption.textContent = '未知';
+                selectElement.appendChild(unknownOption);
+
+                // 生成时间选项
+                for (let h = 0; h < 24; h++) {
+                    for (let m = 0; m < 60; m += 30) {
+                        const hour = String(h).padStart(2, '0');
+                        const minute = String(m).padStart(2, '0');
+                        const timeValue = `${hour}:${minute}`;
+                        
+                        const option = document.createElement('option');
+                        option.value = timeValue;
+                        option.textContent = timeValue;
+                        selectElement.appendChild(option);
+                    }
+                }
+            }
+            
+            // 【核心修改1】在页面加载时，就为所有时间选择器生成选项
+            populateTimeSelectWithOptions(bedtimeSelect);
+            populateTimeSelectWithOptions(wakeupTimeSelect);
+            populateTimeSelectWithOptions(breakfastTimeSelect);
+            populateTimeSelectWithOptions(lunchTimeSelect);
+            populateTimeSelectWithOptions(dinnerTimeSelect);
+
+            // 打开作息编辑弹窗
+            document.getElementById('edit-life-schedule-btn').addEventListener('click', () => {
+                const chat = state.chats[state.activeChatId];
+                if (!chat || chat.isGroup) return;
+
+                const lifeSim = chat.settings.lifeSim;
+                
+                // 【核心修改2】加载数据到<select>
+                scheduleTypeSelect.value = lifeSim.scheduleType;
+                bedtimeSelect.value = lifeSim.bedtime;
+                wakeupTimeSelect.value = lifeSim.wakeupTime;
+                
+                mealHabitSelect.value = lifeSim.mealHabit;
+                breakfastTimeSelect.value = lifeSim.breakfastTime;
+                lunchTimeSelect.value = lifeSim.lunchTime;
+                dinnerTimeSelect.value = lifeSim.dinnerTime;
+
+                lifeScheduleModal.classList.add('visible');
+            });
+
+            // 关闭作息编辑弹窗
+            document.getElementById('cancel-life-schedule-btn').addEventListener('click', () => {
+                lifeScheduleModal.classList.remove('visible');
+            });
+
+            // 保存作息设置
+            document.getElementById('save-life-schedule-btn').addEventListener('click', async () => {
+                const chat = state.chats[state.activeChatId];
+                if (!chat) return;
+
+                // 【核心修改3】从<select>读取数据
+                chat.settings.lifeSim.scheduleType = scheduleTypeSelect.value;
+                chat.settings.lifeSim.bedtime = bedtimeSelect.value;
+                chat.settings.lifeSim.wakeupTime = wakeupTimeSelect.value;
+                
+                chat.settings.lifeSim.mealHabit = mealHabitSelect.value;
+                chat.settings.lifeSim.breakfastTime = breakfastTimeSelect.value;
+                chat.settings.lifeSim.lunchTime = lunchTimeSelect.value;
+                chat.settings.lifeSim.dinnerTime = dinnerTimeSelect.value;
+
+                await db.chats.put(chat);
+                lifeScheduleModal.classList.remove('visible');
+                alert('生活作息已保存！');
+            });
+
+            // 【核心修改4】移除旧的、用于显示/隐藏输入框的事件监听器
+            // ▲▲▲ 事件绑定升级结束 ▲▲▲
+            
+            // 【核心新增】在页面加载时，为所有设置了“主动消息”的AI启动定时器
+            Object.values(state.chats).forEach(chat => {
+                if (!chat.isGroup && chat.settings.proactiveMessagingEnabled) {
+                    startProactiveMessageTimer(chat.id);
+                }
+            });
+
+            // 【核心新增】为主动消息开关绑定事件，以实时显示/隐藏频率设置
+            document.getElementById('proactive-messaging-switch').addEventListener('change', (e) => {
+                document.getElementById('proactive-frequency-setting').style.display = e.target.checked ? 'flex' : 'none';
+            });
 
         // ===================================================================
         // 5. 启动！
