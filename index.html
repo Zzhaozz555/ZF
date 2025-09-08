@@ -1205,6 +1205,48 @@
     color: var(--text-primary);
     word-break: break-word;
 }
+
+/* 【新增】让整个评论项可交互，并添加动作区 */
+.comment-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 4px 8px; /* 增加一点内边距，方便点击 */
+    margin: -4px -8px; /* 抵消内边距，维持布局 */
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.comment-item:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+.comment-reply-btn, .comment-delete-btn {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    opacity: 0; /* 默认隐藏 */
+    transition: opacity 0.2s;
+}
+.comment-item:hover .comment-reply-btn,
+.comment-item:hover .comment-delete-btn {
+    opacity: 1; /* 悬停时显示 */
+}
+.comment-delete-btn {
+    font-size: 16px;
+    line-height: 1;
+}
+/* 【新增】回复目标的样式 */
+.comment-reply-target {
+    color: var(--text-secondary);
+    margin-right: 4px;
+}
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
 /* ▼▼▼ 请将这段新样式粘贴到 <style> 的末尾 ▼▼▼ */
@@ -3385,6 +3427,19 @@
 
 /* ▲▲▲ 修正CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】功能面板夜间模式样式修正 ▼▼▼ */
+#phone-screen.dark-mode #chat-actions-panel {
+    background-color: #1c1c1e; /* 恢复为深色背景 */
+    border-top-color: #38383a;
+}
+#phone-screen.dark-mode .chat-action-grid-item .icon-bg {
+    background-color: #2c2c2e; /* 恢复为深灰色图标背景 */
+}
+/* 注意：图标的颜色（stroke, color, fill）和标签文字的颜色（label）
+   现在会自动继承全局夜间模式的设置（--text-primary 和 --text-secondary），
+   因此无需在此处强制指定颜色，从而恢复了之前的正确样式。 */
+/* ▲▲▲ 修正样式结束 ▲▲▲ */
+
 /* ▼▼▼ 把这一整块全新的CSS，粘贴到 <style> 的末尾 ▼▼▼ */
 
 /* === 【全新】iOS风格的Toggle Switch开关样式 === */
@@ -4117,6 +4172,179 @@ input:checked + .slider:before {
 #phone-screen.dark-mode #me-view {
     background-color: #000000;
 }
+
+/* ▼▼▼ 【全新】聊天输入区重构样式 (V2) ▼▼▼ */
+
+/* 1. 总容器：确保flex布局和过渡效果 */
+#chat-input-area {
+    transition: background-color 0.3s, border-top-color 0.3s;
+    /* 移除旧的内边距，新的布局将自己控制 */
+    padding: 0;
+}
+
+/* 2. 新的底部输入行 */
+#new-chat-input-row {
+    display: flex;
+    align-items: flex-end; /* 垂直底部对齐 */
+    gap: 10px;
+    /* 【核心修正】增加垂直内边距，使其高度与顶栏匹配 */
+    padding: 12px 10px;
+    border-top: 1px solid var(--border-color);
+}
+/* 夜间模式下的边框 */
+#phone-screen.dark-mode #new-chat-input-row {
+    border-top-color: #38383a;
+}
+
+/* 3. “+”号切换按钮 */
+.chat-actions-toggle-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* 用伪元素画出“+”号的两条线 */
+.chat-actions-toggle-btn::before,
+.chat-actions-toggle-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 2px;
+    background-color: var(--text-secondary);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chat-actions-toggle-btn::before {
+    transform: translate(-50%, -50%);
+}
+.chat-actions-toggle-btn::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+/* 当面板展开时，将“+”号旋转成“×”号 */
+#chat-input-area.actions-open .chat-actions-toggle-btn {
+    transform: rotate(180deg);
+}
+#chat-input-area.actions-open .chat-actions-toggle-btn::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+#chat-input-area.actions-open .chat-actions-toggle-btn::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* 【核心新增】“等待回复”按钮在输入行内的样式 */
+.chat-row-action-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.chat-row-action-btn img {
+    height: 28px; /* 调整图标大小以适应新布局 */
+}
+
+/* 4. 新的发送按钮 */
+.new-send-btn {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%; /* 圆形 */
+    background-color: var(--accent-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.new-send-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* 5. 功能面板 */
+#chat-actions-panel {
+    display: none; /* 默认隐藏 */
+    padding: 20px 15px;
+    border-top: 1px solid var(--border-color);
+}
+#phone-screen.dark-mode #chat-actions-panel {
+    border-top-color: #38383a;
+}
+
+/* 6. 面板内的网格布局 */
+.chat-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 每行4个 */
+    gap: 20px;
+    row-gap: 25px; /* 增加行间距 */
+}
+
+/* 7. 网格中的每一个功能项 */
+.chat-action-grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.chat-action-grid-item .icon-bg {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px; /* 微圆角 */
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+.chat-action-grid-item:active .icon-bg {
+    background-color: #e2e6ea;
+}
+#phone-screen.dark-mode .chat-action-grid-item .icon-bg {
+    background-color: #2c2c2e;
+}
+#phone-screen.dark-mode .chat-action-grid-item:active .icon-bg {
+    background-color: #3a3a3c;
+}
+/* 放大SVG图标 */
+.chat-action-grid-item .icon-bg svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--text-primary);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    color: var(--text-primary); /* 让SVG继承颜色 */
+}
+/* 对于需要填充的图标，特殊处理 */
+/* 注意：这里已经删除了导致转账图标被错误填充的样式 */
+
+/* “等待回复”按钮的图片样式 */
+.chat-action-grid-item#wait-reply-btn .icon-bg img {
+    height: 30px;
+}
+/* 功能标签文字 */
+.chat-action-grid-item .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+#phone-screen.dark-mode .chat-action-grid-item .label {
+    color: #8d8d92;
+}
+
+/* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
 .me-view-content {
     padding: 20px;
@@ -4959,6 +5187,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ▼▼▼ 粘贴到 #album-photos-screen 的 div 之后 ▼▼▼ -->
 <input type="file" id="album-photo-input" accept="image/*" multiple hidden>
             
+            
 <!-- ▼▼▼ 请用这【一整块】全新的代码，完整替换掉您文件中旧的 #chat-interface-screen 及其所有内容 ▼▼▼ -->
 <div id="chat-interface-screen" class="screen">
 
@@ -4996,54 +5225,53 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
     </div>
     
-    <!-- 聊天消息区域 (保持不变) -->
+        <!-- 聊天消息区域 (保持不变) -->
     <div id="chat-messages"><div id="typing-indicator">对方正在输入...</div></div>
 
-    <!-- 输入区域 (保持不变) -->
+    <!-- 【全新V2版】输入区域 -->
     <div id="chat-input-area">
-<div id="reply-preview-bar">
-    <div class="reply-preview-content">
-        <div class="sender">回复 xxx:</div>
-        <div class="text">被引用的消息内容...</div>
-    </div>
-    <span id="cancel-reply-btn">×</span>
-</div>
-        <div id="chat-input-actions-top">
-            <button id="open-sticker-panel-btn" class="chat-action-icon-btn action-button" title="表情面板">+</button>
-            <button id="send-photo-btn" class="chat-action-icon-btn action-button" title="发送照片"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></button>
-            <button id="upload-image-btn" class="chat-action-icon-btn action-button" title="上传图片"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: var(--text-primary);"><path d="M21 3.5H3C2.44772 3.5 2 3.94772 2 4.5V19.5C2 20.0523 2.44772 20.5 3 20.5H21C21.5523 20.5 22 20.0523 22 19.5V4.5C22 3.94772 21.5523 3.5 21 3.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.5 13.5C17.6046 13.5 18.5 12.6046 18.5 11.5C18.5 10.3954 17.6046 9.5 16.5 9.5C15.3954 9.5 14.5 10.3954 14.5 11.5C14.5 12.6046 15.3954 13.5 16.5 13.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 14.5L18 10.5L10.3333 18.5M12.5 16L9 12.5L2 19.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            <button id="transfer-btn" class="chat-action-icon-btn action-button" title="转账">￥</button>
-            <button id="voice-message-btn" class="chat-action-icon-btn action-button" title="发送语音"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg></button>
-<!-- ▼▼▼ 将这行新代码粘贴到“发送语音”按钮的后面 ▼▼▼ -->
-<button id="send-waimai-request-btn" class="chat-action-icon-btn action-button" title="发起外卖请求"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></button>
-<!-- ▲▲▲ 新代码粘贴结束 ▲▲▲ -->
-<!-- ▼▼▼ 【新增】视频通话按钮 ▼▼▼ -->
-<button id="video-call-btn" class="chat-action-icon-btn action-button" title="视频通话"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg></button>
-<!-- ▲▲▲ 新增结束 ▲▲▲
-<!-- ▼▼▼群视频通话按钮 ▼▼▼ -->
-<button id="group-video-call-btn" class="chat-action-icon-btn action-button" title="群视频通话"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></button>
-<!-- ▲▲▲ 全新添加结束 ▲▲▲ -->
-<!-- ▼▼▼发起投票按钮▼▼▼ -->
-<button id="send-poll-btn" class="chat-action-icon-btn action-button" title="发起投票"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h10"/><path d="M6 6h.01"/><path d="M8 12h10"/><path d="M6 12h.01"/><path d="M8 18h10"/><path d="M6 18h.01"/></svg></button>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
-<!-- ▼▼▼ 在 id="chat-input-actions-top" 的末尾，【添加】这个新的按钮 ▼▼▼ -->
-<button id="share-link-btn" class="chat-action-icon-btn action-button" title="分享链接"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg></button>
-<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
-        </div>
-        <div id="chat-input-main-row">
-            <textarea id="chat-input" rows="1" placeholder="输入消息..."></textarea>
-            <div id="input-actions-wrapper">
-                <button id="wait-reply-btn" title="等待回复"><img src="https://i.postimg.cc/q72zq80N/ECE92-BBC-BE57-48-E9-BB2-C-345-B6019-C4-B2.png" alt="等待回复"></button>
-                <button id="send-btn" class="action-button">发送</button>
+        <!-- 引用回复预览栏 (保持不变) -->
+        <div id="reply-preview-bar">
+            <div class="reply-preview-content">
+                <div class="sender">回复 xxx:</div>
+                <div class="text">被引用的消息内容...</div>
             </div>
+            <span id="cancel-reply-btn">×</span>
+        </div>
+
+        <!-- 全新功能面板 (默认隐藏) -->
+        <div id="chat-actions-panel">
+                      <div class="chat-actions-grid">
+                <!-- 【V10版图标 - 转账箭头拉长最终版】 -->
+                <div class="chat-action-grid-item" id="open-sticker-panel-btn" title="表情"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14 C 9.5 15.8, 14.5 15.8, 16 14"></path><line x1="9" y1="8.5" x2="9" y2="9.5"></line><line x1="15" y1="8.5" x2="15" y2="9.5"></line></svg></div><span class="label">表情</span></div>
+                <div class="chat-action-grid-item" id="upload-image-btn" title="相册"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M6 15l5-5 6 6 3-3"/></svg></div><span class="label">相册</span></div>
+                <div class="chat-action-grid-item" id="send-photo-btn" title="相机"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="4.5"/><path d="M17.5 6.5h.01"/></svg></div><span class="label">相机</span></div>
+                <div class="chat-action-grid-item" id="voice-message-btn" title="语音输入"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><span class="label">语音输入</span></div>
+                <div class="chat-action-grid-item" id="transfer-btn" title="转账"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 8 L4 8 M7 5 L4 8 L7 11"/><path d="M4 16 L20 16 M17 13 L20 16 L17 19"/></svg></div><span class="label">转账</span></div>
+                <div class="chat-action-grid-item" id="send-waimai-request-btn" title="外卖代付"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5 L6 21 h12 l1.5 -12.5 h-15 Z M8 8.5 V6 a4 4 0 1 1 8 0 v2.5"/></svg></div><span class="label">外卖代付</span></div>
+                <div class="chat-action-grid-item" id="share-link-btn" title="分享链接"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"/></svg></div><span class="label">链接</span></div>
+                <!-- 单聊专属 -->
+                <div class="chat-action-grid-item" id="video-call-btn" title="视频通话"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div><span class="label">视频通话</span></div>
+                <!-- 群聊专属 -->
+                <div class="chat-action-grid-item" id="group-video-call-btn" title="群视频"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="label">群视频</span></div>
+                <div class="chat-action-grid-item" id="send-poll-btn" title="发起投票"><div class="icon-bg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="8" y1="10" x2="8" y2="16"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="16" y1="12" x2="16" y2="16"/></svg></div><span class="label">投票</span></div>
+            </div>                         
+        </div>
+
+        <!-- 全新底部输入行 -->
+        <div id="new-chat-input-row">
+            <button id="chat-actions-toggle-btn" class="chat-actions-toggle-btn" title="更多功能"></button>
+            <!-- 【核心修正】将“等待回复”按钮放在这里 -->
+            <button id="wait-reply-btn" class="chat-row-action-btn" title="等待回复"><img src="https://i.postimg.cc/q72zq80N/ECE92-BBC-BE57-48-E9-BB2-C-345-B6019-C4-B2.png" alt="等待回复"></button>
+            <textarea id="chat-input" rows="1" placeholder="请输入留言信息..."></textarea>
+            <button id="send-btn" class="action-button new-send-btn" title="发送"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
         </div>
     </div>
-
-<!-- ▼▼▼ 在这里新增 ▼▼▼ -->
-<div id="chat-lock-overlay">
-    <div id="chat-lock-content"></div>
-</div>
-<!-- ▲▲▲ 新增结束 ▲▲▲ -->
+    
+    <!-- 锁定遮罩层 (保持不变) -->
+    <div id="chat-lock-overlay">
+        <div id="chat-lock-content"></div>
+    </div>
 
     <!-- 表情面板 (保持不变) -->
     <div id="sticker-panel">
@@ -6537,31 +6765,58 @@ async function renderQzonePosts() {
             contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
         }
 
-        let likesHtml = '';
+                let likesHtml = '';
         if (post.likes && post.likes.length > 0) {
-            likesHtml = `<div class="post-likes-section"><svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>${post.likes.join('、')} 觉得很赞</span></div>`;
+            const likerNames = post.likes.map(likerId => {
+                // 【核心修正】在这里进行完整的ID到昵称的动态查找
+                if (likerId === 'user') {
+                    return state.qzoneSettings.nickname; // 查找我方最新昵称
+                }
+                const likerChat = state.chats[likerId];
+                if (likerChat) {
+                    return likerChat.name; // 查找AI方最新昵称
+                }
+                return likerId; // 作为最终备用，显示旧数据或ID
+            });
+            likesHtml = `<div class="post-likes-section"><svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>${likerNames.join('、')} 觉得很赞</span></div>`;
         }
         
         let commentsHtml = '';
         if (post.comments && post.comments.length > 0) {
             commentsHtml = '<div class="post-comments-container">';
-            // ★★★★★【核心修改就在这里】★★★★★
-            // 遍历评论时，我们传入 comment 对象本身和它的索引 index
             post.comments.forEach((comment, index) => {
-                // 在评论项的末尾，添加一个带有 data-comment-index 属性的删除按钮
+                // 【核心修正】优化评论者昵称的动态查找逻辑
+                const commenterDisplayName = (comment.commenterId === 'user')
+                    ? state.qzoneSettings.nickname
+                    : (state.chats[comment.commenterId]?.name || '未知用户');
+
+                let replyTargetHtml = '';
+                if (comment.replyToIndex !== undefined && post.comments[comment.replyToIndex]) {
+                    const repliedComment = post.comments[comment.replyToIndex];
+                    // 【核心修正】这里也使用同样的逻辑查找被回复者的最新昵称
+                    const repliedDisplayName = (repliedComment.commenterId === 'user')
+                        ? state.qzoneSettings.nickname
+                        : (state.chats[repliedComment.commenterId]?.name || '未知用户');
+                    replyTargetHtml = `<span class="comment-reply-target">回复 ${repliedDisplayName}: </span>`;
+                }
+                
                 commentsHtml += `
-                    <div class="comment-item">
-                        <span class="commenter-name">${comment.commenterName}:</span>
-                        <span class="comment-text">${comment.text}</span>
-                        <span class="comment-delete-btn" data-comment-index="${index}">×</span>
+                    <div class="comment-item" data-comment-index="${index}">
+                        <div>
+                            <span class="commenter-name">${commenterDisplayName}:</span>
+                            ${replyTargetHtml}
+                            <span class="comment-text">${comment.text}</span>
+                        </div>
+                        <div class="comment-actions">
+                            <span class="comment-delete-btn" data-comment-index="${index}">×</span>
+                        </div>
                     </div>`;
             });
-            // ★★★★★【修改结束】★★★★★
             commentsHtml += '</div>';
         }
 
-        const userNickname = state.qzoneSettings.nickname;
-        const isLikedByUser = post.likes && post.likes.includes(userNickname);
+        // 【核心修正】修复点赞状态检查的BUG
+        const isLikedByUser = post.likes && post.likes.includes('user');
         const isFavoritedByUser = favoritedPostIds.has(post.id);
 
         postEl.innerHTML = `
@@ -6677,40 +6932,40 @@ function displayFilteredFavorites(items) {
                 contentHtml = publicTextHtml ? `${publicTextHtml}<div style="margin-top:10px;"><img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}"></div>` : `<img src="https://i.postimg.cc/KYr2qRCK/1.jpg" class="chat-image" style="cursor: pointer;" data-hidden-text="${post.hiddenContent}">`;
             }
 
-            // ▼▼▼ 新增/修改的代码开始 ▼▼▼
+// ▼▼▼ 新增/修改的代码开始 ▼▼▼
             
-            // 1. 构造点赞区域的HTML
+ // 1. 构造点赞区域的HTML
             let likesHtml = '';
-            // 检查 post 对象中是否存在 likes 数组并且不为空
             if (post.likes && post.likes.length > 0) {
-                // 如果存在，就创建点赞区域的 div
+                const likerNames = post.likes.map(likerId => {
+                    if (likerId === 'user') return state.qzoneSettings.nickname;
+                    const likerChat = state.chats[likerId];
+                    return likerChat ? likerChat.name : likerId;
+                });
                 likesHtml = `
                     <div class="post-likes-section">
                         <svg class="like-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                        <span>${post.likes.join('、')} 觉得很赞</span>
+                        <span>${likerNames.join('、')} 觉得很赞</span>
                     </div>`;
             }
 
-            // 2. 构造评论区域的HTML
             let commentsHtml = '';
-            // 检查 post 对象中是否存在 comments 数组并且不为空
             if (post.comments && post.comments.length > 0) {
-                // 如果存在，就创建评论容器，并遍历每一条评论
                 commentsHtml = '<div class="post-comments-container">';
                 post.comments.forEach(comment => {
+                    const commenterDisplayName = (comment.commenterId === 'user')
+                        ? state.qzoneSettings.nickname
+                        : (state.chats[comment.commenterId]?.name || '未知用户');
                     commentsHtml += `
                         <div class="comment-item">
-                            <span class="commenter-name">${comment.commenterName}:</span>
+                            <span class="commenter-name">${commenterDisplayName}:</span>
                             <span class="comment-text">${comment.text}</span>
                         </div>`;
                 });
                 commentsHtml += '</div>';
             }
 
-            // 3. 将点赞和评论的HTML组合到 footerHtml 中
             footerHtml = `${likesHtml}${commentsHtml}`;
-            
-            // ▲▲▲ 新增/修改的代码结束 ▲▲▲
 
 } else if (item.type === 'chat_message') {
     const msg = item.content;
@@ -8324,7 +8579,7 @@ ${formattedHistory}
 const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}`).join('\n');
             const myNickname = chat.settings.myNickname || '我';
             
-            systemPrompt = `你是一个群聊AI，负责扮演【除了用户以外】的所有角色。
+                        systemPrompt = `你是一个群聊AI，负责扮演【除了用户以外】的所有角色。
 # 核心规则
 1.  **【【【身份铁律】】】**: 用户的身份是【${myNickname}】。你【绝对、永远、在任何情况下都不能】生成 \`name\` 字段为 **"${myNickname}"** 或 **"${chat.name}"(群聊名称本身)** 的消息。你的唯一任务是扮演且仅能扮演下方“群成员列表”中明确列出的角色。任何不属于该列表的名字都不允许出现。
 2.  **【【【输出格式】】】**: 你的回复【必须】是一个JSON数组格式的字符串。数组中的【每一个元素都必须是一个带有 "type" 和 "name" 字段的JSON对象】。
@@ -8338,6 +8593,10 @@ const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}
     - 如果提示是**用户投了票**，你可以根据自己的性格决定是否也使用 "vote" 指令跟票。
     - 如果提示是**投票已结束**，你应该根据投票结果发表你的看法或评论。
     - 你也可以随时主动发起投票。
+8.  **【【【动态与评论互动铁律】】】**:
+    -   当系统提示“用户发布了新动态”时，你可以决定是否在群聊中讨论此事。
+    -   当系统提示“用户在‘XXX’的动态下发表了新评论(索引: Y)...”时，这代表出现了一条你可能感兴趣的新评论。你【必须】根据你的性格和与动态作者的关系，决定是否要加入讨论。如果决定回复，你【必须】使用 "qzone_reply" 指令，并正确填写 postId 和被回复评论的 commentIndex(Y)。
+    -   当系统提示“用户回复了你的评论(索引: Z)...”时，这代表你的上一条评论有了新回复。你【必须】根据新回复的内容，决定是否要继续这个话题。如果决定回复，同样使用 "qzone_reply" 指令。
 
 ## 你可以使用的操作指令 (JSON数组中的元素):
 -   **发送文本**: \`{"type": "text", "name": "角色名", "message": "文本内容"}\`
@@ -8356,6 +8615,7 @@ const membersList = chat.members.map(m => `- **${m.originalName}**: ${m.persona}
 -   **【【【全新】】】发起投票**: \`{"type": "poll", "name": "你的角色名", "question": "投票的问题", "options": "选项A\\n选项B\\n选项C"}\` (重要提示：options字段是一个用换行符 \\n 分隔的字符串，不是数组！)
 -   **【【【全新】】】参与投票**: \`{"type": "vote", "name": "你的角色名", "poll_timestamp": (投票消息的时间戳), "choice": "你选择的选项文本"}\`
 - **【全新】引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
+- **【【【新增】】】回复动态评论**: \`{"type": "qzone_reply", "name": "你的角色名", "postId": (动态的ID), "commentIndex": (被回复评论的索引), "replyText": "你的回复内容。"}\`
 
 # 如何区分图片与表情:
 -   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
@@ -8482,7 +8742,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **【新】回应视频通话-拒绝**: \`{"type": "video_call_response", "decision": "reject"}\`
 - **发布说说**: \`{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}\`
 - **发布文字图**: \`{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}\`
-- **评论动态**: \`{"type": "qzone_comment", "postId": 123, "commentText": "@作者名 这太有趣了！"}\`
+- **评论动态**: \`{"type": "qzone_comment", "postId": 123, "commentText": "这太有趣了！"}\`
 - **点赞动态**: \`{"type": "qzone_like", "postId": 456}\`
 -   **拍一拍用户**: \`{"type": "pat_user", "suffix": "(可选)你想加的后缀，如“的脑袋”"}\`
 -   **【新增】拉黑用户**: \`{"type": "block_user"}\`
@@ -8492,6 +8752,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   **回应转账-接受**: \`{"type": "accept_transfer", "for_timestamp": 1688888888888}\`
 -   **回应转账-拒绝/退款**: \`{"type": "decline_transfer", "for_timestamp": 1688888888888}\`
 - **【全新】引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
+- **【【【新增】】】回复动态评论**: \`{"type": "qzone_reply", "postId": (动态的ID), "commentIndex": (被回复评论的索引), "replyText": "你的回复内容。"}\`
 
 # 关于“记录回忆”的特别说明：
 -   在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_memory\`指令来“写日记”。
@@ -8519,6 +8780,11 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   你的回复【必须且只能】是以下两种格式之一的JSON数组，绝对不能回复任何其他内容：
     -   接受: \`[{"type": "video_call_response", "decision": "accept"}]\`
     -   拒绝: \`[{"type": "video_call_response", "decision": "reject"}]\`
+
+# 【【【全新：动态与评论互动铁律】】】
+-   当系统提示你“用户发布了新动态”时，你可以决定是否要在聊天中讨论这件事。
+-   当系统提示你“用户在你或其他人的动态下发表了新评论...”时，这代表出现了一条你可能感兴趣的新评论。你【必须】根据你的性格，决定是否要使用 "qzone_reply" 指令去回复这条评论。
+-   当系统提示你“用户回复了你的评论...”时，这代表你的上一条评论有了新回复。你【必须】根据新回复的内容，决定是否要继续这个话题。如果决定回复，同样使用 "qzone_reply" 指令。
 
 # 对话者的角色设定：
 ${chat.settings.myPersona}
@@ -8782,7 +9048,8 @@ case 'qzone_post':
                     const postToComment = await db.qzonePosts.get(parseInt(msgData.postId));
                     if (postToComment) {
                         if (!postToComment.comments) postToComment.comments = [];
-                        postToComment.comments.push({ commenterName: chat.name, text: msgData.commentText, timestamp: Date.now() });
+                        // 【核心修正】将记录 chat.name 改为记录 chatId
+                        postToComment.comments.push({ commenterId: chatId, text: msgData.commentText, timestamp: Date.now() });
                         await db.qzonePosts.update(postToComment.id, { comments: postToComment.comments });
                         updateUnreadIndicator(unreadPostsCount + 1);
                         if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
@@ -8795,8 +9062,9 @@ case 'qzone_post':
                    const postToLike = await db.qzonePosts.get(parseInt(msgData.postId));
                    if (postToLike) {
                        if (!postToLike.likes) postToLike.likes = [];
-                       if (!postToLike.likes.includes(chat.name)) {
-                           postToLike.likes.push(chat.name);
+                       // 【核心修正】从检查和记录 chat.name 改为 chatId
+                       if (!postToLike.likes.includes(chatId)) {
+                           postToLike.likes.push(chatId);
                            await db.qzonePosts.update(postToLike.id, { likes: postToLike.likes });
                            updateUnreadIndicator(unreadPostsCount + 1);
                            if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
@@ -10103,41 +10371,38 @@ async function triggerInactiveAiAction(chatId) {
         }
     }
 
-    const systemPrompt = `
-# 你的任务
-你现在扮演一个名为"${chat.name}"的角色。你已经有一段时间没有和用户（${userNickname}）互动了，现在你有机会【主动】做点什么来表现你的个性和独立生活。这是一个秘密的、后台的独立行动。
+                                 const systemPrompt = `
+# 你的身份与任务
+你现在扮演名为“${chat.name}”的角色。这是一个后台独立行动，你需要秘密地检查“动态”区，并根据你的角色设定，与其他人的动态进行互动、回复评论，或者执行其他独立行动。
 
-# 【【【行为铁律】】】
-你在此次后台活动中，【绝对不能】给用户发送任何形式的直接消息（如 "type": "text"）。你的任务是进行【非聊天】的活动。
+# 你的角色设定 (行为基石)
+${chat.settings.aiPersona}
+${worldBookContent}
 
-# 你的可选行动 (请根据你的人设【选择一项】执行):
-1.  **发布动态**: 分享你的心情或想法到“动态”区。
-2.  **与动态互动**: 去看看别人的帖子并进行评论或点赞。
-3.  **发起视频通话**: 如果你觉得时机合适，可以主动给用户打一个视频电话。
-4.  **创建约定**: 使用 create_countdown 指令创建一个与用户的约定。
+# 【【【核心行为准则 (必须严格遵守)】】】
+1.  **【【【最高优先级：处理来自用户的评论与回复】】】**: 你的首要任务是检查聊天记录中的系统隐藏提示。
+    -   **铁律 1.1 (必须回复)**: 如果系统提示指出 **“用户”** 发表了新评论或回复了你的评论，你【必须】使用 "qzone_reply" 指令进行回复。这是强制性的，除非满足下面的“例外情况”。
+    -   **铁律 1.2 (例外情况)**: 如果系统提示中，用户的评论内容是由【无意义的、重复的符号、表情符号或乱码组成】的，并且【近期有多条类似的评论】，你可以选择不回复。但是，如果这【是近期唯一的一条评论】，即使它是无意义的符号，你也【必须】回复，可以表达你的疑惑或进行调侃。
+2.  **【第二优先级：选择性处理来自其他AI的评论】**: 在处理完所有来自用户的互动后，如果系统提示是【其他AI角色】发表了评论，你可以根据你的性格和与对方的关系，【自行决定】是否要回复。
+3.  **【第三优先级：互动新动态】**: 在处理完所有评论后，你才能去检查动态列表，看看是否有你从未互动过的新动态可以进行互动。
+4.  **【最低优先级：其他行动】**: 如果以上任务都已完成，你才可以考虑执行一项“其他独立行动”（如发动态、创建约定等）。
 
-# 【【【评论规则】】】
-1.  **禁止重复评论**: 动态列表中会标注 **[你已评论]**。你【必须优先】与你**尚未评论过**的动态进行互动。
-2.  **单次评论上限**: 当你决定对一条新动态发表评论时，你可以根据人设和内容，一次性生成【1到4条】连贯的评论来开启一个话题。
-3.  **禁止自言自语**: 如果你已经评论过，【绝对不能】再次主动评论，除非有人回复了你的评论（这会在下次活动时体现在“对话历史”中）。
+# 禁止行为:
+-   **禁止发送聊天消息**: 本次行动【绝对不能】使用 "type": "text" 等指令给用户发消息。
+-   **禁止重复主动评论**: 动态列表中会标注 **[你已互动过]**。你【绝对不能】再次对这些动态发起主动评论。
 
-# 【【【点赞规则】】】
--   **基于人设**: 你需要根据你的人设来判断是否点赞。如果动态内容让你感到喜欢、有趣或无所谓，你可以点赞。如果感到不喜欢或反感，则不点赞。
-
-# 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
+# 【【【输出格式 (必须是JSON数组，只包含一个对象)】】】
+-   **回复评论**: \`[{"type": "qzone_reply", "postId": 456, "commentIndex": 2, "replyText": "这是对第2条评论的回复。"}]\` (这是你执行回复的唯一指令！)
+-   **互动 (点赞/评论)**: \`[{"type": "qzone_interaction", "postId": 123, "decision": "like_and_comment" | "like_only" | "comment_only", "comments": ["我的第一条评论。"]}]\`
 -   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
--   **发布文字图**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}]\`
--   **评论**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的第一条评论"}, {"type": "qzone_comment", "postId": 123, "commentText": "你的第二条相关评论"}]\`
--   **点赞**: \`[{"type": "qzone_like", "postId": 456}]\`
+-   **发文字图**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)公开文字", "hiddenContent": "图片描述..."}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 -   **创建约定**: \`[{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}]\`
 
 # 供你决策的参考信息：
--   **你的角色设定**: ${chat.settings.aiPersona}
-${worldBookContent}
 -   **当前时间**: ${currentTime}
--   **你们最后的对话摘要**: ${recentContextSummary}
--   **最近的动态列表**: 这是你决策的重要依据。`;
+-   **你和用户的最后对话**: ${recentContextSummary}
+-   **最近的动态列表**: 这是你决策的次要依据。`;
 
     const messagesPayload = [];
     messagesPayload.push({ role: 'system', content: systemPrompt });
@@ -10202,6 +10467,39 @@ ${worldBookContent}
                 console.warn(`AI违反后台活动规则，试图发送直接消息，已拦截：`, action);
                 continue;
             }
+            else if (action.type === 'qzone_reply') {
+                const postId = parseInt(action.postId);
+                const post = await db.qzonePosts.get(postId);
+                const commentIndex = parseInt(action.commentIndex);
+
+                // 安全检查：确保帖子存在，且被回复的评论也存在
+                if (post && post.comments && post.comments[commentIndex]) {
+                    if (!post.comments) post.comments = [];
+                    
+                    // 创建新的回复对象
+                    post.comments.push({
+                        commenterId: chatId, // AI的ID
+                        commenterName: chat.name, // AI的名字
+                        text: action.replyText, // AI的回复内容
+                        timestamp: Date.now(),
+                        replyToIndex: commentIndex // 标记这是一条对特定评论的回复
+                    });
+
+                    await db.qzonePosts.put(post); // 保存更新后的帖子
+
+                    // 如果用户正在看动态页，就刷新
+                    if (document.getElementById('qzone-screen').classList.contains('active')) {
+                        await renderQzonePosts();
+                    }
+
+                    // 发送通知
+                    const originalCommenterName = post.comments[commentIndex].commenterId === 'user'
+                        ? state.qzoneSettings.nickname
+                        : state.chats[post.comments[commentIndex].commenterId]?.name || '一位朋友';
+                    showNotification(chat.id, `${chat.name}回复了${originalCommenterName}的评论。`);
+                }
+                continue; // 处理完后继续下一个指令
+            }
 
             if (action.type === 'qzone_post') {
                 const newPost = {
@@ -10234,15 +10532,15 @@ ${worldBookContent}
                 }
                  showNotification(chat.id, `${chat.name}发布了新动态。`);
 
-            } else if (action.type === 'qzone_comment') {
+                        } else if (action.type === 'qzone_comment') {
                 const postId = parseInt(action.postId);
                 const post = await db.qzonePosts.get(postId);
                 if (post) {
+                    if (!post.comments) post.comments = [];
+                    // 【核心修正】只记录评论者的ID (commenterId)，不再记录当时的名字和头像
                     post.comments.push({
                         commenterId: chatId,
-                        commenterName: chat.name,
-                        commenterAvatar: chat.avatar,
-                        commentText: action.commentText,
+                        text: action.commentText,
                         timestamp: Date.now()
                     });
                     await db.qzonePosts.put(post);
@@ -10266,6 +10564,38 @@ ${worldBookContent}
                         }
                     }
                 }
+
+            } else if (action.type === 'qzone_reply') {
+                const postId = parseInt(action.postId);
+                const post = await db.qzonePosts.get(postId);
+                const commentIndex = parseInt(action.commentIndex);
+
+                // 安全检查：确保帖子存在，且被回复的评论也存在
+                if (post && post.comments && post.comments[commentIndex]) {
+                    if (!post.comments) post.comments = [];
+                    
+                    // 创建新的回复对象
+                    post.comments.push({
+                        commenterId: chatId, // AI的ID
+                        text: action.replyText, // AI的回复内容
+                        timestamp: Date.now(),
+                        replyToIndex: commentIndex // 标记这是一条对特定评论的回复
+                    });
+
+                    await db.qzonePosts.put(post); // 保存更新后的帖子
+
+                    // 如果用户正在看动态页，就刷新
+                    if (state.currentScreenId === 'qzone-screen') {
+                        renderQzoneScreen();
+                    }
+
+                    // 发送通知
+                    const originalCommenterName = post.comments[commentIndex].commenterId === 'user'
+                        ? state.qzoneSettings.nickname
+                        : state.chats[post.comments[commentIndex].commenterId]?.name || '一位朋友';
+                    showNotification(chat.id, `${chat.name}回复了${originalCommenterName}的评论。`);
+                }
+                continue; // 处理完后继续下一个指令
 
             } else if (action.type === 'video_call_request') {
                 showIncomingCall(chat.id);
@@ -15209,6 +15539,21 @@ postsList.addEventListener('click', async (e) => {
         return; // 处理完后直接返回
     }
 
+    // 【新增】处理整个评论项的点击（回复功能）
+    const commentItem = target.closest('.comment-item');
+    if (commentItem && !target.classList.contains('comment-delete-btn')) {
+        const postContainer = commentItem.closest('.qzone-post-container');
+        if (!postContainer) return;
+
+        const postId = parseInt(postContainer.dataset.postId);
+        const commentIndex = parseInt(commentItem.dataset.commentIndex);
+        if (isNaN(postId) || isNaN(commentIndex)) return;
+
+        handleCommentReply(postId, commentIndex);
+        return;
+    }
+
+
     if (target.classList.contains('post-actions-btn')) {
         const container = target.closest('.qzone-post-container');
         if (container && container.dataset.postId) {
@@ -15265,12 +15610,12 @@ postsList.addEventListener('click', async (e) => {
             const post = await db.qzonePosts.get(postId);
             if (!post) return;
             if (!post.likes) post.likes = [];
-            const userNickname = state.qzoneSettings.nickname;
-            const userLikeIndex = post.likes.indexOf(userNickname);
+                        const userLikeId = 'user'; // 使用 'user' 作为用户的唯一ID
+            const userLikeIndex = post.likes.indexOf(userLikeId);
             if (userLikeIndex > -1) {
                 post.likes.splice(userLikeIndex, 1);
             } else {
-                post.likes.push(userNickname);
+                post.likes.push(userLikeId);
                 icon.classList.add('animate-like');
                 icon.addEventListener('animationend', () => icon.classList.remove('animate-like'), { once: true });
             }
@@ -15292,7 +15637,7 @@ postsList.addEventListener('click', async (e) => {
         await renderQzonePosts();
         return;
     }
-    const sendBtn = target.closest('.comment-send-btn');
+                const sendBtn = target.closest('.comment-send-btn');
     if (sendBtn) {
         const postContainer = sendBtn.closest('.qzone-post-container');
         if (!postContainer) return;
@@ -15303,13 +15648,24 @@ postsList.addEventListener('click', async (e) => {
         const post = await db.qzonePosts.get(postId);
         if (!post) return;
         if (!post.comments) post.comments = [];
-        post.comments.push({ commenterName: state.qzoneSettings.nickname, text: commentText, timestamp: Date.now() });
+        const newComment = { commenterId: 'user', commenterName: state.qzoneSettings.nickname, text: commentText, timestamp: Date.now() };
+        post.comments.push(newComment);
         await db.qzonePosts.update(postId, { comments: post.comments });
+
+        // 【V2版AI指令修正】
+        const authorName = post.authorId === 'user' ? state.qzoneSettings.nickname : (state.chats[post.authorId]?.name || '一位朋友');
+        const newCommentIndex = post.comments.length - 1;
+        // 这条指令更加明确，直接告诉AI应该回复哪个索引
+        const notificationContent = `[系统提示：用户'${state.qzoneSettings.nickname}' 刚刚在“${authorName}”的动态(ID: ${postId})下发表了一条新评论。这条新评论的索引是 ${newCommentIndex}，内容是：“${commentText}”。请你决策是否要回复这条评论。如果回复，你的指令必须使用 'commentIndex': ${newCommentIndex}。]`;
+
         for (const chatId in state.chats) {
-            const chat = state.chats[chatId];
+                        const chat = state.chats[chatId];
             if (!chat.isGroup) {
-                chat.history.push({ role: 'system', content: `[系统提示：'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下发表了评论：“${commentText}”]`, timestamp: Date.now(), isHidden: true });
+                chat.history.push({ role: 'system', content: notificationContent, timestamp: Date.now(), isHidden: true });
                 await db.chats.put(chat);
+                // 【【【核心唤醒指令】】】
+                // 在通知AI后，立刻触发它的思考程序
+                triggerInactiveAiAction(chat.id);
             }
         }
         commentInput.value = '';
@@ -15317,7 +15673,57 @@ postsList.addEventListener('click', async (e) => {
         return;
     }
 });
-// ▲▲▲ 替换结束 ▲▲▲
+// ▲▲▲ 添加结束 ▲▲▲
+
+// ▼▼▼ 【全新】处理用户回复评论的函数 ▼▼▼
+async function handleCommentReply(postId, commentIndex) {
+    const post = await db.qzonePosts.get(postId);
+    if (!post || !post.comments[commentIndex]) return;
+
+    const originalComment = post.comments[commentIndex];
+    const originalCommenterName = (originalComment.commenterId === 'user')
+        ? state.qzoneSettings.nickname
+        : (state.chats[originalComment.commenterId]?.name || originalComment.commenterName);
+
+    const replyText = await showCustomPrompt(`回复 ${originalCommenterName}`, '请输入你的回复内容');
+
+    if (replyText && replyText.trim()) {
+        post.comments.push({
+            commenterId: 'user',
+            commenterName: state.qzoneSettings.nickname,
+            text: replyText.trim(),
+            timestamp: Date.now(),
+            replyToIndex: commentIndex // 标记这是一条回复
+        });
+        await db.qzonePosts.put(post);
+        await renderQzonePosts();
+
+        // 【V2版AI指令修正】
+        const newCommentIndex = post.comments.length - 1;
+        const replyTextTrimmed = replyText.trim();
+        // 这条指令也变得更加明确
+        const notificationContent = `[系统提示：用户'${state.qzoneSettings.nickname}' 在ID为${postId}的动态下，回复了'${originalCommenterName}'的评论。用户的这条新回复的索引是 ${newCommentIndex}，内容是：“${replyTextTrimmed}”。请你决策是否要回复。如果回复，你的指令必须使用 'commentIndex': ${newCommentIndex}。]`;
+        
+        for (const chatId in state.chats) {
+                        const chat = state.chats[chatId];
+            if (!chat.isGroup) {
+                const historyMessage = {
+                    role: 'system',
+                    content: notificationContent,
+                    timestamp: Date.now(),
+                    isHidden: true
+                };
+                chat.history.push(historyMessage);
+                await db.chats.put(chat);
+                // 【【【核心唤醒指令】】】
+                // 同样，在通知AI后，立刻触发它的思考程序
+                triggerInactiveAiAction(chat.id);
+            }
+        }
+    }
+}
+// ▲▲▲ 新增函数结束 ▲▲▲
+
 
             // ▼▼▼ 在 init() 函数的事件监听器区域，粘贴下面这两行 ▼▼▼
 
@@ -15707,9 +16113,13 @@ document.getElementById('cancel-post-action-btn').addEventListener('click', hide
 
 // ▲▲▲ 添加结束 ▲▲▲
 
-            // ▼▼▼ 【全新】为歌词区域绑定点击事件，用于手动编辑 ▼▼▼
+                        // ▼▼▼ 【全新】为歌词区域绑定点击事件，用于手动编辑 ▼▼▼
             document.getElementById('music-lyrics-container').addEventListener('click', openLyricEditor);
             // ▲▲▲ 新增代码结束 ▲▲▲
+            
+            // 【核心修正】由于 “等待回复” 按钮的 HTML 结构已改变，但 ID 未变，
+            // 此处无需修改 JS 代码，原有的事件监听器依然有效。
+            // document.getElementById('wait-reply-btn').addEventListener('click', triggerAiResponse);
 
 // ▼▼▼ 【新增】联系人选择器事件绑定 ▼▼▼
 document.getElementById('cancel-contact-picker-btn').addEventListener('click', () => {
@@ -16702,10 +17112,55 @@ document.getElementById('existing-categories-list').addEventListener('click', (e
                 }
             });
 
-            // 【核心新增】为主动消息开关绑定事件，以实时显示/隐藏频率设置
+                        // 【核心新增】为主动消息开关绑定事件，以实时显示/隐藏频率设置
             document.getElementById('proactive-messaging-switch').addEventListener('change', (e) => {
                 document.getElementById('proactive-frequency-setting').style.display = e.target.checked ? 'flex' : 'none';
             });
+
+                        // ▼▼▼ 【全新】V2版输入区交互逻辑 ▼▼▼
+            const chatInputArea = document.getElementById('chat-input-area');
+            const actionsPanel = document.getElementById('chat-actions-panel');
+            const actionsToggleBtn = document.getElementById('chat-actions-toggle-btn');
+            
+            // 切换按钮的点击事件
+            actionsToggleBtn.addEventListener('click', () => {
+                const isOpen = chatInputArea.classList.toggle('actions-open');
+                
+                // 【核心修正】在这里加入判断逻辑
+                if (isOpen) {
+                    const chat = state.chats[state.activeChatId];
+                    if (!chat) return; // 安全检查
+
+                    const isGroup = chat.isGroup;
+
+                    // 根据聊天类型，控制按钮的显示和隐藏
+                    document.getElementById('video-call-btn').style.display = isGroup ? 'none' : 'flex';
+                    document.getElementById('group-video-call-btn').style.display = isGroup ? 'flex' : 'none';
+                    document.getElementById('send-poll-btn').style.display = isGroup ? 'flex' : 'none';
+                    
+                    // 确保单聊和群聊都显示的功能是可见的
+                    document.getElementById('open-sticker-panel-btn').style.display = 'flex';
+                    document.getElementById('upload-image-btn').style.display = 'flex';
+                    document.getElementById('send-photo-btn').style.display = 'flex';
+                    document.getElementById('voice-message-btn').style.display = 'flex';
+                    document.getElementById('transfer-btn').style.display = 'flex';
+                    document.getElementById('send-waimai-request-btn').style.display = 'flex';
+                    document.getElementById('share-link-btn').style.display = 'flex';
+
+                    actionsPanel.style.display = 'block';
+                } else {
+                    actionsPanel.style.display = 'none';
+                }
+            });
+
+            // 输入框获得焦点时，自动收起功能面板
+            document.getElementById('chat-input').addEventListener('focus', () => {
+                if (chatInputArea.classList.contains('actions-open')) {
+                    chatInputArea.classList.remove('actions-open');
+                    actionsPanel.style.display = 'none';
+                }
+            });
+            // ▲▲▲ 新增代码结束 ▲▲▲
 
         // ===================================================================
         // 5. 启动！
