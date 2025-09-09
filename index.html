@@ -35,10 +35,43 @@
 
         .header .action-btn img { height: 26px; }
         .header .save-btn { font-size: 16px; color: var(--accent-color); font-weight: 600; cursor: pointer; }
-        #home-screen { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; padding-top: 80px; padding-bottom: 50px; box-sizing: border-box; background-size: cover; background-position: center; }
-        #clock-container { text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-bottom: 20px; flex-shrink: 0; }
-        #main-time { font-size: 80px; font-weight: 200; }
-        #main-date { font-size: 18px; font-weight: 500; }
+                #home-screen { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; padding-top: 80px; padding-bottom: 50px; box-sizing: border-box; background-size: cover; background-position: center; }
+        #clock-container { position: relative; text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-bottom: 20px; flex-shrink: 0; }
+                        #main-time { font-size: 80px; font-weight: 200; margin-bottom: 60px; /* 【再次修改】进一步增加下边距，拉开与天气的距离 */ }
+        #main-date { font-size: 18px; font-weight: 500; margin-bottom: 8px; /* 【修改】增大日期字号并加粗 */ }
+                        /* === 天气小组件样式 (V3 - 左对齐终极修正) === */
+        #weather-container {
+            position: absolute;
+            bottom: 0;
+            left: 36%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 【核心修正1】改为左对齐 */
+            gap: 2px;
+            width: 200px;
+        }
+                .weather-line {
+            display: flex;
+            align-items: center; /* 【修正】恢复为垂直居中，为手动微调做准备 */
+            gap: 6px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+        /* 手动调整天气状况行的位置 */
+        #weather-container .weather-line:nth-child(2) {
+            margin-top: -7px; /* 负值表示上移，可自行调整 */
+        }
+                .weather-icon svg {
+            width: 22px;
+            height: 22px;
+            position: relative; /* 允许我们微调位置 */
+            top: 5px;           /* 【核心】将图标向下移动2像素 */
+        }
+                .weather-range {
+            opacity: 0.7;
+            margin-top: -3px; /* 负值表示上移，可自行调整 */
+        }
         #app-grid { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; padding: 20px; }
         .app-row { display: flex; justify-content: center; gap: 25px; width: 100%; }
         .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-size: 14px; font-weight: 500; text-align: center; }
@@ -4888,7 +4921,13 @@ input:checked + .slider:before { transform: translateX(20px); }
             <div id="notification-bar"><img id="notification-avatar" src=""><div id="notification-content"><div class="name"></div><div class="message"></div></div></div>
             
             <div id="home-screen" class="screen active">
-                <div id="clock-container"><div id="main-time">12:00</div><div id="main-date">星期一, 1月1日</div></div>
+                                <div id="clock-container">
+                    <div id="main-date">星期一, 1月1日</div>
+                    <div id="main-time">12:00</div>
+                    <div id="weather-container">
+                        <!-- 天气内容将由JS生成 -->
+                    </div>
+                </div>
                                                                    <!-- ▼▼▼ 用这整块代码替换你原来的 id="app-grid" ▼▼▼ -->
 <div id="app-grid">
     <!-- 第一行：放2个图标 -->
@@ -6373,6 +6412,104 @@ input:checked + .slider:before { transform: translateX(20px); }
 <script>
 
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
+    // ===================================================================
+    // 0. 工具函数
+    // ===================================================================
+
+    /**
+     * 根据公历年份获取干支纪年
+     * @param {number} year - 公历年份
+     * @returns {string} - 干支纪年字符串 (例如 "乙巳")
+     */
+    function getGanzhiYear(year) {
+        const heavenlyStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const earthlyBranches = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        const baseYear = 4; // 公元4年是甲子年
+        const yearDiff = year - baseYear;
+        const stemIndex = yearDiff % 10;
+        const branchIndex = yearDiff % 12;
+        return heavenlyStems[stemIndex] + earthlyBranches[branchIndex] + '年';
+    }
+
+
+    /**
+     * 【全新】将农历日数字（字符串）转换为中文
+     * @param {string} dayString - 例如 "18", "20", "21"
+     * @returns {string} - 例如 "十八", "二十", "廿一"
+     */
+    function convertLunarDayToChinese(dayString) {
+        const num = parseInt(dayString, 10);
+        const chineseNums = '〇一二三四五六七八九';
+        if (num <= 10) {
+            return '初' + chineseNums[num];
+        } else if (num < 20) {
+            return '十' + chineseNums[num - 10];
+        } else if (num === 20) {
+            return '二十';
+        } else if (num < 30) {
+            return '廿' + chineseNums[num - 20];
+        } else if (num === 30) {
+            return '三十';
+        }
+        return dayString; // fallback
+    }
+
+    /**
+     * 将公历日期转换为农历日期字符串 (简版实现)
+     * @param {Date} date - 公历日期对象
+     * @returns {string} - 农历日期字符串 (例如 "七月十八")
+     */
+    function getLunarDate(date) {
+                // 使用Intl.DateTimeFormat分别获取农历月和日
+        try {
+            const monthFormatter = new Intl.DateTimeFormat('zh-u-ca-chinese', { month: 'long' });
+            const dayFormatter = new Intl.DateTimeFormat('zh-u-ca-chinese', { day: 'numeric' });
+
+            const lunarMonth = monthFormatter.format(date); // "七月"
+            const lunarDayString = dayFormatter.format(date); // "18"
+            const lunarDayChinese = convertLunarDayToChinese(lunarDayString); // "十八"
+
+            return lunarMonth + lunarDayChinese; // "七月十八"
+        } catch (e) {
+            console.error("农历转换失败:", e);
+            return "七月十八"; // 作为备用
+        }
+    }
+    /**
+     * 更新天气小组件的静态内容
+     */
+    function updateWeatherWidget() {
+        const weatherContainer = document.getElementById('weather-container');
+        if (!weatherContainer) return;
+
+                // 随机生成天气数据
+        const conditions = ['多云', '晴', '阴', '小雨'];
+        const currentCondition = conditions[Math.floor(Math.random() * conditions.length)];
+        const currentTemp = Math.floor(Math.random() * 8) + 22; // 22-29
+        const lowTemp = currentTemp - Math.floor(Math.random() * 3) - 2; // 比当前低2-4度
+        const highTemp = currentTemp + Math.floor(Math.random() * 4) + 1; // 比当前高1-4度
+
+        // SVG 图标 (多云)
+        const cloudyIconSvg = `
+            <svg viewBox="0 0 64 64" fill="white">
+                <path d="M46.5,23.5c-1.5-5.3-6.2-9-11.8-9c-2.2,0-4.3,0.6-6.2,1.7c-2.3-3.9-6.7-6.5-11.7-6.5c-7.2,0-13,5.8-13,13 c0,0.8,0.1,1.5,0.2,2.3C1.7,26.5,0,29.3,0,32.5c0,4.7,3.8,8.5,8.5,8.5h36c5.2,0,9.5-4.3,9.5-9.5C54,27.5,50.8,24.1,46.5,23.5z"/>
+            </svg>
+        `;
+
+        // 【核心修改】生成三行HTML结构
+        weatherContainer.innerHTML = `
+            <div class="weather-line">
+                <div class="weather-icon">${cloudyIconSvg}</div>
+                <span>${currentTemp}°</span>
+            </div>
+            <div class="weather-line">
+                <span>${currentCondition}</span>
+            </div>
+            <div class="weather-line weather-range">
+                <span>最高 ${highTemp}° 最低 ${lowTemp}°</span>
+            </div>
+        `;
+    }
     // gemini如果是多个密钥, 那么随机获取一个
     function getRandomValue(str) {
         // 检查字符串是否包含逗号
@@ -7388,7 +7525,20 @@ state.globalSettings.appIcons = { ...DEFAULT_APP_ICONS, ...(state.globalSettings
 
         function showNotification(chatId, messageContent) { clearTimeout(notificationTimeout); const chat = state.chats[chatId]; if (!chat) return; const bar = document.getElementById('notification-bar'); document.getElementById('notification-avatar').src = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar; document.getElementById('notification-content').querySelector('.name').textContent = chat.name; document.getElementById('notification-content').querySelector('.message').textContent = messageContent; const newBar = bar.cloneNode(true); bar.parentNode.replaceChild(newBar, bar); newBar.addEventListener('click', () => { openChat(chatId); newBar.classList.remove('visible'); }); newBar.classList.add('visible'); notificationTimeout = setTimeout(() => { newBar.classList.remove('visible'); }, 4000); }
 
-        function updateClock() { const now = new Date(); const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('main-time').textContent = timeString; document.getElementById('status-bar-time').textContent = timeString; document.getElementById('main-date').textContent = dateString; }
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            
+            // 生成新格式的日期字符串
+                        const gregorianDate = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).replace(',', ' ').replace('星期', '周');
+            const ganzhiYear = getGanzhiYear(now.getFullYear());
+            const lunarDate = getLunarDate(now);
+            const newDateString = `${gregorianDate} · ${ganzhiYear}${lunarDate}`;
+
+            document.getElementById('main-time').textContent = timeString;
+            document.getElementById('status-bar-time').textContent = timeString;
+            document.getElementById('main-date').textContent = newDateString;
+        }
 
 /**
  * 【终极健壮版】解析AI返回的、可能格式不规范的响应内容
@@ -14596,6 +14746,8 @@ async function showBillingDetails(txId) {
             updateClock();
             setInterval(updateClock, 1000 * 30);
             applyGlobalWallpaper();
+
+updateWeatherWidget();
             initBatteryManager(); 
 
 applyAppIcons();
