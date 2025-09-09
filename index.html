@@ -4718,6 +4718,36 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 /* ▲▲▲ 新样式粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】约定详情弹窗样式 ▼▼▼ */
+#countdown-details-modal {
+    /* 复用现有modal的居中和背景样式 */
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.countdown-details-content {
+    background-color: var(--secondary-bg); /* 兼容日夜模式 */
+    color: var(--text-primary);
+    width: 280px; /* 参考图片里的宽度 */
+    padding: 20px;
+    border-radius: 14px; /* 参考图片里的圆角 */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+    cursor: pointer; /* 让整个弹窗可点击关闭 */
+    transform: scale(0.95);
+    opacity: 0;
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+#countdown-details-modal.visible .countdown-details-content {
+    transform: scale(1);
+    opacity: 1;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* ▼▼▼ 【全新】账单详情页面样式 ▼▼▼ */
 
 /* 1. 页面主容器 */
@@ -6244,6 +6274,15 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
     </div>
 </div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▼▼▼ 【全新】约定详情弹窗 ▼▼▼ -->
+<div id="countdown-details-modal" class="modal">
+    <div id="countdown-details-content" class="countdown-details-content">
+        <!-- 内容将由JS动态生成 -->
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】世界书分类管理模态框 ▼▼▼ -->
 <div id="world-book-category-manager-modal" class="modal">
@@ -8728,7 +8767,7 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 -   **【新增】更新状态**: \`{"type": "update_status", "status_text": "我去做什么了", "is_busy": false}\` (is_busy: true代表忙碌/离开, false代表空闲)
 -   **【新增】切换歌曲**: \`{"type": "change_music", "song_name": "你想切换到的歌曲名"}\` (歌曲名必须在下面的播放列表中)
 -   **【新增】记录回忆**: \`{"type": "create_memory", "description": "用你自己的话，记录下这个让你印象深刻的瞬间。"}\`
--   **【新增】创建约定/倒计时**: \`{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}\` (必须是未来的时间)
+-   **【新增】创建约定/倒计时**: \`{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss", "reason": "你对此约定的简短想法或理由"}\`
 - **发送文本**: \`{"type": "text", "content": "你好呀！"}\`
 - **发送表情**: \`{"type": "sticker", "url": "https://...表情URL...", "meaning": "(可选)表情的含义"}\`
 - **发送图片**: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
@@ -9250,13 +9289,14 @@ case 'qzone_reply': { // 使用大括号创建独立的块级作用域
                     
                     continue; 
 
-        case 'create_countdown':
+                case 'create_countdown':
             const targetDate = new Date(msgData.date);
             if (!isNaN(targetDate) && targetDate > new Date()) {
                 const newCountdown = {
                     chatId: chatId,
                     authorName: chat.name,
                     description: msgData.title,
+                    reason: msgData.reason || '',
                     timestamp: Date.now(),
                     type: 'countdown',
                     targetDate: targetDate.getTime()
@@ -9264,7 +9304,7 @@ case 'qzone_reply': { // 使用大括号创建独立的块级作用域
                 await db.memories.add(newCountdown);
                 console.log(`AI "${chat.name}" 创建了一个新约定:`, msgData.title);
             }
-            continue;
+            continue; 
 
     case 'block_user':
         if (!chat.isGroup) {
@@ -10448,9 +10488,9 @@ ${worldBookContent}
 -   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
 -   **发文字图**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)公开文字", "hiddenContent": "图片描述..."}]\`
 -   **打视频**: \`[{"type": "video_call_request"}]\`
--   **创建约定**: \`[{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}]\`
+-   **创建约定**: \`[{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss", "reason": "你对此约定的简短想法或理由"}]\`
 
-# 【【【后台内容创作指南】】】
+# 【【【内容创作指南】】】
 -   **发布说说 (qzone_post)**: 内容【必须】是关于你的独立生活，也可以与用户有关，但要从你的视角出发。内容【禁止】为空，且必须严格遵守你的人设和世界书设定。
 -   **创建约定 (create_countdown)**: 内容用于计划未来，可以与当前聊天无关，偏向于日常。小事可以小到“明天一起买菜”，大事可以大到“订婚”或“纪念日”。
 
@@ -10661,13 +10701,25 @@ ${worldBookContent}
                 }
                 continue; // 处理完后继续下一个指令
 
-            } else if (action.type === 'video_call_request') {
+                        } else if (action.type === 'video_call_request') {
                 showIncomingCall(chat.id);
             
             } else if (action.type === 'create_countdown') {
                 if (action.title && action.date) {
-                    await createCountdown(action.title, action.date, 'ai_created');
-                     showNotification(chat.id, `${chat.name}创建了一个新的约定。`);
+                    const targetDate = new Date(action.date);
+                    if (!isNaN(targetDate) && targetDate > new Date()) {
+                        const newCountdown = {
+                            chatId: chatId,
+                            authorName: chat.name,
+                            description: action.title,
+                            reason: action.reason || '',
+                            timestamp: Date.now(),
+                            type: 'countdown',
+                            targetDate: targetDate.getTime()
+                        };
+                        await db.memories.add(newCountdown);
+                        showNotification(chat.id, `${chat.name}创建了一个新的约定。`);
+                    }
                 }
             }
         }
@@ -12598,6 +12650,12 @@ function createCountdownCard(countdown) {
     const card = document.createElement('div');
     card.className = 'countdown-card';
 
+    // 【核心】只有AI创建的约定才能点击
+    if (countdown.chatId) { 
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => showCountdownDetails(countdown.id));
+    }
+
     // 【核心修复】在使用前，先从 countdown 对象中创建 targetDate 变量
     const targetDate = new Date(countdown.targetDate);
     
@@ -12622,6 +12680,34 @@ function createCountdownCard(countdown) {
 
 // 全局变量，用于管理所有倒计时
 let activeCountdownTimers = [];
+
+/**
+ * 【全新】显示约定详情弹窗
+ * @param {number} memoryId - 约定的ID
+ */
+async function showCountdownDetails(memoryId) {
+    const modal = document.getElementById('countdown-details-modal');
+    const contentEl = document.getElementById('countdown-details-content');
+    
+    const memory = await db.memories.get(memoryId);
+    if (!memory || !memory.chatId) return;
+
+    // 获取AI的最新名字
+    const chat = state.chats[memory.chatId];
+    const aiName = chat ? chat.name : memory.authorName; // 备用旧名字
+
+    // 填充内容
+    contentEl.innerHTML = `<strong>${aiName}:</strong> ${memory.reason || '我们定下了一个很棒的约定！'}`;
+
+    // 显示弹窗
+    modal.classList.add('visible');
+
+    // 点击弹窗任何地方都可以关闭
+    modal.addEventListener('click', function closeHandler() {
+        modal.classList.remove('visible');
+        modal.removeEventListener('click', closeHandler);
+    });
+}
 
 // ▼▼▼ 请用这个【已彻底修复】的函数，完整替换掉你代码中旧的 startAllCountdownTimers 函数 ▼▼▼
 function startAllCountdownTimers() {
