@@ -8685,7 +8685,7 @@ messagesPayload = historySlice.map(msg => {
 }).filter(Boolean);
 // ▲▲▲ 替换结束 ▲▲▲
 
-        } else { // 单聊的Prompt
+                        } else { // 单聊的Prompt
                                                                         systemPrompt = `你现在扮演一个名为"${chat.name}"的角色。
 # 你的角色设定：
 ${chat.settings.aiPersona}
@@ -8754,9 +8754,19 @@ ${chat.settings.aiAvatarLibrary && chat.settings.aiAvatarLibrary.length > 0
 - **【全新】引用回复**: \`{"type": "quote_reply", "target_timestamp": (你想引用的消息的时间戳), "reply_content": "你的回复内容"}\` (提示：每条历史消息的开头都提供了 \`(Timestamp: ...)\`，请使用它！)
 - **【【【新增】】】回复动态评论**: \`{"type": "qzone_reply", "postId": (动态的ID), "commentIndex": (被回复评论的索引), "replyText": "你的回复内容。"}\`
 
-# 关于“记录回忆”的特别说明：
--   在对话中，如果发生了对你而言意义非凡的事件（比如用户向你表白、你们达成了某个约定、或者你度过了一个特别开心的时刻），你可以使用\`create_memory\`指令来“写日记”。
--   这个操作是【秘密】的，用户不会立刻看到你记录了什么。
+# 【【【内容创作指南】】】
+1.  **主动更新状态 (高频)**: 在对话的间隙，你应该以**较高的频率**主动使用 \`update_status\` 指令来分享你的生活动态或心情。更新的内容应偏向于独立生活（例如：“正在窗边看雨”、“刚刚泡了杯咖啡”、“有点想打哈欠了”），而不是仅仅围绕当前聊天话题。
+2.  **记录回忆 (create_memory)**:
+    -   此指令【必须】与聊天内容紧密相关。
+    -   当你们共同经历重要或有意义的时刻时使用（例如：第一次约定、互相表白、解决矛盾等）。
+    -   大事必须记录。小事则根据你的人设决定是否值得记录（例如，恋爱脑人设可能会记录一起看电影的小事，而高冷人设则不会）。
+3.  **创建约定 (create_countdown)**:
+    -   此指令用于计划未来，内容可以与当前聊天无关，偏向于日常。
+    -   小事可以小到“明天一起买菜”，大事可以大到“订婚”或“纪念日”。
+4.  **发布说说 (qzone_post)**:
+    -   内容【必须】是关于你的独立生活，也可以与用户有关，但要从你的视角出发。
+    -   内容【禁止】为空。
+    -   内容必须严格遵守你的人设和世界书设定。
 
 # 如何区分图片与表情:
 -   **图片 (ai_image)**: 指的是【模拟真实相机拍摄的照片】，比如风景、自拍、美食等。指令: \`{"type": "ai_image", "description": "图片的详细文字描述..."}\`
@@ -9026,19 +9036,60 @@ if (chat.isGroup && !msgData.name) {
                     }
                     continue;
 
-case 'qzone_post':
-    const newPost = { 
-        type: msgData.postType, 
-        content: msgData.content || '', 
-        publicText: msgData.publicText || '', 
-        hiddenContent: msgData.hiddenContent || '', 
-        timestamp: Date.now(), 
-        authorId: chatId, 
-        authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
-        visibleGroupIds: null 
-    };
-    await db.qzonePosts.add(newPost);
-                    updateUnreadIndicator(unreadPostsCount + 1);
+case 'qzone_reply': { // 使用大括号创建独立的块级作用域
+    const postId = parseInt(msgData.postId);
+    const post = await db.qzonePosts.get(postId);
+    const commentIndex = parseInt(msgData.commentIndex);
+
+    // 进行严格的安全检查
+    if (post && post.comments && post.comments[commentIndex]) {
+        // 创建新的回复对象
+        post.comments.push({
+            commenterId: chatId, // AI的ID
+            commenterName: chat.name, // AI的名字 (作为备用)
+            text: msgData.replyText, // AI的回复内容
+            timestamp: Date.now(),
+            replyToIndex: commentIndex // 核心：标记这是一条对特定评论的回复
+        });
+
+        await db.qzonePosts.put(post); // 保存更新后的帖子
+
+        // 如果用户恰好在看动态页，就刷新它
+        if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
+           await renderQzonePosts();
+        }
+
+        // 可以在这里添加一个通知，告诉用户AI回复了评论
+        const originalCommenter = post.comments[commentIndex];
+        const originalCommenterName = originalCommenter.commenterId === 'user'
+            ? state.qzoneSettings.nickname
+            : state.chats[originalCommenter.commenterId]?.name || '一位朋友';
+
+        showNotification(chat.id, `${chat.name} 回复了 ${originalCommenterName} 的评论。`);
+    } else {
+        console.warn(`AI试图回复一条不存在的评论 (PostID: ${postId}, CommentIndex: ${commentIndex})，已忽略。`);
+    }
+    continue; // 处理完后，继续处理AI返回的下一条指令
+}
+
+                case 'qzone_post':
+                    // 【核心新增】在这里增加安全检查，防止发布空说说
+                    if (msgData.postType === 'shuoshuo' && (!msgData.content || !String(msgData.content).trim())) {
+                        console.warn(`AI "${chat.name}" 试图发布一条空的 "说说"，操作已被拦截。`);
+                        continue; // 直接跳过，不执行后续操作
+                    }
+                    const newPost = { 
+                        type: msgData.postType, 
+                        content: msgData.content || '', 
+                        publicText: msgData.publicText || '', 
+                        hiddenContent: msgData.hiddenContent || '', 
+                        timestamp: Date.now(), 
+                        authorId: chatId, 
+                        authorGroupId: chat.groupId, // 【核心新增】记录作者的分组ID
+                        visibleGroupIds: null 
+                    };
+                    await db.qzonePosts.add(newPost);
+                    updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                     if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
                        await renderQzonePosts();
                     }
@@ -9051,7 +9102,7 @@ case 'qzone_post':
                         // 【核心修正】将记录 chat.name 改为记录 chatId
                         postToComment.comments.push({ commenterId: chatId, text: msgData.commentText, timestamp: Date.now() });
                         await db.qzonePosts.update(postToComment.id, { comments: postToComment.comments });
-                        updateUnreadIndicator(unreadPostsCount + 1);
+                        updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                         if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
                            await renderQzonePosts();
                         }
@@ -9066,7 +9117,7 @@ case 'qzone_post':
                        if (!postToLike.likes.includes(chatId)) {
                            postToLike.likes.push(chatId);
                            await db.qzonePosts.update(postToLike.id, { likes: postToLike.likes });
-                           updateUnreadIndicator(unreadPostsCount + 1);
+                           updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                            if (isViewingThisChat && document.getElementById('qzone-screen').classList.contains('active')) {
                               await renderQzonePosts();
                            }
@@ -10371,7 +10422,7 @@ async function triggerInactiveAiAction(chatId) {
         }
     }
 
-                                 const systemPrompt = `
+                                                const systemPrompt = `
 # 你的身份与任务
 你现在扮演名为“${chat.name}”的角色。这是一个后台独立行动，你需要秘密地检查“动态”区，并根据你的角色设定，与其他人的动态进行互动、回复评论，或者执行其他独立行动。
 
@@ -10399,6 +10450,10 @@ ${worldBookContent}
 -   **打视频**: \`[{"type": "video_call_request"}]\`
 -   **创建约定**: \`[{"type": "create_countdown", "title": "约定的标题", "date": "YYYY-MM-DDTHH:mm:ss"}]\`
 
+# 【【【后台内容创作指南】】】
+-   **发布说说 (qzone_post)**: 内容【必须】是关于你的独立生活，也可以与用户有关，但要从你的视角出发。内容【禁止】为空，且必须严格遵守你的人设和世界书设定。
+-   **创建约定 (create_countdown)**: 内容用于计划未来，可以与当前聊天无关，偏向于日常。小事可以小到“明天一起买菜”，大事可以大到“订婚”或“纪念日”。
+
 # 供你决策的参考信息：
 -   **当前时间**: ${currentTime}
 -   **你和用户的最后对话**: ${recentContextSummary}
@@ -10417,13 +10472,10 @@ ${worldBookContent}
             let postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
             for (const post of visiblePosts) {
                 let authorName = post.authorId === 'user' ? userNickname : (state.chats[post.authorId]?.name || '一位朋友');
-                let interactionStatus = '';
-                if (post.likes && post.likes.includes(aiName)) interactionStatus += " [你已点赞]";
-                
-                // 【核心修改】在这里检查AI是否已评论
-                if (post.comments && post.comments.some(c => c.commenterName === aiName)) {
-                    interactionStatus += " [你已评论]";
-                }
+                // 【核心BUG修复】在这里，我们用chatId而不是aiName来判断
+                let hasLiked = post.likes && post.likes.includes(chat.id);
+                let hasCommented = post.comments && post.comments.some(c => c.commenterId === chat.id);
+                let interactionStatus = (hasLiked || hasCommented) ? " [你已互动过]" : "";
                 
                 postsContext += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${(post.publicText || post.content || "图片动态").substring(0, 30)}..."${interactionStatus}\n`;
             }
@@ -10479,13 +10531,14 @@ ${worldBookContent}
                     // 创建新的回复对象
                     post.comments.push({
                         commenterId: chatId, // AI的ID
-                        commenterName: chat.name, // AI的名字
+                        commenterName: chat.name, // AI的名字 (作为备用)
                         text: action.replyText, // AI的回复内容
                         timestamp: Date.now(),
                         replyToIndex: commentIndex // 标记这是一条对特定评论的回复
                     });
 
                     await db.qzonePosts.put(post); // 保存更新后的帖子
+                    updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
 
                     // 如果用户正在看动态页，就刷新
                     if (document.getElementById('qzone-screen').classList.contains('active')) {
@@ -10502,6 +10555,12 @@ ${worldBookContent}
             }
 
             if (action.type === 'qzone_post') {
+                // 【核心新增】在这里增加安全检查，防止发布空说说
+                if (action.postType === 'shuoshuo' && (!action.content || !String(action.content).trim())) {
+                    console.warn(`AI "${chat.name}" 在后台试图发布一条空的 "说说"，操作已被拦截。`);
+                    continue; // 直接跳过
+                }
+
                 const newPost = {
                     authorId: chatId,
                     authorName: chat.name,
@@ -10527,6 +10586,7 @@ ${worldBookContent}
                 }
                 
                 await db.qzonePosts.add(newPost);
+                updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                 if (state.currentScreenId === 'qzone-screen') {
                     renderQzoneScreen();
                 }
@@ -10544,6 +10604,7 @@ ${worldBookContent}
                         timestamp: Date.now()
                     });
                     await db.qzonePosts.put(post);
+                    updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                     if (state.currentScreenId === 'qzone-screen') {
                         renderQzoneScreen();
                     }
@@ -10556,9 +10617,11 @@ ${worldBookContent}
                 const post = await db.qzonePosts.get(postId);
                 if (post) {
                     if (!post.likes) post.likes = [];
-                    if (!post.likes.includes(chat.name)) {
-                        post.likes.push(chat.name);
+                     // 【核心BUG修复】在这里，我们用chat.id而不是chat.name来判断和记录
+                    if (!post.likes.includes(chat.id)) {
+                        post.likes.push(chat.id);
                         await db.qzonePosts.put(post);
+                        updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
                         if (state.currentScreenId === 'qzone-screen') {
                             renderQzoneScreen();
                         }
@@ -10583,6 +10646,7 @@ ${worldBookContent}
                     });
 
                     await db.qzonePosts.put(post); // 保存更新后的帖子
+                    updateUnreadIndicator(unreadPostsCount + 1); // 【核心新增】触发红点
 
                     // 如果用户正在看动态页，就刷新
                     if (state.currentScreenId === 'qzone-screen') {
@@ -15652,7 +15716,7 @@ postsList.addEventListener('click', async (e) => {
         post.comments.push(newComment);
         await db.qzonePosts.update(postId, { comments: post.comments });
 
-        // 【V2版AI指令修正】
+                    // 【V2版AI指令修正】
         const authorName = post.authorId === 'user' ? state.qzoneSettings.nickname : (state.chats[post.authorId]?.name || '一位朋友');
         const newCommentIndex = post.comments.length - 1;
         // 这条指令更加明确，直接告诉AI应该回复哪个索引
@@ -15663,9 +15727,12 @@ postsList.addEventListener('click', async (e) => {
             if (!chat.isGroup) {
                 chat.history.push({ role: 'system', content: notificationContent, timestamp: Date.now(), isHidden: true });
                 await db.chats.put(chat);
-                // 【【【核心唤醒指令】】】
-                // 在通知AI后，立刻触发它的思考程序
-                triggerInactiveAiAction(chat.id);
+                
+                // 【【【核心BUG修复】】】
+                // 只有在后台活动总开关开启时，才唤醒AI进行思考
+                if (state.globalSettings.enableBackgroundActivity) {
+                    triggerInactiveAiAction(chat.id);
+                }
             }
         }
         commentInput.value = '';
@@ -15698,7 +15765,7 @@ async function handleCommentReply(postId, commentIndex) {
         await db.qzonePosts.put(post);
         await renderQzonePosts();
 
-        // 【V2版AI指令修正】
+                        // 【V2版AI指令修正】
         const newCommentIndex = post.comments.length - 1;
         const replyTextTrimmed = replyText.trim();
         // 这条指令也变得更加明确
@@ -15715,9 +15782,12 @@ async function handleCommentReply(postId, commentIndex) {
                 };
                 chat.history.push(historyMessage);
                 await db.chats.put(chat);
-                // 【【【核心唤醒指令】】】
-                // 同样，在通知AI后，立刻触发它的思考程序
-                triggerInactiveAiAction(chat.id);
+
+                // 【【【核心BUG修复】】】
+                // 同样，在这里加上开关检查
+                if (state.globalSettings.enableBackgroundActivity) {
+                    triggerInactiveAiAction(chat.id);
+                }
             }
         }
     }
