@@ -14,10 +14,16 @@
         .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #1f1f1f; border-radius: 0 0 15px 15px; z-index: 20; }
         #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #333; }
         #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; }
+        /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
+        #status-bar-battery {
+            pointer-events: auto; /* 覆盖父级的 pointer-events: none; */
+            cursor: pointer; /* 添加手型光标，给予用户可点击的反馈 */
+        }
+        /* ▲▲▲ 修正结束 ▲▲▲ */
         #status-bar-time { font-weight: 600; }
-        .battery-container { display: flex; align-items: center; gap: 5px; }
-        .battery-icon { width: 25px; height: 12px; border: 1px solid white; border-radius: 3px; position: relative; padding: 1px; }
-        .battery-icon::after { content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 6px; background-color: white; border-radius: 0 1px 1px 0; }
+                .battery-container { display: flex; align-items: center; gap: 5px; }               
+        .battery-icon { width: 20px; height: 10px; /* <- 在这里修改数字以调整高度 */ border: 1px solid rgba(180, 180, 180, 0.6); /* <- 在这里调整灰色和透明度 */ border-radius: 3px; position: relative; padding: 1px; }
+        .battery-icon::after { content: ''; position: absolute; right: -3px; top: 1px; /* 比如从2px改成1px */ width: 2px; height: 6px; background-color: rgba(200, 200, 200, 0.8); /* <- 在这里调整灰色和透明度 */ border-radius: 0 1px 1px 0; }
         .battery-level { height: 100%; background-color: white; border-radius: 1px; transition: width 0.5s ease; }
         .battery-container.charging .battery-level { background-color: #4cd964; animation: charge-breath 2s infinite; }
         .battery-container.charging .battery-text { color: #4cd964; }
@@ -28,9 +34,22 @@
         .header .header-actions { display: flex; align-items: center; gap: 15px; }
         .header .back-btn, .header .action-btn { font-size: 24px; cursor: pointer; width: 30px; text-align: center; color: var(--accent-color); display: flex; align-items: center; justify-content: center; }
 
+
 .header .action-btn {
     font-size: 16px; /* 专门为“上传”、“+”等文字按钮缩小字号 */
     font-weight: 600; /* 可以加粗一点让它更清晰 */
+    /* ▼▼▼ 【核心修正】在这里为所有文字按钮恢复宽度 ▼▼▼ */
+    width: auto; /* 覆盖掉上方的 width: 30px，让宽度自适应内容 */
+    padding: 0 5px; /* 给左右一点留白，避免文字贴边 */
+    white-space: nowrap; /* 确保文字内容不换行 */
+}
+
+/* ▼▼▼ 【核心修正】只对需要固定宽度（如“+”号）的按钮单独设置宽度 ▼▼▼ */
+#add-chat-btn,
+#add-world-book-btn,
+#create-album-btn-page {
+    width: 30px; /* 恢复固定的窄宽度 */
+    padding: 0; /* 移除为文字按钮添加的左右留白 */
 }
 
         .header .action-btn img { height: 26px; }
@@ -3404,6 +3423,16 @@
 #phone-screen.dark-mode .form-container {
     background-color: #000000;
 }
+/* ▼▼▼ 【全新】世界书夜间模式文字颜色修正 ▼▼▼ */
+#phone-screen.dark-mode .world-book-group-header .group-name,
+#phone-screen.dark-mode #world-book-list .item-title {
+    color: var(--text-primary); /* 将分类标题和书名改为主要文字颜色 (白色) */
+}
+
+#phone-screen.dark-mode #world-book-list .item-content {
+    color: var(--text-secondary); /* 确保内容预览也使用次要文字颜色 (浅灰) */
+}
+/* ▲▲▲ 新增CSS粘贴结束 ▲▲▲ */
 #phone-screen.dark-mode .form-group input, 
 #phone-screen.dark-mode .form-group select, 
 #phone-screen.dark-mode .form-group textarea {
@@ -4790,6 +4819,145 @@ input:checked + .slider:before { transform: translateX(20px); }
 #phone-screen.dark-mode #billing-details-screen {
     background-color: #000000;
 }
+/* ▼▼▼ 【全新】iOS风格电池控制与警报弹窗 ▼▼▼ */
+#battery-control-modal .custom-modal-ios {
+    background-color: rgba(45, 45, 45, 0.75);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    width: 270px;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    color: white;
+    transform: scale(0.95);
+    transition: transform 0.2s ease-in-out;
+}
+#battery-control-modal.visible .custom-modal-ios {
+    transform: scale(1);
+}
+#battery-control-modal .custom-modal-header {
+    padding: 20px 16px 5px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    color: rgba(255, 255, 255, 1); /* 标题行：纯白色，最亮 */
+}
+#battery-control-modal .custom-modal-body {
+    padding: 0 16px 20px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85); /* <- 在这里手动调整第二行字的灰度 */
+}
+#battery-control-modal .custom-modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+}
+#battery-control-modal .custom-modal-footer button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    color: #0A84FF; /* iOS蓝色 */
+}
+#battery-control-modal .custom-modal-footer button:first-child {
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+#battery-control-modal .custom-modal-footer .confirm-btn {
+    font-weight: 600;
+}
+
+/* === 状态栏电池图标新样式 === */
+.battery-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* 充电状态的样式 */
+.battery-container.charging .battery-level {
+    background-color: #30D158; /* iOS绿色 */
+    animation: none; /* 移除呼吸动画 */
+
+    /* ▼▼▼ 【最终方案】步骤1：使用一个精心构造的、轮廓平滑的SVG作为遮罩（洞） ▼▼▼ */
+    
+    /* 
+      这个SVG通过两层<use>叠加，构造了一个完美的、等宽的轮廓：
+      - 底层<use>: 使用粗壮、圆滑的描边(stroke)来创建轮廓。
+      - 顶层<use>: 使用纯黑填充(fill)来覆盖描边的内部，形成一个完整的形状。
+      - stroke-width: 决定了描边的粗细。
+      - stroke-linejoin="round": 核心！确保所有拐角都平滑过渡。
+    */
+    --ios-bolt-mask-svg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 14 20"><defs><path id="p" d="M6.5 0L0 8.5h4.5L2 16l8-8.5H5.5L6.5 0z"/></defs><use href="%23p" stroke="black" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/><use href="%23p" fill="black"/></svg>');
+    
+    -webkit-mask-image: linear-gradient(white, white), var(--ios-bolt-mask-svg);
+    mask-image: linear-gradient(white, white), var(--ios-bolt-mask-svg);
+    
+    -webkit-mask-composite: destination-out;
+    mask-composite: subtract;
+    
+    /* 这个尺寸决定了整个“洞”（闪电+描边）的大小 */
+    mask-size: auto, 16px 19px;
+    mask-repeat: no-repeat;
+    mask-position: center;
+}
+
+/* ▼▼▼ 【最终方案】步骤2：在顶层添加尺寸精确匹配的实心黑色闪电 ▼▼▼ */
+.battery-container.charging .battery-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    background-color: #000000; /* 闪电的颜色，这里是纯黑 */
+
+    /* 使用一个标准的、无描边的闪电SVG */
+    --ios-bolt-svg: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 16"><path d="M6.5 0L0 8.5h4.5L2 16l8-8.5H5.5L6.5 0z" fill="black"/></svg>');
+
+    -webkit-mask-image: var(--ios-bolt-svg);
+    mask-image: var(--ios-bolt-svg);
+
+    /* 这个尺寸必须精确，以正好填充进“洞”的内部 */
+    -webkit-mask-size: 9px 14px;
+    mask-size: 9px 14px;
+    
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+
+.battery-container.charging .battery-icon {
+    /* border-color 已被移除，边框将保持灰色 */
+}
+
+/* 低电量状态的样式 (20%及以下) */
+.battery-container.low-power:not(.charging) .battery-level {
+    background-color: #FF453A; /* iOS红色 */
+}
+.battery-container.low-power:not(.charging) .battery-icon {
+    /* border-color 已被移除，边框将保持灰色 */
+}
+.battery-container.low-power:not(.charging) .battery-icon::after {
+    /* background-color 已被移除，“正极”将保持灰色 */
+}
+
+/* === 低电量警报弹窗美化 === */
+#battery-alert-modal .battery-alert-content {
+    background-color: rgba(45, 45, 45, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    color: white;
+}
+#battery-alert-text {
+    color: white;
+}
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 .billing-details-content {
     flex-grow: 1;
     overflow-y: auto; /* 确保内容可滚动 */
@@ -4911,10 +5079,11 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div id="phone-screen">
             <div id="status-bar">
                 <span id="status-bar-time">12:00</span>
-                <div id="status-bar-battery" class="battery-container">
+                                                <div id="status-bar-battery" class="battery-container">
                     <span class="battery-text">--%</span>
                     <div class="battery-icon">
                         <div class="battery-level"></div>
+                        <!-- 旧的SVG闪电已被移除，效果将由CSS实现 -->
                     </div>
                 </div>
             </div>
@@ -4974,11 +5143,11 @@ input:checked + .slider:before { transform: translateX(20px); }
             </div>
           
 <div id="world-book-screen" class="screen">
-    <div class="header">
+        <div class="header">
         <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
         <span>世界书</span>
         <div class="header-actions"> <!-- 【推荐】用一个容器把按钮包起来 -->
-            <span class="action-btn" id="manage-world-book-categories-btn">管理分类</span>
+            <span class="action-btn" id="manage-world-book-categories-btn">分类</span>
             <span class="action-btn" id="add-world-book-btn">+</span>
         </div>
     </div>
@@ -5705,6 +5874,26 @@ input:checked + .slider:before { transform: translateX(20px); }
 
         </div>
     </div>
+
+<!-- ▼▼▼ 【全新】iOS风格电池控制与警报弹窗 ▼▼▼ -->
+<div id="battery-control-modal" class="modal">
+    <div class="custom-modal-ios">
+        <div class="custom-modal-header" id="battery-control-title"></div>
+        <div class="custom-modal-body" id="battery-control-text"></div>
+        <div class="custom-modal-footer">
+            <button id="battery-control-cancel">取消</button>
+            <button id="battery-control-confirm" class="confirm-btn">确认</button>
+        </div>
+    </div>
+</div>
+
+<div id="battery-alert-modal">
+    <div class="battery-alert-content">
+        <img id="battery-alert-image" src="">
+        <p id="battery-alert-text"></p>
+    </div>
+</div>
+<!-- ▲▲▲ 新增HTML结束 ▲▲▲ -->
   
     <div id="chat-settings-modal" class="modal"><div class="modal-content"><div class="modal-header"><span>聊天设置</span></div><div class="modal-body"><div class="form-group" id="chat-name-group"><label for="chat-name-input">备注名 / 群名</label><input type="text" id="chat-name-input"></div>
 
@@ -6611,6 +6800,19 @@ let waimaiTimers = {}; // 用于存储外卖倒计时
 let activeMessageTimestamp = null;
 let currentReplyContext = null; // <--- 新增这行，用来存储当前正在引用的消息信息
 let activePostId = null; // <-- 新增：用于存储当前操作的动态ID
+
+// ▼▼▼ 【全新】电池模拟系统全局变量 ▼▼▼
+let isBatterySimulationMode = false; // 是否启用模拟模式的总开关
+let simulatedBattery = {
+    level: 1.0, // 0.0 to 1.0
+    charging: false,
+    lastUpdated: Date.now(),
+};
+let dischargeTimer = null;
+let chargeTimer = null;
+// 这个 alertFlags 是专门给模拟模式用的，和旧的不冲突
+let simAlertFlags = { hasShown20: false, hasShown0: false }; 
+// ▲▲▲ 新增变量结束 ▲▲▲
 
         let photoViewerState = {
             isOpen: false,
@@ -7981,14 +8183,14 @@ function createWorldBookGroup(groupName, books) {
     `;
 
     const contentEl = groupContainer.querySelector('.world-book-group-content');
-    books.sort((a,b) => a.name.localeCompare(b.name, 'zh-CN')); // 按书名排序
+        books.sort((a,b) => a.name.localeCompare(b.name, 'zh-CN')); // 按书名排序
     books.forEach(book => {
         const item = document.createElement('div');
         item.className = 'list-item';
         item.dataset.bookId = book.id;
         item.innerHTML = `<div class="item-title">${book.name}</div><div class="item-content">${(book.content || '暂无内容...').substring(0, 50)}</div>`;
         item.addEventListener('click', () => openWorldBookEditor(book.id));
-        addLongPressListener(item, async () => { const confirmed = await showCustomConfirm('删除世界书', `确定要删除《${book.name}》吗？此操作不可撤销。`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await db.worldBooks.delete(book.id); state.worldBooks = state.worldBooks.filter(wb => wb.id !== book.id); renderWorldBookScreen(); } });         contentEl.appendChild(item);
+        addLongPressListener(item, async () => { const confirmed = await showCustomConfirm('删除世界书', `确定要删除《${book.name}》吗？此操作不可撤销。`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await db.worldBooks.delete(book.id); renderWorldBookScreen(); } });         contentEl.appendChild(item);
     });
 
     return groupContainer;
@@ -10268,6 +10470,179 @@ async function openLyricEditor() {
 
         function openPersonaLibrary() { renderPersonaLibrary(); personaLibraryModal.classList.add('visible'); }
 
+// ▼▼▼ 【全新】电池模拟系统核心函数 ▼▼▼
+
+/**
+ * 初始化电池模拟系统
+ */
+function initBatterySimulation() {
+    // 1. 从本地存储加载上一次的状态
+    const savedState = localStorage.getItem('simulatedBatteryState');
+    if (savedState) {
+        simulatedBattery = JSON.parse(savedState);
+    } else {
+        // 如果没有，就初始化为满电状态
+        simulatedBattery = { level: 1.0, charging: false, lastUpdated: Date.now() };
+    }
+
+    const now = Date.now();
+    const timeElapsed = now - simulatedBattery.lastUpdated;
+
+    // 2. 计算离线时的电量变化
+    if (simulatedBattery.charging) {
+        // 如果离线时在充电
+        const chargeRatePerHour = 100 / 3; // 3小时充满
+        const chargePerMillisecond = chargeRatePerHour / 3600000;
+        const chargeAdded = (chargePerMillisecond * timeElapsed) / 100;
+        simulatedBattery.level = Math.min(1.0, simulatedBattery.level + chargeAdded);
+        startCharging(); // 回来后继续充电
+    } else {
+        // 如果离线时没充电，电量不变
+        // 回来后开始掉电
+        startDischarging();
+    }
+
+    // 3. 更新UI并保存当前状态
+    simulatedBattery.lastUpdated = now;
+    updateSimulatedBatteryUI();
+    saveSimulatedBatteryState();
+}
+
+/**
+ * 将当前模拟电池状态保存到localStorage
+ */
+function saveSimulatedBatteryState() {
+    simulatedBattery.lastUpdated = Date.now();
+    localStorage.setItem('simulatedBatteryState', JSON.stringify(simulatedBattery));
+}
+
+/**
+ * 更新模拟电池的UI显示
+ */
+function updateSimulatedBatteryUI() {
+    const batteryContainer = document.getElementById('status-bar-battery');
+    const batteryLevelEl = batteryContainer.querySelector('.battery-level');
+    const batteryTextEl = batteryContainer.querySelector('.battery-text');
+    const levelPercent = Math.floor(simulatedBattery.level * 100);
+
+    batteryLevelEl.style.width = `${levelPercent}%`;
+    batteryTextEl.textContent = ``; // 模拟模式下不在状态栏显示数字
+
+    // 根据充电状态切换样式
+    batteryContainer.classList.toggle('charging', simulatedBattery.charging);
+    // 根据电量决定是否进入低电量模式
+    batteryContainer.classList.toggle('low-power', simulatedBattery.level <= 0.2);
+}
+
+/**
+ * 开始模拟掉电
+ */
+function startDischarging() {
+    if (chargeTimer) clearInterval(chargeTimer);
+    chargeTimer = null;
+    if (dischargeTimer) return; // 防止重复启动
+
+    simulatedBattery.charging = false;
+    updateSimulatedBatteryUI();
+    saveSimulatedBatteryState();
+
+    // 满电12小时，1%需要 (12 * 60 * 60) / 100 = 432秒
+    const dischargeInterval = 432 * 1000; 
+
+    dischargeTimer = setInterval(() => {
+        if (simulatedBattery.level > 0 && !simulatedBattery.charging) { // 增加充电判断
+            simulatedBattery.level = Math.max(0, simulatedBattery.level - 0.01);
+            
+            // 检查并触发20%警报
+            if (simulatedBattery.level <= 0.2 && !simAlertFlags.hasShown20) {
+                showBatteryAlert(null, "电量不足20%，可以去找充电线惹");
+                simAlertFlags.hasShown20 = true;
+            }
+            // 检查并触发0%警报
+            if (simulatedBattery.level <= 0 && !simAlertFlags.hasShown0) {
+                showBatteryAlert(null, "请及时充电");
+                simAlertFlags.hasShown0 = true;
+            }
+
+            updateSimulatedBatteryUI();
+            saveSimulatedBatteryState();
+        } else {
+            // 电量为0或开始充电后，停止掉电
+            clearInterval(dischargeTimer);
+            dischargeTimer = null;
+        }
+    }, dischargeInterval);
+}
+
+/**
+ * 开始模拟充电
+ */
+function startCharging() {
+    if (dischargeTimer) clearInterval(dischargeTimer);
+    dischargeTimer = null;
+    if (chargeTimer) return; // 防止重复启动
+
+    simulatedBattery.charging = true;
+    // 开始充电时，重置低电量警报标志，以便下次掉电时能再次触发
+    simAlertFlags = { hasShown20: false, hasShown0: false };
+    updateSimulatedBatteryUI();
+    saveSimulatedBatteryState();
+
+    // 3小时充满，1%需要 (3 * 60 * 60) / 100 = 108秒
+    const chargeInterval = 108 * 1000;
+
+    chargeTimer = setInterval(() => {
+        if (simulatedBattery.level < 1.0) {
+            simulatedBattery.level = Math.min(1.0, simulatedBattery.level + 0.01);
+        }
+        // 注意：就算满了100%，我们也不停止计时器，以模拟“一直插着电”的状态
+        
+        updateSimulatedBatteryUI();
+        saveSimulatedBatteryState();
+
+    }, chargeInterval);
+}
+
+/**
+ * 停止充电（断开充电线）
+ */
+function stopCharging() {
+    if (chargeTimer) {
+        clearInterval(chargeTimer);
+        chargeTimer = null;
+    }
+    simulatedBattery.charging = false;
+    updateSimulatedBatteryUI();
+    saveSimulatedBatteryState();
+    startDischarging(); // 断开后立即开始掉电
+}
+
+/**
+ * 显示电池控制弹窗
+ */
+function showBatteryControlModal() {
+    const modal = document.getElementById('battery-control-modal');
+    const titleEl = document.getElementById('battery-control-title');
+    const textEl = document.getElementById('battery-control-text');
+    const confirmBtn = document.getElementById('battery-control-confirm');
+
+    const currentLevel = Math.floor(simulatedBattery.level * 100);
+    
+    titleEl.textContent = `当前电量 ${currentLevel}%`;
+
+    if (simulatedBattery.charging) {
+        textEl.textContent = "是否断开充电？";
+        confirmBtn.textContent = "断开";
+    } else {
+        textEl.textContent = "是否连接充电线？";
+        confirmBtn.textContent = "充电";
+    }
+    
+    modal.classList.add('visible');
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
         function closePersonaLibrary() { personaLibraryModal.classList.remove('visible'); }
 
         function renderPersonaLibrary() { const grid = document.getElementById('persona-library-grid'); grid.innerHTML = ''; if (state.personaPresets.length === 0) { grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1 / -1; text-align: center; margin-top: 20px;">空空如也~ 点击右上角"添加"来创建你的第一个人设预设吧！</p>'; return; } state.personaPresets.forEach(preset => { const item = document.createElement('div'); item.className = 'persona-preset-item'; item.style.backgroundImage = `url(${preset.avatar})`; item.dataset.presetId = preset.id; item.addEventListener('click', () => applyPersonaPreset(preset.id)); addLongPressListener(item, () => showPresetActions(preset.id)); grid.appendChild(item); }); }
@@ -10288,15 +10663,94 @@ async function openLyricEditor() {
 
         async function savePersonaPreset() { const avatar = document.getElementById('preset-avatar-preview').src; const persona = document.getElementById('preset-persona-input').value.trim(); if (avatar === defaultAvatar && !persona) { alert("头像和人设不能都为空哦！"); return; } if (editingPersonaPresetId) { const preset = state.personaPresets.find(p => p.id === editingPersonaPresetId); if (preset) { preset.avatar = avatar; preset.persona = persona; await db.personaPresets.put(preset); } } else { const newPreset = { id: 'preset_' + Date.now(), avatar: avatar, persona: persona }; await db.personaPresets.add(newPreset); state.personaPresets.push(newPreset); } renderPersonaLibrary(); closePersonaEditor(); }
 
-        const batteryAlertModal = document.getElementById('battery-alert-modal');
+                const batteryAlertModal = document.getElementById('battery-alert-modal');
 
-        function showBatteryAlert(imageUrl, text) { clearTimeout(batteryAlertTimeout); document.getElementById('battery-alert-image').src = imageUrl; document.getElementById('battery-alert-text').textContent = text; batteryAlertModal.classList.add('visible'); const closeAlert = () => { batteryAlertModal.classList.remove('visible'); batteryAlertModal.removeEventListener('click', closeAlert); }; batteryAlertModal.addEventListener('click', closeAlert); batteryAlertTimeout = setTimeout(closeAlert, 2000); }
+        function showBatteryAlert(imageUrl, text) { 
+            clearTimeout(batteryAlertTimeout); 
+            const imgEl = document.getElementById('battery-alert-image');
+            // 【核心修改】如果没传图片URL，就隐藏图片元素
+            if (imageUrl) {
+                imgEl.src = imageUrl;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+            document.getElementById('battery-alert-text').textContent = text; 
+            batteryAlertModal.classList.add('visible'); 
+            const closeAlert = () => { 
+                batteryAlertModal.classList.remove('visible'); 
+                batteryAlertModal.removeEventListener('click', closeAlert); 
+            }; 
+            batteryAlertModal.addEventListener('click', closeAlert); 
+            batteryAlertTimeout = setTimeout(closeAlert, 2000); 
+        }
 
-        function updateBatteryDisplay(battery) { const batteryContainer = document.getElementById('status-bar-battery'); const batteryLevelEl = batteryContainer.querySelector('.battery-level'); const batteryTextEl = batteryContainer.querySelector('.battery-text'); const level = Math.floor(battery.level * 100); batteryLevelEl.style.width = `${level}%`; batteryTextEl.textContent = `${level}%`; if (battery.charging) { batteryContainer.classList.add('charging'); } else { batteryContainer.classList.remove('charging'); } }
+        function updateBatteryDisplay(battery) { 
+            const batteryContainer = document.getElementById('status-bar-battery'); 
+            const batteryLevelEl = batteryContainer.querySelector('.battery-level'); 
+            const batteryTextEl = batteryContainer.querySelector('.battery-text'); 
+            const level = Math.floor(battery.level * 100); 
+            
+            batteryLevelEl.style.width = `${level}%`; 
+            // 【核心修改】真实模式下才显示百分比
+            batteryTextEl.textContent = isBatterySimulationMode ? '' : `${level}%`; 
+            
+            batteryContainer.classList.toggle('charging', battery.charging);
+            batteryContainer.classList.toggle('low-power', battery.level <= 0.2);
+        }
 
-        function handleBatteryChange(battery) { updateBatteryDisplay(battery); const level = battery.level; if (!battery.charging) { if (level <= 0.4 && lastKnownBatteryLevel > 0.4 && !alertFlags.hasShown40) { showBatteryAlert('https://i.postimg.cc/T2yKJ0DV/40.jpg', '有点饿了，可以去找充电器惹'); alertFlags.hasShown40 = true; } if (level <= 0.2 && lastKnownBatteryLevel > 0.2 && !alertFlags.hasShown20) { showBatteryAlert('https://i.postimg.cc/qB9zbKs9/20.jpg', '赶紧的充电，要饿死了'); alertFlags.hasShown20 = true; } if (level <= 0.1 && lastKnownBatteryLevel > 0.1 && !alertFlags.hasShown10) { showBatteryAlert('https://i.postimg.cc/ThMMVfW4/10.jpg', '已阵亡，还有30秒爆炸'); alertFlags.hasShown10 = true; } } if (level > 0.4) alertFlags.hasShown40 = false; if (level > 0.2) alertFlags.hasShown20 = false; if (level > 0.1) alertFlags.hasShown10 = false; lastKnownBatteryLevel = level; }
+        function handleBatteryChange(battery) { 
+            updateBatteryDisplay(battery); 
+            const level = battery.level; 
+            if (!battery.charging) { 
+                if (level <= 0.2 && lastKnownBatteryLevel > 0.2 && !alertFlags.hasShown20) { 
+                    // 【核心修改】这里我们只显示文本，不再需要图片
+                    showBatteryAlert(null, '电量不足20%，可以去找充电线惹');
+                    alertFlags.hasShown20 = true; 
+                }
+                // 保留旧的10%和40%提醒，因为这是真实模式下的特色
+                if (level <= 0.4 && lastKnownBatteryLevel > 0.4 && !alertFlags.hasShown40) { showBatteryAlert('https://i.postimg.cc/T2yKJ0DV/40.jpg', '有点饿了，可以去找充电器惹'); alertFlags.hasShown40 = true; } 
+                if (level <= 0.1 && lastKnownBatteryLevel > 0.1 && !alertFlags.hasShown10) { showBatteryAlert('https://i.postimg.cc/ThMMVfW4/10.jpg', '已阵亡，还有30秒爆炸'); alertFlags.hasShown10 = true; }
+            } 
+            if (level > 0.4) alertFlags.hasShown40 = false; 
+            if (level > 0.2) alertFlags.hasShown20 = false; 
+            if (level > 0.1) alertFlags.hasShown10 = false; 
+            lastKnownBatteryLevel = level; 
+        }
 
-        async function initBatteryManager() { if ('getBattery' in navigator) { try { const battery = await navigator.getBattery(); lastKnownBatteryLevel = battery.level; handleBatteryChange(battery); battery.addEventListener('levelchange', () => handleBatteryChange(battery)); battery.addEventListener('chargingchange', () => { handleBatteryChange(battery); if (battery.charging) { showBatteryAlert('https://i.postimg.cc/3NDQ0dWG/image.jpg', '窝爱泥，电量吃饱饱'); } }); } catch (err) { console.error("无法获取电池信息:", err); document.querySelector('.battery-text').textContent = 'ᗜωᗜ'; } } else { console.log("浏览器不支持电池状态API。"); document.querySelector('.battery-text').textContent = 'ᗜωᗜ'; } }
+        async function initBatteryManager() {
+            // 尝试获取真实电池API
+            if ('getBattery' in navigator) {
+                try {
+                    const battery = await navigator.getBattery();
+                    console.log("真实电池API可用，启动同步模式。");
+                    isBatterySimulationMode = false; // 明确设置为非模拟模式
+                    
+                    // --- 这是旧的、处理真实电量的逻辑，我们保留它 ---
+                    lastKnownBatteryLevel = battery.level;
+                    handleBatteryChange(battery);
+                    battery.addEventListener('levelchange', () => handleBatteryChange(battery));
+                    battery.addEventListener('chargingchange', () => {
+                        handleBatteryChange(battery);
+                        if (battery.charging) {
+                            showBatteryAlert('https://i.postimg.cc/3NDQ0dWG/image.jpg', '窝爱泥，电量吃饱饱');
+                        }
+                    });
+                    // --- 旧逻辑结束 ---
+
+                } catch (err) {
+                    // 如果获取API失败（例如用户拒绝权限），则回退到模拟模式
+                    console.warn("获取真实电池API失败，回退到模拟模式。", err);
+                    isBatterySimulationMode = true;
+                    initBatterySimulation();
+                }
+            } else {
+                // 如果浏览器根本不支持电池API，则直接进入模拟模式
+                console.log("浏览器不支持电池状态API，启动模拟模式。");
+                isBatterySimulationMode = true;
+                initBatterySimulation();
+            }
+        }
 
         async function renderAlbumList() {
             const albumGrid = document.getElementById('album-grid-page');
@@ -15007,8 +15461,8 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
                 alert(`拉取模型失败: ${error.message}`);
             }
         });
-            document.getElementById('add-world-book-btn').addEventListener('click', async () => { const name = await showCustomPrompt('创建世界书', '请输入书名'); if (name && name.trim()) { const newBook = { id: 'wb_' + Date.now(), name: name.trim(), content: '' }; await db.worldBooks.add(newBook); state.worldBooks.push(newBook); renderWorldBookScreen(); openWorldBookEditor(newBook.id); } });
-            document.getElementById('save-world-book-btn').addEventListener('click', async () => { if (!editingWorldBookId) return; const book = state.worldBooks.find(wb => wb.id === editingWorldBookId); if (book) { const newName = document.getElementById('world-book-name-input').value.trim(); if (!newName) { alert('书名不能为空！'); return; } book.name = newName; book.content = document.getElementById('world-book-content-input').value; 
+                        document.getElementById('add-world-book-btn').addEventListener('click', async () => { const name = await showCustomPrompt('创建世界书', '请输入书名'); if (name && name.trim()) { const newBook = { id: 'wb_' + Date.now(), name: name.trim(), content: '' }; await db.worldBooks.add(newBook); renderWorldBookScreen(); openWorldBookEditor(newBook.id); } });
+                        document.getElementById('save-world-book-btn').addEventListener('click', async () => { if (!editingWorldBookId) return; const book = state.worldBooks.find(wb => wb.id === editingWorldBookId); if (book) { const newName = document.getElementById('world-book-name-input').value.trim(); if (!newName) { alert('书名不能为空！'); return; } book.name = newName; book.content = document.getElementById('world-book-content-input').value; 
 
         // ▼▼▼ 【核心修改】在这里保存分类ID ▼▼▼
         const categoryId = document.getElementById('world-book-category-select').value;
@@ -15016,7 +15470,7 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
         book.categoryId = categoryId ? parseInt(categoryId) : null; 
         // ▲▲▲ 修改结束 ▲▲▲
 
-await db.worldBooks.put(book); document.getElementById('world-book-editor-title').textContent = newName; editingWorldBookId = null; renderWorldBookScreen(); showScreen('world-book-screen'); } });
+await db.worldBooks.put(book); document.getElementById('world-book-editor-title').textContent = newName; editingWorldBookId = null; showScreen('world-book-screen'); } });
             document.getElementById('chat-messages').addEventListener('click', (e) => { const aiImage = e.target.closest('.ai-generated-image'); if (aiImage) { const description = aiImage.dataset.description; if (description) showCustomAlert('照片描述', description); return; }  });
             
             const chatSettingsModal = document.getElementById('chat-settings-modal');
@@ -16621,6 +17075,27 @@ document.getElementById('memories-back-btn').addEventListener('click', () => swi
 document.getElementById('add-countdown-btn').addEventListener('click', () => {
     document.getElementById('create-countdown-modal').classList.add('visible');
 });
+            // ▼▼▼ 【全新】电池模拟系统事件绑定 ▼▼▼
+            document.getElementById('status-bar-battery').addEventListener('click', () => {
+                // 只有在模拟模式下，点击才有效
+                if (isBatterySimulationMode) {
+                    showBatteryControlModal();
+                }
+            });
+
+            document.getElementById('battery-control-cancel').addEventListener('click', () => {
+                document.getElementById('battery-control-modal').classList.remove('visible');
+            });
+
+            document.getElementById('battery-control-confirm').addEventListener('click', () => {
+                if (simulatedBattery.charging) {
+                    stopCharging();
+                } else {
+                    startCharging();
+                }
+                document.getElementById('battery-control-modal').classList.remove('visible');
+            });
+            // ▲▲▲ 新增代码结束 ▲▲▲
 document.getElementById('cancel-create-countdown-btn').addEventListener('click', () => {
     document.getElementById('create-countdown-modal').classList.remove('visible');
 });
