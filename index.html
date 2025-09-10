@@ -10,24 +10,93 @@
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
         html { height: 100%; overflow: hidden; }
         body { height: 100%; overflow: hidden; margin: 0; padding: 20px; font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: normal; background-color: #dcdcdc; display: flex; justify-content: center; align-items: center; box-sizing: border-box; }
+/* ▼▼▼ 【全新】根据夜间模式切换手机外框颜色 ▼▼▼ */
+#phone-screen.dark-mode + #phone-frame, /* 选择器修正: 当 screen 是 dark-mode 时, 选中它后面的 frame */
+#phone-frame.dark-mode-frame { /* 提供一个备用类, 以防万一 */
+    background-color: #1a1a1c; /* 一个有质感的深灰色，而不是纯黑 */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* 为了让上面的选择器生效，我们需要在JS中添加一个辅助类切换的逻辑 */
+/* ▲▲▲ 新增代码结束 ▲▲▲ */
         #phone-frame { padding: 12px; background-color: #fff; border-radius: 50px; box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1); position: relative; }       
         .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #1f1f1f; border-radius: 0 0 15px 15px; z-index: 20; }
-        #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #333; }
-        #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; }
-        /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
+        #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #333; }                        #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; /* 移除了 mix-blend-mode */ }
+                /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
         #status-bar-battery {
-            pointer-events: auto; /* 覆盖父级的 pointer-events: none; */
-            cursor: pointer; /* 添加手型光标，给予用户可点击的反馈 */
+            pointer-events: auto;
+            cursor: pointer;
         }
         /* ▲▲▲ 修正结束 ▲▲▲ */
         #status-bar-time { font-weight: 600; }
-                .battery-container { display: flex; align-items: center; gap: 5px; }               
-        .battery-icon { width: 20px; height: 10px; /* <- 在这里修改数字以调整高度 */ border: 1px solid rgba(180, 180, 180, 0.6); /* <- 在这里调整灰色和透明度 */ border-radius: 3px; position: relative; padding: 1px; }
-        .battery-icon::after { content: ''; position: absolute; right: -3px; top: 1px; /* 比如从2px改成1px */ width: 2px; height: 6px; background-color: rgba(200, 200, 200, 0.8); /* <- 在这里调整灰色和透明度 */ border-radius: 0 1px 1px 0; }
-        .battery-level { height: 100%; background-color: white; border-radius: 1px; transition: width 0.5s ease; }
-        .battery-container.charging .battery-level { background-color: #4cd964; animation: charge-breath 2s infinite; }
-        .battery-container.charging .battery-text { color: #4cd964; }
-        @keyframes charge-breath { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* ▼▼▼ 【V3 - 最终版】电池图标样式重构 ▼▼▼ */
+
+/* 1. 电池容器 (保持不变) */
+.battery-container { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+/* 2. 电池外框 (回归到最稳定的固定颜色) */
+.battery-icon { 
+    width: 20px; height: 10px;
+    border: 1px solid rgba(180, 180, 180, 0.6); /* 边框永远是这个灰色，不变 */
+    border-radius: 3px; 
+    position: relative; 
+    padding: 1px;
+    background-color: transparent;
+}
+/* 电池正极 (也使用固定的灰色) */
+.battery-icon::after { 
+    content: ''; position: absolute; right: -3px; top: 1px;
+    width: 2px; height: 6px; 
+    background-color: rgba(180, 180, 180, 0.6); /* 正极永远是这个灰色，不变 */
+    border-radius: 0 1px 1px 0; 
+}
+
+/* 3. 内部电量条的通用样式 */
+.battery-level { 
+    height: 100%; border-radius: 1px; 
+    transition: width 0.5s ease, background-color 0.3s ease;
+}
+
+/* --- 4. 【全新】精确的颜色控制逻辑 --- */
+
+/* === 默认状态 (未充电, >20%) === */
+/* 日间模式 */
+#phone-screen:not(.dark-mode) .battery-level { background-color: #3d3d3d; }
+/* 夜间模式 */
+#phone-screen.dark-mode .battery-level { background-color: white; }
+
+/* === 低电量状态 (未充电, <=20%) === */
+/* 无论日夜，都强制为红色 */
+.battery-container.low-power:not(.charging) .battery-level {
+    background-color: #FF453A !important;
+}
+
+/* === 充电状态 (所有情况) === */
+/* 无论日夜和电量，电量条都强制为绿色 */
+.battery-container.charging .battery-level {
+    background-color: #30D158 !important;
+}
+
+/* 充电时的闪电颜色控制 */
+/* 日间模式 */
+#phone-screen:not(.dark-mode) .battery-container.charging .battery-icon::after {
+    background-color: #3d3d3d; /* 深灰色闪电 */
+}
+/* 夜间模式 */
+#phone-screen.dark-mode .battery-container.charging .battery-icon::after {
+    background-color: white; /* 白色闪电 */
+}
+
+/* e) 充电文本颜色 (已移除，因为我们不再显示百分比) */
+
+/* f) 旧的充电动画 (已移除，因为新方案不再需要) */
+
+/* ▲▲▲ 电池样式重构结束 ▲▲▲ */
         .screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
         .screen.active { opacity: 1; visibility: visible; z-index: 1; }
         .header { position: relative; z-index: 15; flex-shrink: 0; padding: 15px 20px; padding-top: 45px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 600; }
@@ -54,6 +123,33 @@
 
         .header .action-btn img { height: 26px; }
         .header .save-btn { font-size: 16px; color: var(--accent-color); font-weight: 600; cursor: pointer; }
+/* ▼▼▼ 【全新】主屏幕日间/夜间模式文字颜色适配 ▼▼▼ */
+
+/* 1. 日间模式样式 (默认情况，即没有 .dark-mode 时) */
+#phone-screen:not(.dark-mode) #clock-container {
+    color: var(--text-primary); /* 将时钟容器内的所有文字颜色设为主要文字颜色 (深色) */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5); /* 阴影改为浅色，以在深色壁纸上更清晰 */
+}
+
+#phone-screen:not(.dark-mode) #weather-container svg path {
+    fill: var(--text-primary); /* 天气图标也变成深色 */
+}
+
+#phone-screen:not(.dark-mode) .app-icon .label {
+    color: var(--text-primary); /* App图标下方的文字变为深色 */
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5); /* 同样使用浅色阴影 */
+}
+
+/* 2. 夜间模式样式 (恢复为白色) */
+#phone-screen.dark-mode #clock-container,
+#phone-screen.dark-mode .app-icon .label {
+    color: white;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.4);
+}
+#phone-screen.dark-mode #weather-container svg path {
+    fill: white;
+}
+/* ▲▲▲ 新增代码结束 ▲▲▲ */
                 #home-screen { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; padding-top: 80px; padding-bottom: 50px; box-sizing: border-box; background-size: cover; background-position: center; }
         #clock-container { position: relative; text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-bottom: 20px; flex-shrink: 0; }
                         #main-time { font-size: 80px; font-weight: 200; margin-bottom: 60px; /* 【再次修改】进一步增加下边距，拉开与天气的距离 */ }
@@ -6816,7 +6912,7 @@ let activePostId = null; // <-- 新增：用于存储当前操作的动态ID
 // ▼▼▼ 【全新】电池模拟系统全局变量 ▼▼▼
 let isBatterySimulationMode = false; // 是否启用模拟模式的总开关
 let simulatedBattery = {
-    level: 1.0, // 0.0 to 1.0
+    level: 0.21, // <- 在这里修改数字, 1.0代表100%, 0.21代表21%
     charging: false,
     lastUpdated: Date.now(),
 };
@@ -10491,11 +10587,12 @@ function initBatterySimulation() {
     // 1. 从本地存储加载上一次的状态
     const savedState = localStorage.getItem('simulatedBatteryState');
     if (savedState) {
-        simulatedBattery = JSON.parse(savedState);
-    } else {
-        // 如果没有，就初始化为满电状态
-        simulatedBattery = { level: 1.0, charging: false, lastUpdated: Date.now() };
-    }
+        const loadedState = JSON.parse(savedState);
+        // 【核心修正】将加载的状态与代码中的默认状态合并
+        // 这意味着，如果localStorage中没有某个值，就会使用我们代码里设置的默认值
+        simulatedBattery = { ...simulatedBattery, ...loadedState };
+    } 
+    // 现在，如果localStorage是空的，simulatedBattery会自然地保持我们在代码里设置的初始值（比如0.21）
 
     const now = Date.now();
     const timeElapsed = now - simulatedBattery.lastUpdated;
@@ -14283,7 +14380,8 @@ function applyTheme(theme) {
     const toggleSwitch = document.getElementById('theme-toggle-switch');
     
     const isDark = theme === 'dark';
-    
+
+    document.getElementById('phone-frame').classList.toggle('dark-mode-frame', isDark); // 【核心】同步切换外框的类    
     phoneScreen.classList.toggle('dark-mode', isDark);
     
     // 如果开关存在，就同步它的状态
