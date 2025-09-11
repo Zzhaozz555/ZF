@@ -3612,6 +3612,104 @@
 
 /* ▼▼▼ 把这一整块全新的CSS，粘贴到 <style> 的末尾 ▼▼▼ */
 
+/* ▼▼▼ 【全新】外观设置卡片式布局样式 ▼▼▼ */
+#wallpaper-screen .form-container {
+    gap: 15px; /* 增加元素之间的垂直间距 */
+}
+
+/* 卡片容器 */
+.settings-card {
+    width: 100%;
+    background-color: var(--secondary-bg);
+    border-radius: 10px;
+    padding: 5px 15px; /* 上下留白少，左右留白多 */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* 卡片内项目之间的间距 */
+}
+
+/* 卡片内的单个设置项 */
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0; /* 增加每个设置项的垂直高度 */
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+/* 卡片内分割线 */
+.card-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0;
+    opacity: 0.5;
+}
+
+/* 透明度滑块的容器 */
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 透明度滑块样式 */
+#notch-opacity-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px; /* 滑块长度 */
+    height: 6px;
+    background: #ddd;
+    outline: none;
+    border-radius: 3px;
+}
+#notch-opacity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+#notch-opacity-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+
+/* 透明度百分比文字 */
+#notch-opacity-value {
+    font-size: 14px;
+    color: var(--text-secondary);
+    width: 45px; /* 固定宽度防止文字跳动 */
+    text-align: right;
+}
+
+/* --- 夜间模式适配 --- */
+#phone-screen.dark-mode .settings-card {
+    background-color: #1c1c1e;
+}
+
+#phone-screen.dark-mode #notch-opacity-slider {
+    background: #333;
+}
+#phone-screen.dark-mode #notch-opacity-slider::-webkit-slider-thumb {
+    background: #888;
+    border-color: #555;
+}
+#phone-screen.dark-mode #notch-opacity-slider::-moz-range-thumb {
+    background: #888;
+    border-color: #555;
+}
+
+/* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
 /* === 【全新】iOS风格的Toggle Switch开关样式 === */
 
 /* 1. 开关的容器 */
@@ -5708,33 +5806,46 @@ input:checked + .slider:before { transform: translateX(20px); }
         <span>外观设置</span>
         <span style="width: 30px;"></span>
     </div>
-    <div class="form-container">
-        <!-- 壁纸设置部分保持不变 -->
+        <div class="form-container">
+        <!-- 1. 壁纸设置 (无卡片) -->
         <div id="wallpaper-preview">点击下方上传</div>
         <button class="form-button" onclick="document.getElementById('wallpaper-upload-input').click();">上传壁纸</button>
         <input type="file" id="wallpaper-upload-input" accept="image/*">
 
-<!-- ▼▼▼ 将【上面整块代码】，完整替换为下面这段【全新的代码】 ▼▼▼ -->
-<div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-    <label for="theme-toggle-switch" style="margin-bottom: 0;">夜间模式</label>
-    <label class="toggle-switch">
-        <input type="checkbox" id="theme-toggle-switch">
-        <span class="slider"></span>
-    </label>
-</div>
-<!-- ▲▲▲ 替换结束 ▲▲▲ -->
-        
-        <!-- 【核心修改2】新增图标设置区域 -->
-        <hr style="width: 80%; opacity: 0.3; margin: 30px 0;">
-        <div style="width:100%; text-align: left; margin-bottom: 15px;">
-            <label style="font-weight: 500; color: var(--text-secondary);">App 图标设置</label>
+        <!-- 2. 第一个卡片：显示设置 -->
+        <div class="settings-card">
+            <!-- 夜间模式 -->
+            <div class="settings-item">
+                <label for="theme-toggle-switch">夜间模式</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="theme-toggle-switch">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <!-- 分割线 -->
+            <hr class="card-divider">
+            <!-- 刘海屏透明度 -->
+            <div class="settings-item">
+                <label for="notch-opacity-slider">刘海屏透明度</label>
+                <div class="slider-control">
+                    <input type="range" id="notch-opacity-slider" min="0" max="100" value="100">
+                    <span id="notch-opacity-value">100%</span>
+                </div>
+            </div>
         </div>
-        <div id="icon-settings-grid">
-            <!-- 图标设置项将由JS动态生成在这里 -->
+
+        <!-- 3. 第二个卡片：App图标设置 -->
+        <div class="settings-card">
+            <div style="width:100%; text-align: left;">
+                <label style="font-weight: 500; color: var(--text-secondary);">App 图标设置</label>
+            </div>
+            <div id="icon-settings-grid" style="margin-top: 15px;">
+                <!-- 图标设置项将由JS动态生成在这里 -->
+            </div>
         </div>
         
-        <!-- 【核心修改3】按钮文字也改一下 -->
-        <button class="form-button" id="save-wallpaper-btn" style="margin-top: 30px;">保存所有外观设置</button>
+        <!-- 4. 保存按钮 (无卡片) -->
+        <button class="form-button" id="save-wallpaper-btn" style="margin-top: 20px;">保存所有外观设置</button>
     </div>
 </div>
 <!-- ▲▲▲ 替换结束 ▲▲▲ -->
@@ -17536,6 +17647,70 @@ document.getElementById('cancel-reply-btn').addEventListener('click', cancelRepl
 // 在你的 init() 函数的事件监听器区域...
 
 // ▼▼▼ 用这段代码替换旧的转账卡片点击事件 ▼▼▼
+// ▼▼▼ 【全新】刘海屏透明度功能逻辑 ▼▼▼
+
+/**
+ * 根据给定的值（0-100）应用刘海屏的透明度
+ * @param {number} value - 透明度值
+ */
+function applyNotchOpacity(value) {
+    const notch = document.querySelector('.notch');
+    if (!notch) return;
+    
+    const opacity = parseInt(value) / 100;
+    
+    // 当完全透明时，直接隐藏元素以避免潜在的交互问题
+    if (opacity === 0) {
+        notch.style.visibility = 'hidden';
+    } else {
+        notch.style.visibility = 'visible';
+        // 使用rgba来控制背景色的透明度，确保颜色是纯黑
+        notch.style.backgroundColor = `rgba(0, 0, 0, ${opacity})`;
+    }
+}
+
+// 在 init() 函数中，找到 await loadAllDataFromDB(); 这一行，在它的【后面】添加：
+// applyNotchOpacity(state.globalSettings.notchOpacity || 100);
+
+// 在 loadAllDataFromDB() 函数中，找到 state.globalSettings = globalSettings || { ... }; 这一块，
+// 在里面添加一行 'notchOpacity: 100,'，如下：
+/*
+state.globalSettings = globalSettings || { 
+    id: 'main', 
+    wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', 
+    fontUrl: '', 
+    notchOpacity: 100, // <--- 添加这一行
+    // ... 其他设置
+};
+*/
+
+// 在 renderWallpaperScreen() 函数中，添加以下代码来初始化滑块：
+/*
+const opacitySlider = document.getElementById('notch-opacity-slider');
+const opacityValueEl = document.getElementById('notch-opacity-value');
+const currentOpacity = state.globalSettings.notchOpacity || 100;
+opacitySlider.value = currentOpacity;
+opacityValueEl.textContent = `${currentOpacity}%`;
+*/
+
+// 在 id="save-wallpaper-btn" 的 click 事件监听器中，
+// 在 await db.globalSettings.put(state.globalSettings); 这一行的【前面】添加：
+/*
+const newOpacity = document.getElementById('notch-opacity-slider').value;
+state.globalSettings.notchOpacity = parseInt(newOpacity);
+applyNotchOpacity(newOpacity); // 保存时立即应用
+*/
+
+// 在 init() 函数的事件监听器区域，粘贴下面这段新代码
+document.getElementById('notch-opacity-slider').addEventListener('input', (e) => {
+    const value = e.target.value;
+    // 实时更新百分比显示
+    document.getElementById('notch-opacity-value').textContent = `${value}%`;
+    // 实时预览透明度效果
+    applyNotchOpacity(value);
+});
+
+// ▲▲▲ 新增JS逻辑结束 ▲▲▲
 document.getElementById('chat-messages').addEventListener('click', (e) => {
     // 1. 向上查找被点击的元素是否在一个消息气泡内
     const bubble = e.target.closest('.message-bubble');
