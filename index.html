@@ -20,8 +20,8 @@
 /* 为了让上面的选择器生效，我们需要在JS中添加一个辅助类切换的逻辑 */
 /* ▲▲▲ 新增代码结束 ▲▲▲ */
         #phone-frame { padding: 12px; background-color: #fff; border-radius: 50px; box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1); position: relative; }       
-        .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #1f1f1f; border-radius: 0 0 15px 15px; z-index: 20; }
-        #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #333; }                        #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; /* 移除了 mix-blend-mode */ }
+                .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #000000; border-radius: 0 0 15px 15px; z-index: 20; }
+               #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #000000; }                       #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; /* 移除了 mix-blend-mode */ }
                 /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
         #status-bar-battery {
             pointer-events: auto;
