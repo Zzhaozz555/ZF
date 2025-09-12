@@ -10,16 +10,29 @@
         :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
         html { height: 100%; overflow: hidden; }
         body { height: 100%; overflow: hidden; margin: 0; padding: 20px; font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-weight: normal; background-color: #dcdcdc; display: flex; justify-content: center; align-items: center; box-sizing: border-box; }
-/* ▼▼▼ 【全新】根据夜间模式切换手机外框颜色 ▼▼▼ */
-#phone-screen.dark-mode + #phone-frame, /* 选择器修正: 当 screen 是 dark-mode 时, 选中它后面的 frame */
-#phone-frame.dark-mode-frame { /* 提供一个备用类, 以防万一 */
-    background-color: #1a1a1c; /* 一个有质感的深灰色，而不是纯黑 */
+/* ▼▼▼ 【重构】手机外框基础样式与独立颜色类 ▼▼▼ */
+#phone-frame {
+    padding: 12px;
+    border-radius: 50px;
+    position: relative;
+    transition: background-color 0.4s, box-shadow 0.4s;
+}
+/* 白色外框 (默认) */
+#phone-frame.frame-white {
+    background-color: #fff;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1);
+}
+/* 黑色外框 */
+#phone-frame.frame-black {
+    background-color: #1a1a1c;
     box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.3);
 }
-
-/* 为了让上面的选择器生效，我们需要在JS中添加一个辅助类切换的逻辑 */
-/* ▲▲▲ 新增代码结束 ▲▲▲ */
-        #phone-frame { padding: 12px; background-color: #fff; border-radius: 50px; box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1); position: relative; }       
+/* 【全新】玫瑰金色外框 */
+#phone-frame.frame-rose-gold {
+    background: linear-gradient(145deg, #f9e0c9, #e6c9a3 40%, #e8cbb0 60%, #f9e0c9);
+    box-shadow: 0 20px 50px rgba(102, 88, 72, 0.3), inset 0 2px 4px rgba(255, 245, 235, 0.5), inset 0 -2px 3px rgba(112, 92, 75, 0.2);
+}
+/* ▲▲▲ 重构结束 ▲▲▲ */       
                 .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #000000; border-radius: 0 0 15px 15px; z-index: 20; }
                #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #000000; }                       #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; /* 移除了 mix-blend-mode */ }
                 /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
@@ -3710,7 +3723,216 @@
 
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
 
+/* ▼▼▼ 【全新】外观设置-手机框选择样式 ▼▼▼ */
+.current-value-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+.current-value-display .arrow-right {
+    font-size: 20px;
+}
+
+/* 手机框选择弹窗 */
+#frame-picker-modal .custom-modal-footer button {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 14px;
+    font-size: 18px;
+    color: var(--accent-color);
+}
+#frame-picker-modal .custom-modal-footer button:last-child {
+    border-bottom: none;
+}
+/* 选中项的样式 */
+#frame-picker-modal .custom-modal-footer button.selected {
+    font-weight: 600;
+    color: #007bff; /* 突出显示 */
+}
+#frame-picker-modal #cancel-frame-picker-btn {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】iPhone SE 手机框样式 (V6 - 最终视觉层次修正版) ▼▼▼ */
+
+#phone-frame.frame-se {
+    /* 
+    ================================================
+    === iPHONE SE 终极手动微调控制器 ===
+    ================================================
+    */
+    /* --- 整体边框 --- */
+    --se-top-bezel-height: 75px;
+    --se-bottom-bezel-height: 30px;
+    --se-horizontal-padding: 14px;
+
+    /* --- Home键 --- */
+    --home-button-size: 61px;
+    --home-button-bottom: 13px;
+
+    /* --- 顶部开孔 --- */
+    --speaker-width: 45px;
+    --speaker-height: 4px;
+    --camera-size: 7px;
+    --camera-offset-y: -11px;
+    --sensor-size: 5px;
+    --sensor-offset-x: -32px;
+
+    /* --- 视觉效果 --- */
+    --outer-border-color: #c5c6c7;
+    --screen-protector-border-color: #c8c9cb; /* “手机膜”边框颜色 */
+    --glass-pane-opacity: 0.6;          /* “玻璃面板”的透明度 (0到1) */
+    /* 
+    ================================================
+    */
+
+    background: linear-gradient(to bottom, #fdfdfd, #f6f6f6);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.22), inset 0 1px 1px #fff, inset 0 -1px 1px rgba(0,0,0,0.1);
+    padding: var(--se-top-bezel-height) var(--se-horizontal-padding) var(--se-bottom-bezel-height);
+    border: 1px solid var(--outer-border-color);
+    position: relative; 
+}
+
+/* 【核心修正】：“玻璃面板”和“手机膜”现在是同一个元素 */
+/* 它现在位于最底层(z-index: 1)，作为边框的背景，绝对不会覆盖屏幕 */
+#phone-frame.frame-se::before {
+    content: '';
+    position: absolute;
+    /* 定位在外边框的内侧 */
+    top: 1px; left: 1px; right: 1px; bottom: 1px;
+    border-radius: 49px; /* 圆角比外框小一点 */
+    /* 背景是半透明玻璃 */
+    background-color: rgba(255, 255, 255, var(--glass-pane-opacity));
+    /* 边框是手机膜 */
+    border: 1px solid var(--screen-protector-border-color);
+    pointer-events: none;
+    z-index: 1; /* 把它放在最底层 */
+}
+
+/* 隐藏不再需要的::after伪元素 */
+#phone-frame.frame-se::after {
+    display: none;
+}
+
+/* 隐藏刘海屏 */
+#phone-frame.frame-se .notch { display: none; }
+
+/* 屏幕样式，提升其层级，确保在玻璃面板之上 */
+#phone-frame.frame-se #phone-screen {
+    border-radius: 4px;
+    border: 1px solid #999;
+    box-shadow: inset 0 0 0 2px #000;
+    position: relative;
+    z-index: 2; /* 层级高于玻璃面板 */
+}
+
+/* Home键和顶部开孔，提升层级，确保在所有元素之上 */
+.home-button, .se-top-elements {
+    z-index: 3; /* 最高层级 */
+}
+
+/* Home键精修 (应用手动调整值) */
+.home-button {
+    display: none; position: absolute; left: 50%;
+    bottom: var(--home-button-bottom);
+    width: var(--home-button-size);
+    height: var(--home-button-size);
+    transform: translateX(-50%); 
+    border-radius: 50%; border: none; cursor: pointer;
+    background: #f7f8fa;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+.home-button::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(var(--home-button-size) - 10px);
+    height: calc(var(--home-button-size) - 10px);
+    border-radius: 50%;
+    border: 1px solid var(--screen-protector-border-color); 
+}
+#phone-frame.frame-se .home-button { display: block; }
+
+/* 顶部开孔精修 (全新布局，应用手动调整值) */
+.se-top-elements {
+    display: none; position: absolute; top: 30px; left: 0; right: 0;
+    height: 20px;
+}
+.se-speaker {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--speaker-width); 
+    height: var(--speaker-height); 
+    border-radius: 2px;
+    background-color: #383838;
+}
+.se-camera {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, calc(-50% + var(--camera-offset-y)));
+    width: var(--camera-size); 
+    height: var(--camera-size); 
+    border-radius: 50%;
+    background-color: #383838;
+}
+.se-proximity-sensor {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(calc(-50% + var(--sensor-offset-x)), -50%);
+    width: var(--sensor-size); 
+    height: var(--sensor-size); 
+    border-radius: 50%;
+    background-color: #383838;
+}
+#phone-frame.frame-se .se-top-elements { display: block; }
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
 /* === 【全新】iOS风格的Toggle Switch开关样式 === */
+
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新V3】iOS风格居中磨砂滚动选择器样式 ▼▼▼ */
+#frame-picker-modal-ios {
+    justify-content: center; /* 垂直居中 */
+    align-items: center;   /* 水平居中 */
+    background-color: rgba(0,0,0,0.3);
+}
+.picker-window {
+    width: 270px; /* 弹窗宽度 */
+    /* 【核心】灰色磨砂背景 */
+    background-color: rgba(240, 240, 240, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 14px; /* 圆角 */
+    box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    /* 弹入动画 */
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+#frame-picker-modal-ios.visible .picker-window {
+    transform: scale(1);
+    opacity: 1;
+}
+.picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.picker-title { font-size: 16px; font-weight: 600; color: #333; }
+.picker-btn { background: none; border: none; font-size: 16px; color: #007bff; cursor: pointer; padding: 5px; }
+.picker-btn.confirm { font-weight: 600; }
+.picker-body { padding: 20px 0; }
+.picker-container { height: 180px; overflow: hidden; position: relative; }
+.picker-highlight { position: absolute; top: 50%; left: 15px; right: 15px; height: 36px; transform: translateY(-50%); border-top: 1px solid #bbb; border-bottom: 1px solid #bbb; pointer-events: none; z-index: 2; }
+.picker-options { height: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+.picker-options::-webkit-scrollbar { display: none; }
+.picker-options { -ms-overflow-style: none; scrollbar-width: none; }
+.picker-option { height: 36px; display: flex; justify-content: center; align-items: center; font-size: 18px; color: #333; scroll-snap-align: center; transition: all 0.2s ease; }
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
 
 /* 1. 开关的容器 */
 .toggle-switch {
@@ -5281,6 +5503,13 @@ input:checked + .slider:before { transform: translateX(20px); }
 </head>
 <body>
     <div id="phone-frame">
+        <div class="se-top-elements">
+            <div class="se-speaker">
+                <div class="se-camera"></div>
+                <div class="se-proximity-sensor"></div>
+            </div>
+        </div>
+        <div class="home-button"></div>
         <div class="notch"></div>
         <div id="phone-screen">
             <div id="status-bar">
@@ -5830,6 +6059,16 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <div class="slider-control">
                     <input type="range" id="notch-opacity-slider" min="0" max="100" value="100">
                     <span id="notch-opacity-value">100%</span>
+                </div>
+            </div>
+            <!-- 分割线 -->
+            <hr class="card-divider">
+            <!-- 手机选择-->
+            <div id="frame-picker-btn" class="settings-item" style="cursor: pointer;">
+                <label>手机选择</label>
+                <div class="current-value-display">
+                    <span id="current-frame-choice">白色</span>
+                    <span class="arrow-right">›</span>
                 </div>
             </div>
         </div>
@@ -6732,6 +6971,27 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
 <!-- ▼▼▼ 【全新】世界书分类管理模态框 ▼▼▼ -->
+<!-- ▼▼▼ 【全新V3】iOS风格滚动选择器弹窗 (居中磨砂版) ▼▼▼ -->
+<div id="frame-picker-modal-ios" class="modal">
+    <div class="picker-window">
+        <div class="picker-header">
+            <button class="picker-btn cancel" id="cancel-frame-picker-ios-btn">取消</button>
+            <span class="picker-title">更换手机</span>
+            <button class="picker-btn confirm" id="confirm-frame-picker-ios-btn">确定</button>
+        </div>
+        <div class="picker-body">
+            <div class="picker-container">
+                <div class="picker-options">
+                    <!-- 选项将由JS生成 -->
+                </div>
+                <div class="picker-highlight"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 <div id="world-book-category-manager-modal" class="modal">
     <div class="modal-content" style="height: 60%;">
         <div class="modal-header">
@@ -15110,6 +15370,100 @@ async function deleteCategory(categoryId) {
 
 // ▼▼▼ 【全新】钱包、零钱、账单功能核心函数 ▼▼▼
 
+// ▼▼▼ 【全新】手机外框功能核心函数 ▼▼▼
+
+/**
+ * 根据设置应用手机外框样式
+ */
+function applyPhoneFrameStyle() {
+    const frame = document.getElementById('phone-frame');
+    const frameStyle = state.globalSettings.phoneFrame || 'white';
+    // 先移除所有可能的颜色类，再添加正确的那个
+    frame.classList.remove('frame-white', 'frame-black', 'frame-rose-gold');
+    frame.classList.add(`frame-${frameStyle}`);
+}
+
+/**
+ * 【V3 - 最终尺寸】
+ * 根据设置应用手机外框样式，并调整屏幕尺寸
+ */
+function applyPhoneFrameStyle() {
+    const frame = document.getElementById('phone-frame');
+    const screen = document.getElementById('phone-screen');
+    const frameStyle = state.globalSettings.phoneFrame || 'white';
+
+    // 1. 切换外框样式
+    frame.classList.remove('frame-white', 'frame-black', 'frame-rose-gold', 'frame-se');
+    frame.classList.add(`frame-${frameStyle}`);
+
+    // 2. 【核心】根据机型调整屏幕尺寸和缩放
+    if (frameStyle === 'se') {
+        // 【最终尺寸】将高度从622px进一步压缩到592px，视觉上更协调
+        const seHeight = '592px';
+        const originalHeight = 650;
+        const scaleFactor = 592 / originalHeight;
+
+        screen.style.setProperty('--screen-height', seHeight);
+        // 通过 scale 来缩小内容，避免布局错乱
+        screen.style.transform = `scale(${scaleFactor})`;
+        screen.style.transformOrigin = 'top center'; // 从顶部中心开始缩放
+    } else {
+        // 恢复为默认全面屏尺寸
+        screen.style.setProperty('--screen-height', '650px');
+        screen.style.transform = 'scale(1)';
+    }
+}
+
+
+/**
+ * 【V4 - 居中磨砂弹窗版】打开手机框滚动选择器
+ */
+function openFramePicker() {
+    const modal = document.getElementById('frame-picker-modal-ios');
+    const optionsContainer = modal.querySelector('.picker-options');
+    optionsContainer.innerHTML = ''; // 清空旧选项
+
+    const frameOptions = [
+        { value: 'white', text: '白色' },
+        { value: 'black', text: '黑色' },
+        { value: 'rose-gold', text: '玫瑰金色' },
+        { value: 'se', text: 'iPhone SE' } // 新增SE选项
+    ];
+
+    // 为列表上下添加空白占位符，确保第一项和最后一项能滚到中心
+    const placeholderCount = 2;
+    for (let i = 0; i < placeholderCount; i++) {
+        optionsContainer.innerHTML += '<div class="picker-option"></div>';
+    }
+
+    // 填充真实选项
+    frameOptions.forEach(opt => {
+        const optionEl = document.createElement('div');
+        optionEl.className = 'picker-option';
+        optionEl.dataset.value = opt.value;
+        optionEl.textContent = opt.text;
+        optionsContainer.appendChild(optionEl);
+    });
+
+    // 添加底部空白占位符
+    for (let i = 0; i < placeholderCount; i++) {
+        optionsContainer.innerHTML += '<div class="picker-option"></div>';
+    }
+    
+    modal.classList.add('visible');
+
+    // 滚动到当前选中的选项
+    const currentChoice = state.globalSettings.phoneFrame || 'white';
+    const currentOptionEl = optionsContainer.querySelector(`.picker-option[data-value="${currentChoice}"]`);
+    if (currentOptionEl) {
+        setTimeout(() => {
+             currentOptionEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+        }, 50);
+    }
+}
+
+// ▲▲▲ 新函数粘贴结束 ▲▲▲
+
 /**
  * 渲染钱包主页
  */
@@ -15426,6 +15780,14 @@ updateWeatherWidget();
             initBatteryManager(); 
 
 applyAppIcons();
+
+
+            // 【核心新增】在页面加载时，读取并应用已保存的手机框样式
+            const savedFrame = localStorage.getItem('ephone-frame-style');
+            if (savedFrame) {
+                state.globalSettings.phoneFrame = savedFrame;
+            }
+            applyPhoneFrameStyle(); // 无论是否有保存，都在启动时应用一次样式
 
             // ==========================================================
             // --- 各种事件监听器 ---
@@ -17679,6 +18041,7 @@ state.globalSettings = globalSettings || {
     id: 'main', 
     wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', 
     fontUrl: '', 
+    phoneFrame: 'white', // <--- 添加这一行
     notchOpacity: 100, // <--- 添加这一行
     // ... 其他设置
 };
@@ -17711,6 +18074,86 @@ document.getElementById('notch-opacity-slider').addEventListener('input', (e) =>
 });
 
 // ▲▲▲ 新增JS逻辑结束 ▲▲▲
+
+// ▼▼▼ 【全新V4】为iOS风格居中磨砂滚动选择器绑定事件 ▼▼▼
+// ▼▼▼ 【全新】为SE机型的Home键绑定双击返回主页事件 ▼▼▼
+document.querySelector('.home-button').addEventListener('dblclick', () => {
+    // 无论当前在哪一个页面，都直接调用显示主屏幕的函数
+    showScreen('home-screen');
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
+document.getElementById('frame-picker-btn').addEventListener('click', openFramePicker);
+
+// 取消按钮
+document.getElementById('cancel-frame-picker-ios-btn').addEventListener('click', () => {
+    document.getElementById('frame-picker-modal-ios').classList.remove('visible');
+    // 恢复到保存前的样式
+    applyPhoneFrameStyle();
+});
+
+// 确定按钮
+document.getElementById('confirm-frame-picker-ios-btn').addEventListener('click', () => {
+    const modal = document.getElementById('frame-picker-modal-ios');
+    const optionsContainer = modal.querySelector('.picker-options');
+    
+    // 计算哪个选项在中间
+    const containerRect = optionsContainer.getBoundingClientRect();
+    const centerLine = containerRect.top + (containerRect.height / 2);
+    
+    let closestOption = null;
+    let minDistance = Infinity;
+
+    optionsContainer.querySelectorAll('.picker-option[data-value]').forEach(opt => {
+        const optRect = opt.getBoundingClientRect();
+        const optCenter = optRect.top + (optRect.height / 2);
+        const distance = Math.abs(centerLine - optCenter);
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestOption = opt;
+        }
+    });
+
+    if (closestOption) {
+        const selectedValue = closestOption.dataset.value;
+        // 保存选择
+        state.globalSettings.phoneFrame = selectedValue;
+        // 【核心新增】将用户的选择保存到浏览器的本地存储中
+        localStorage.setItem('ephone-frame-style', selectedValue);
+        // 更新设置页面的显示文字
+        document.getElementById('current-frame-choice').textContent = closestOption.textContent;
+        // 最终应用样式
+        applyPhoneFrameStyle();
+    }
+    
+    modal.classList.remove('visible');
+});
+
+// 滚动时实时预览（可选，但体验更好）
+document.querySelector('#frame-picker-modal-ios .picker-options').addEventListener('scroll', () => {
+    const modal = document.getElementById('frame-picker-modal-ios');
+    const optionsContainer = modal.querySelector('.picker-options');
+    const containerRect = optionsContainer.getBoundingClientRect();
+    const centerLine = containerRect.top + (containerRect.height / 2);
+    let closestOption = null;
+    let minDistance = Infinity;
+    optionsContainer.querySelectorAll('.picker-option[data-value]').forEach(opt => {
+        const optRect = opt.getBoundingClientRect();
+        const optCenter = optRect.top + (optRect.height / 2);
+        const distance = Math.abs(centerLine - optCenter);
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestOption = opt;
+        }
+    });
+    if (closestOption) {
+        const frame = document.getElementById('phone-frame');
+        const selectedValue = closestOption.dataset.value;
+        // 临时应用样式以供预览
+        frame.classList.remove('frame-white', 'frame-black', 'frame-rose-gold', 'frame-se');
+        frame.classList.add(`frame-${selectedValue}`);
+    }
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
 document.getElementById('chat-messages').addEventListener('click', (e) => {
     // 1. 向上查找被点击的元素是否在一个消息气泡内
     const bubble = e.target.closest('.message-bubble');
