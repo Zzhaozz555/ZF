@@ -19,20 +19,17 @@
 }
 /* 白色外框 (默认) */
 #phone-frame.frame-white {
-    background-color: #fff;
+    background: var(--device-main-color, #fff);
     box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1);
 }
+
 /* 黑色外框 */
 #phone-frame.frame-black {
-    background-color: #1a1a1c;
+    background: var(--device-main-color, #1a1a1c);
     box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.3);
 }
-/* 【全新】玫瑰金色外框 */
-#phone-frame.frame-rose-gold {
-    background: linear-gradient(145deg, #f9e0c9, #e6c9a3 40%, #e8cbb0 60%, #f9e0c9);
-    box-shadow: 0 20px 50px rgba(102, 88, 72, 0.3), inset 0 2px 4px rgba(255, 245, 235, 0.5), inset 0 -2px 3px rgba(112, 92, 75, 0.2);
-}
-/* ▲▲▲ 重构结束 ▲▲▲ */       
+
+/* ▲▲▲ 重构结束 ▲▲▲ */      
                 .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 130px; height: 28px; background-color: #000000; border-radius: 0 0 15px 15px; z-index: 20; }
                #phone-screen { width: var(--screen-width); height: var(--screen-height); background-color: #000; border-radius: 40px; position: relative; overflow: hidden; display: flex; flex-direction: column; border: 2px solid #000000; }                       #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; /* 移除了 mix-blend-mode */ }
                 /* ▼▼▼ 【核心修正】为电池图标区域重新启用点击事件 ▼▼▼ */
@@ -3790,7 +3787,7 @@
     ================================================
     */
 
-    background: linear-gradient(to bottom, #fdfdfd, #f6f6f6);
+        background: var(--device-main-color, linear-gradient(to bottom, #fdfdfd, #f6f6f6));
     box-shadow: 0 15px 40px rgba(0,0,0,0.22), inset 0 1px 1px #fff, inset 0 -1px 1px rgba(0,0,0,0.1);
     padding: var(--se-top-bezel-height) var(--se-horizontal-padding) var(--se-bottom-bezel-height);
     border: 1px solid var(--outer-border-color);
@@ -3896,7 +3893,7 @@
     aspect-ratio: 1 / 1.1; 
     border-radius: 60px;
     padding: 18px;
-    background: #e0e1e2;
+    background: var(--device-main-color, #e0e1e2);
     box-shadow: 0 20px 50px rgba(0,0,0,0.25), inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
@@ -3937,7 +3934,7 @@
     right: var(--series-button-right);  /* 应用左右位置 */
     width: var(--series-button-width);  /* 应用宽度 */
     height: var(--series-button-height);/* 应用高度 */
-    background: #d0d1d2;
+    background: var(--side-button-color, #d0d1d2);
     border-radius: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
@@ -3983,6 +3980,39 @@
 
 /* === 【全新】iOS风格的Toggle Switch开关样式 === */
 
+/* ▲▲▲ 新增CSS结束 ▲▲▲ */
+
+/* ▼▼▼ 【全新】颜色选择器UI样式 ▼▼▼ */
+.color-preview-box {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff; /* 默认背景 */
+}
+.settings-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+}
+.modal-footer-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    font-size: 17px;
+    color: #007bff;
+    cursor: pointer;
+}
+.modal-footer-btn.confirm {
+    font-weight: 600;
+}
+.modal-footer-btn:first-child {
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
 /* ▲▲▲ 新增CSS结束 ▲▲▲ */
 
 /* ▼▼▼ 【全新V3】iOS风格居中磨砂滚动选择器样式 ▼▼▼ */
@@ -5391,6 +5421,41 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-weight: 600;
 }
 
+/* ▼▼▼ 【全新】颜色输入弹窗样式修正（带圆角） ▼▼▼ */
+#color-input-modal .custom-modal-ios {
+    /* 覆盖电池弹窗的深色背景，改为浅色磨砂 */
+    background-color: rgba(240, 240, 240, 0.85); /* 默认浅灰色磨砂 */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    color: var(--text-primary); /* 文字颜色适应日夜模式 */
+    border-radius: 14px; /* 添加圆角 */
+}
+#color-input-modal .custom-modal-header {
+    color: var(--text-primary); /* 标题颜色适应日夜模式 */
+}
+#color-input-modal .custom-modal-body {
+    padding: 15px; /* 调整内边距，确保内容不贴边 */
+    color: var(--text-secondary); /* 内容文字颜色适应日夜模式 */
+}
+#color-input-modal .custom-modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1); /* 分隔线颜色 */
+}
+/* 夜间模式适配 */
+#phone-screen.dark-mode #color-input-modal .custom-modal-ios {
+    background-color: rgba(45, 45, 45, 0.85); /* 夜间模式下的深灰色磨砂 */
+    color: #ffffff; /* 夜间模式下文字为白色 */
+}
+#phone-screen.dark-mode #color-input-modal .custom-modal-header {
+    color: #ffffff; /* 夜间模式下标题为白色 */
+}
+#phone-screen.dark-mode #color-input-modal .custom-modal-body {
+    color: #e0e0e0; /* 夜间模式下内容文字为浅灰色 */
+}
+#phone-screen.dark-mode #color-input-modal .custom-modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.2); /* 夜间模式下分隔线颜色 */
+}
+/* ▲▲▲ 颜色输入弹窗样式修正（带圆角）结束 ▲▲▲ */
+
 /* === 状态栏电池图标新样式 === */
 .battery-icon {
     display: flex;
@@ -6155,13 +6220,32 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span id="notch-opacity-value">100%</span>
                 </div>
             </div>
-            <!-- 分割线 -->
+                                    <!-- 分割线 -->
             <hr class="card-divider">
-            <!-- 手机选择-->
-            <div id="frame-picker-btn" class="settings-item" style="cursor: pointer;">
-                <label>手机选择</label>
+
+            <!-- 设备选择 -->
+            <div id="frame-picker-btn" class="settings-item">
+                <label>设备选择</label>
                 <div class="current-value-display">
                     <span id="current-frame-choice">白色</span>
+                    <span class="arrow-right">›</span>
+                </div>
+            </div>
+
+            <!-- 【全新】设备颜色 -->
+            <div id="device-color-picker" class="settings-item">
+                <label>设备颜色</label>
+                <div class="current-value-display">
+                    <div id="current-color-display" class="color-preview-box"></div>
+                    <span class="arrow-right">›</span>
+                </div>
+            </div>
+
+            <!-- 【全新】侧钮颜色 (默认隐藏) -->
+            <div id="side-button-color-picker" class="settings-item" style="display: none;">
+                <label>侧钮颜色</label>
+                <div class="current-value-display">
+                    <div id="current-side-button-color-display" class="color-preview-box"></div>
                     <span class="arrow-right">›</span>
                 </div>
             </div>
@@ -7064,6 +7148,21 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 <!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
 
+<!-- ▼▼▼ 【全新】颜色输入弹窗 ▼▼▼ -->
+<div id="color-input-modal" class="modal">
+    <div class="custom-modal-ios" style="width: 280px;">
+        <div class="custom-modal-header" id="color-modal-title">输入颜色代码</div>
+        <div class="custom-modal-body" style="padding: 15px;">
+            <input type="text" id="color-input-field" class="settings-input" placeholder="#FFFFFF">
+        </div>
+        <div class="custom-modal-footer" style="border-top: 1px solid rgba(0,0,0,0.1);">
+            <button id="cancel-color-input-btn" class="modal-footer-btn">取消</button>
+            <button id="confirm-color-input-btn" class="modal-footer-btn confirm">确定</button>
+        </div>
+    </div>
+</div>
+<!-- ▲▲▲ 新HTML粘贴结束 ▲▲▲ -->
+
 <!-- ▼▼▼ 【全新】世界书分类管理模态框 ▼▼▼ -->
 <!-- ▼▼▼ 【全新V3】iOS风格滚动选择器弹窗 (居中磨砂版) ▼▼▼ -->
 <div id="frame-picker-modal-ios" class="modal">
@@ -7345,7 +7444,7 @@ input:checked + .slider:before { transform: translateX(20px); }
         // ===================================================================
         const db = new Dexie('GeminiChatDB');
         // --- 已修正 ---
-        let state = { chats: {}, activeChatId: null, globalSettings: {}, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
+                let state = { chats: {}, activeChatId: null, globalSettings: { customDeviceColor: null, customSideButtonColor: null }, apiConfig: {}, userStickers: [], worldBooks: [], personaPresets: [], qzoneSettings: {}, activeAlbumId: null };
         // --- 修正结束 ---
 let musicState = { 
     isActive: false, 
@@ -7515,6 +7614,63 @@ function showCustomPrompt(title, placeholder, initialValue = '', type = 'text', 
     });
 }
 // ▲▲▲ 替换结束 ▲▲▲
+
+// ▼▼▼ 【全新】颜色应用、保存与加载的核心逻辑 ▼▼▼
+
+// 当前正在编辑的颜色目标 ('device' 或 'sideButton')
+let currentEditingColorTarget = null; 
+
+/**
+ * 【重写】应用所有自定义颜色（适配独立记忆和实时预览）
+ */
+function applyAllCustomColors() {
+    const frame = document.getElementById('phone-frame');
+    const currentFrameStyle = state.globalSettings.phoneFrame;
+
+    // 确保颜色存储对象存在，防止访问 undefined 报错
+    state.globalSettings.customDeviceColors = state.globalSettings.customDeviceColors || {};
+    state.globalSettings.customSideButtonColors = state.globalSettings.customSideButtonColors || {};
+
+    // 获取当前设备对应的自定义颜色
+    const deviceColor = state.globalSettings.customDeviceColors[currentFrameStyle];
+    const sideButtonColor = state.globalSettings.customSideButtonColors[currentFrameStyle];
+
+    // 1. 应用设备主颜色
+    const currentColorDisplay = document.getElementById('current-color-display');
+    if (deviceColor) {
+        frame.style.setProperty('--device-main-color', deviceColor);
+        if (currentColorDisplay) currentColorDisplay.style.backgroundColor = deviceColor;
+    } else {
+        frame.style.removeProperty('--device-main-color');
+        // 如果没有自定义颜色，则显示当前设备的默认颜色
+        if (currentColorDisplay) currentColorDisplay.style.backgroundColor = getDefaultColorForFrame(currentFrameStyle);
+    }
+
+    // 2. 应用侧边按钮颜色
+    const currentSideButtonColorDisplay = document.getElementById('current-side-button-color-display');
+    if (sideButtonColor) {
+        frame.style.setProperty('--side-button-color', sideButtonColor);
+        if (currentSideButtonColorDisplay) currentSideButtonColorDisplay.style.backgroundColor = sideButtonColor;
+    } else {
+        frame.style.removeProperty('--side-button-color');
+        // 侧边按钮默认色
+        if (currentSideButtonColorDisplay) currentSideButtonColorDisplay.style.backgroundColor = '#d0d1d2';
+    }
+}
+
+/**
+ * 根据当前的设备类型，获取其默认颜色
+ */
+function getDefaultColorForFrame(frameStyle) {
+    switch(frameStyle) {
+        case 'black': return '#1a1a1c';
+        case 'se': return '#f6f6f6';
+        case 'series': return '#e0e1e2';
+        case 'white':
+        default: return '#fcfcfc';
+    }
+}
+// ▲▲▲ 核心逻辑结束 ▲▲▲
 
         // ===================================================================
         // 2. 数据库结构定义
@@ -8267,16 +8423,20 @@ async function loadAllDataFromDB() {
     }, {});
     state.apiConfig = apiConfig || { id: 'main', proxyUrl: '', apiKey: '', model: '' };
 
-state.globalSettings = globalSettings || { 
-    id: 'main', 
-    wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)', 
-    fontUrl: '', 
-    enableBackgroundActivity: false, 
+state.globalSettings = globalSettings || {
+    id: 'main',
+    wallpaper: 'linear-gradient(135deg, #89f7fe, #66a6ff)',
+    fontUrl: '',
+    enableBackgroundActivity: false,
     backgroundActivityInterval: 60,
     blockCooldownHours: 1,
-    // 【核心新增】初始化钱包余额，默认300
     walletBalance: 300.00,
-    appIcons: { ...DEFAULT_APP_ICONS }
+    appIcons: { ...DEFAULT_APP_ICONS },
+    phoneFrame: 'white', // 默认手机框为白色
+    notchOpacity: 100, // 默认刘海屏不透明
+    // 【核心修改】将颜色存储改为对象，键为frame类型
+    customDeviceColors: {}, 
+    customSideButtonColors: {},
 };
 // ▲▲▲ 添加结束 ▲▲▲ -->
 
@@ -8667,20 +8827,41 @@ chatScreen.style.backgroundColor = chat.settings.background ? 'transparent' : (i
         function loadMoreMessages() { const messagesContainer = document.getElementById('chat-messages'); const chat = state.chats[state.activeChatId]; if (!chat) return; const loadMoreBtn = document.getElementById('load-more-btn'); if (loadMoreBtn) loadMoreBtn.remove(); const totalMessages = chat.history.length; const nextSliceStart = totalMessages - currentRenderedCount - MESSAGE_RENDER_WINDOW; const nextSliceEnd = totalMessages - currentRenderedCount; const messagesToPrepend = chat.history.slice(Math.max(0, nextSliceStart), nextSliceEnd); const oldScrollHeight = messagesContainer.scrollHeight; messagesToPrepend.reverse().forEach(msg => prependMessage(msg, chat)); currentRenderedCount += messagesToPrepend.length; const newScrollHeight = messagesContainer.scrollHeight; messagesContainer.scrollTop += (newScrollHeight - oldScrollHeight); if (totalMessages > currentRenderedCount) { prependLoadMoreButton(messagesContainer); } }
 
 // ▼▼▼ 用这个【新版本】替换旧的 renderWallpaperScreen 函数 ▼▼▼
-function renderWallpaperScreen() { 
-    const preview = document.getElementById('wallpaper-preview'); 
-    const bg = newWallpaperBase64 || state.globalSettings.wallpaper; 
-    if (bg && bg.startsWith('data:image')) { 
-        preview.style.backgroundImage = `url(${bg})`; 
-        preview.textContent = ''; 
-    } else if(bg) { 
-        preview.style.backgroundImage = bg; 
-        preview.textContent = '当前为渐变色'; 
+function renderWallpaperScreen() {
+    const preview = document.getElementById('wallpaper-preview');
+    const bg = newWallpaperBase64 || state.globalSettings.wallpaper;
+    if (bg && bg.startsWith('data:image')) {
+        preview.style.backgroundImage = `url(${bg})`;
+        preview.textContent = '';
+    } else if(bg) {
+        preview.style.backgroundImage = bg;
+        preview.textContent = '当前为渐变色';
     }
-    // 【核心修改】在这里调用图标渲染函数
     renderIconSettings();
+
+    // 【核心修改】在渲染壁纸界面时，确保颜色预览正确显示当前选中设备的颜色
+    const currentFrameStyle = state.globalSettings.phoneFrame;
+    const currentColorDisplay = document.getElementById('current-color-display');
+    const currentSideButtonColorDisplay = document.getElementById('current-side-button-color-display');
+
+    // 如果 state.globalSettings.customDeviceColors[currentFrameStyle] 不存在，就用getDefaultColorForFrame
+    if (currentColorDisplay) {
+        currentColorDisplay.style.backgroundColor = state.globalSettings.customDeviceColors[currentFrameStyle] || getDefaultColorForFrame(currentFrameStyle);
+    }
+    // 如果 state.globalSettings.customSideButtonColors[currentFrameStyle] 不存在，就用默认的灰色
+    if (currentSideButtonColorDisplay) {
+        currentSideButtonColorDisplay.style.backgroundColor = state.globalSettings.customSideButtonColors[currentFrameStyle] || '#d0d1d2';
+    }
+
+    // 更新设备选择的显示文本
+    const frameOptionsMap = {
+        'white': '白色',
+        'black': '黑色',
+        'se': 'iPhone SE',
+        'series': 'Apple Series'
+    };
+    document.getElementById('current-frame-choice').textContent = frameOptionsMap[currentFrameStyle] || '白色';
 }
-// ▲▲▲ 替换结束 ▲▲▲
         window.renderWallpaperScreenProxy = renderWallpaperScreen;
 
         function applyGlobalWallpaper() { const homeScreen = document.getElementById('home-screen'); const wallpaper = state.globalSettings.wallpaper; if (wallpaper && wallpaper.startsWith('data:image')) homeScreen.style.backgroundImage = `url(${wallpaper})`; else if (wallpaper) homeScreen.style.backgroundImage = wallpaper; }
@@ -15478,8 +15659,8 @@ function applyPhoneFrameStyle() {
 }
 
 /**
- * 【V4 - 终极版，兼容Apple Watch】
- * 根据设置应用手机外框样式，并调整屏幕尺寸
+ * 【V5 - 终极版，集成颜色系统】
+ * 根据设置应用手机外框样式，并调整屏幕尺寸和颜色
  */
 function applyPhoneFrameStyle() {
     const frame = document.getElementById('phone-frame');
@@ -15487,29 +15668,34 @@ function applyPhoneFrameStyle() {
     const frameStyle = state.globalSettings.phoneFrame || 'white';
 
     // 1. 切换外框样式
-    frame.classList.remove('frame-white', 'frame-black', 'frame-rose-gold', 'frame-se', 'frame-series');
+    frame.className = 'frame'; // 先重置为基础class
     frame.classList.add(`frame-${frameStyle}`);
 
-    // 2. 【核心】根据机型调整屏幕尺寸和缩放
+    // 2. 根据机型调整屏幕尺寸
     if (frameStyle === 'se') {
         const seHeight = '580px';
         const originalHeight = 650;
         const scaleFactor = 580 / originalHeight;
-        screen.style.setProperty('--screen-width', '350px'); // 确保是默认宽度
+        screen.style.setProperty('--screen-width', '350px');
         screen.style.setProperty('--screen-height', seHeight);
         screen.style.transform = `scale(${scaleFactor})`;
         screen.style.transformOrigin = 'top center';
     } else if (frameStyle === 'series') {
-        // 对于手表，直接将屏幕容器变为正方形
         screen.style.setProperty('--screen-width', '350px');
-        screen.style.setProperty('--screen-height', '350px');
-        screen.style.transform = 'scale(1)'; // 不进行缩放，依靠CSS压缩内容
+        screen.style.setProperty('--screen-height', `calc(350px * 1.1)`);
+        screen.style.transform = 'scale(1)';
     } else {
-        // 恢复为默认全面屏尺寸
         screen.style.setProperty('--screen-width', '350px');
         screen.style.setProperty('--screen-height', '650px');
         screen.style.transform = 'scale(1)';
     }
+
+    // 3. 【核心】根据机型显示/隐藏侧钮颜色选项
+    const sideButtonPicker = document.getElementById('side-button-color-picker');
+    sideButtonPicker.style.display = (frameStyle === 'series') ? 'flex' : 'none';
+
+    // 4. 【核心】应用所有自定义颜色
+    applyAllCustomColors();
 }
 
 
@@ -15521,12 +15707,11 @@ function openFramePicker() {
     const optionsContainer = modal.querySelector('.picker-options');
     optionsContainer.innerHTML = ''; // 清空旧选项
 
-    const frameOptions = [
+        const frameOptions = [
         { value: 'white', text: '白色' },
         { value: 'black', text: '黑色' },
-        { value: 'rose-gold', text: '玫瑰金色' },
         { value: 'se', text: 'iPhone SE' },
-        { value: 'series', text: 'Apple Series' } // 新增Series选项
+        { value: 'series', text: 'Apple Series' }
     ];
 
     // 为列表上下添加空白占位符，确保第一项和最后一项能滚到中心
@@ -15880,13 +16065,28 @@ updateWeatherWidget();
 
 applyAppIcons();
 
+// 【核心修改】在页面加载时，从localStorage加载独立颜色数据
+const savedCustomDeviceColors = localStorage.getItem('custom-device-colors');
+if (savedCustomDeviceColors) {
+    state.globalSettings.customDeviceColors = JSON.parse(savedCustomDeviceColors);
+}
+const savedCustomSideButtonColors = localStorage.getItem('custom-side-button-colors');
+if (savedCustomSideButtonColors) {
+    state.globalSettings.customSideButtonColors = JSON.parse(savedCustomSideButtonColors);
+}
 
-            // 【核心新增】在页面加载时，读取并应用已保存的手机框样式
+                        // 【核心新增】在页面加载时，读取并应用已保存的手机框样式及颜色
             const savedFrame = localStorage.getItem('ephone-frame-style');
             if (savedFrame) {
                 state.globalSettings.phoneFrame = savedFrame;
             }
-            applyPhoneFrameStyle(); // 无论是否有保存，都在启动时应用一次样式
+            // 加载自定义颜色
+            state.globalSettings.customDeviceColor = localStorage.getItem('custom-device-color');
+            state.globalSettings.customSideButtonColor = localStorage.getItem('custom-side-button-color');
+            
+            applyPhoneFrameStyle(); // 启动时应用所有样式和颜色
+
+
 
             // ==========================================================
             // --- 各种事件监听器 ---
@@ -16046,8 +16246,14 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
         state.globalSettings.wallpaper = newWallpaperBase64;
         changesMade = true;
     }
+    
+    // 【核心修改】保存所有独立颜色数据到localStorage
+    localStorage.setItem('custom-device-colors', JSON.stringify(state.globalSettings.customDeviceColors));
+    localStorage.setItem('custom-side-button-colors', JSON.stringify(state.globalSettings.customSideButtonColors));
 
-    // 【核心修改】保存图标设置（它已经在内存中了，我们只需要把整个globalSettings存起来）
+    // 保存所有其他全局设置
+    // 注意：db.globalSettings.put 会保存整个 state.globalSettings 对象，
+    // 所以 customDeviceColors 和 customSideButtonColors 也会被保存
     await db.globalSettings.put(state.globalSettings);
 
     // 应用所有更改
@@ -16056,6 +16262,7 @@ document.getElementById('save-wallpaper-btn').addEventListener('click', async ()
         newWallpaperBase64 = null;
     }
     applyAppIcons(); // 重新应用所有图标
+    applyPhoneFrameStyle(); // 重新应用手机框和颜色（这将调用 applyAllCustomColors）
 
     alert('外观设置已保存并应用！');
     showScreen('home-screen');
@@ -18184,6 +18391,48 @@ document.querySelector('.home-button').addEventListener('dblclick', () => {
 // ▼▼▼ 【全新】为手表侧边按钮绑定单击返回主页事件 ▼▼▼
 document.querySelector('.series-side-button').addEventListener('click', () => {
     showScreen('home-screen');
+});
+// ▲▲▲ 新增代码结束 ▲▲▲
+// ▼▼▼ 【全新】为颜色选择器和弹窗绑定事件 ▼▼▼
+document.getElementById('device-color-picker').addEventListener('click', () => {
+    currentEditingColorTarget = 'device';
+    document.getElementById('color-modal-title').textContent = '输入设备颜色代码';
+    // 【核心修改】从正确的独立存储中加载当前选中设备框的自定义颜色
+    document.getElementById('color-input-field').value = (state.globalSettings.customDeviceColors[state.globalSettings.phoneFrame] || '').trim();
+    document.getElementById('color-input-modal').classList.add('visible');
+});
+document.getElementById('side-button-color-picker').addEventListener('click', () => {
+    currentEditingColorTarget = 'sideButton';
+    document.getElementById('color-modal-title').textContent = '输入侧钮颜色代码';
+    // 【核心修改】从正确的独立存储中加载当前选中设备框的侧钮自定义颜色
+    document.getElementById('color-input-field').value = (state.globalSettings.customSideButtonColors[state.globalSettings.phoneFrame] || '').trim();
+    document.getElementById('color-input-modal').classList.add('visible');
+});
+document.getElementById('cancel-color-input-btn').addEventListener('click', () => {
+    document.getElementById('color-input-modal').classList.remove('visible');
+});
+document.getElementById('confirm-color-input-btn').addEventListener('click', () => {
+    const colorValue = document.getElementById('color-input-field').value.trim(); // 获取并清理输入的颜色值
+    const currentFrameStyle = state.globalSettings.phoneFrame;
+
+    // 【核心修改】将颜色存入对应设备框的独立存储中
+    if (currentEditingColorTarget === 'device') {
+        if (colorValue) {
+            state.globalSettings.customDeviceColors[currentFrameStyle] = colorValue;
+        } else {
+            // 如果用户清空了输入，就删除这个设备的自定义颜色记录，使其恢复默认
+            delete state.globalSettings.customDeviceColors[currentFrameStyle];
+        }
+    } else if (currentEditingColorTarget === 'sideButton') {
+        if (colorValue) {
+            state.globalSettings.customSideButtonColors[currentFrameStyle] = colorValue;
+        } else {
+            // 如果用户清空了输入，就删除这个设备的自定义侧钮颜色记录
+            delete state.globalSettings.customSideButtonColors[currentFrameStyle];
+        }
+    }
+    applyAllCustomColors(); // 实时预览和更新
+    document.getElementById('color-input-modal').classList.remove('visible');
 });
 // ▲▲▲ 新增代码结束 ▲▲▲
 document.getElementById('frame-picker-btn').addEventListener('click', openFramePicker);
